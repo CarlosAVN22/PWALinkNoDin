@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <title>
+        Publicar empleo | LinkNoDin
+    </title>
+    <link href="/css/estilos.css" rel="stylesheet" />
+    <link href="/css/linknodin.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/worklink-pendientes.css">
+</head>
+
+<body>
+    <header class="topbar">
+        <a class="brand" href="/doc/general/index.html">
+            <img alt="" class="brand-logo" src="/img/logo.png" />
+            <span class="brand-copy">
+                <span class="brand-title"><span class="brand-link">Link</span><span class="brand-no">No</span><span
+                        class="brand-din">Din</span></span>
+                <span class="brand-tagline">CONECTANDO OPORTUNIDADES</span>
+            </span>
+        </a>
+        <nav class="navlinks">
+            <a class="" href="/doc/general/index.html">
+                Inicio
+            </a>
+            <a class="" href="/doc/empleo/empleos.html">
+                Empleos
+            </a>
+            <a class="" href="/doc/empresa/empresas.html">
+                Empresas
+            </a>
+            <a class="" href="/doc/general/recursos.html">
+                Recursos
+            </a>
+            <a class="" href="/doc/cursos-foros/foros.html">
+                Foros
+            </a>
+        </nav>
+        <div class="actions">
+            <a class="btn btn-sm" href="/doc/general/index.html">
+                Salir al inicio
+            </a>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <h1 class="page-title">
+                Publicar empleo
+            </h1>
+            <p class="lead">
+                Completa los datos necesarios para dar a conocer una vacante.
+            </p>
+            <div class="layout">
+                <aside class="sidebar">
+                    <h4>
+                        Menú de navegación
+                    </h4>
+                    <a class="" href="/doc/empresa/empresa-panel.html">
+                        Panel empresa
+                    </a>
+                    <a class="" href="/doc/empresa/empresa-perfil.html">
+                        Perfil empresa
+                    </a>
+                    <a class="" href="/doc/empresa/empresa-vacantes.html">
+                        Mis vacantes
+                    </a>
+                    <a class="active" href="/doc/empleo/publicar.html">
+                        Publicar empleo
+                    </a>
+                    <a class="" href="/doc/empresa/empresa-candidatos.html">
+                        Candidatos
+                    </a>
+                </aside>
+                <div class="content">
+                    <form class="panel demo-form" id="ld-publish">
+                        <h3>
+                            Nueva oferta laboral
+                        </h3>
+                        <div class="grid2">
+                            <div class="field">
+                                <label>
+                                    Título del puesto
+                                </label>
+                                <input placeholder="Título del puesto" required="" type="text" />
+                            </div>
+                            <div class="field">
+                                <label>
+                                    Ubicación
+                                </label>
+                                <input placeholder="Ubicación" required="" type="text" />
+                            </div>
+                            <div class="field">
+                                <label>
+                                    Tipo de contrato
+                                </label>
+                                <input placeholder="Tipo de contrato" required="" type="text" />
+                            </div>
+                            <div class="field"><label for="ld-job-modality">Modalidad de trabajo</label><select
+                                    id="ld-job-modality" name="modalidad">
+                                    <option>Presencial</option>
+                                    <option>Remoto</option>
+                                    <option>Híbrido</option>
+                                </select></div>
+                            <div class="field">
+                                <label>
+                                    Salario aproximado
+                                </label>
+                                <input placeholder="Salario aproximado" required="" type="text" />
+                            </div>
+                            <div class="field">
+                                <label>
+                                    Experiencia requerida
+                                </label>
+                                <input placeholder="Experiencia requerida" required="" type="text" />
+                            </div>
+                            <div class="field">
+                                <label>
+                                    Correo de contacto
+                                </label>
+                                <input placeholder="Correo de contacto" required="" type="text" />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>
+                                Descripción del puesto
+                            </label>
+                            <textarea></textarea>
+                        </div>
+                        <div class="field">
+                            <label>
+                                Requisitos y beneficios
+                            </label>
+                            <textarea></textarea>
+                        </div>
+                        <button class="btn btn-primary" type="submit">
+                            Publicar vacante
+                        </button>
+                        <p aria-live="polite" class="ld-status" id="ld-status" role="status"></p>
+                        <p class="ld-muted">La vacante se guardará únicamente en este navegador y aparecerá en Empleos y
+                            en el mapa cuando la ciudad sea reconocida.</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="footer">
+        LinkNoDin · Portal de empleo
+    </footer>
+    <script src="/js/app.js">
+    </script>
+    <script src="/js/acceso-demo.js"></script>
+     <script src="/js/linknodin.js"></script>
+    <script src="/js/notificaciones.js"></script>
+    <script src="/js/worklink-pendientes.js"></script>
+</body>
+
+</html>

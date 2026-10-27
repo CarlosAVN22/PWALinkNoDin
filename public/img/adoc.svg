@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 100" role="img" aria-label="ADOC">
+  <rect width="240" height="100" rx="18" fill="#fff"/>
+  <path d="M26 66 45 29h11l19 37H62l-3-7H42l-3 7zm21-17h9l-5-11z" fill="#e56a23"/>
+  <text x="87" y="64" font-family="Arial,sans-serif" font-size="35" font-weight="800" letter-spacing="2" fill="#30343b">ADOC</text>
+</svg>

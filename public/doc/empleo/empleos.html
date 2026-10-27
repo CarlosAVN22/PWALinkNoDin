@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <title>
+        Búsqueda de empleos | LinkNoDin
+    </title>
+    <link href="/css/estilos.css" rel="stylesheet" />
+    <link href="/css/linknodin.css" rel="stylesheet" />
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+    <script defer="" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="/css/worklink-pendientes.css">
+</head>
+
+<body>
+    <header class="topbar">
+        <a class="brand" href="/doc/general/index.html">
+            <img alt="" class="brand-logo" src="/img/logo.png" />
+            <span class="brand-copy">
+                <span class="brand-title"><span class="brand-link">Link</span><span class="brand-no">No</span><span
+                        class="brand-din">Din</span></span>
+                <span class="brand-tagline">CONECTANDO OPORTUNIDADES</span>
+            </span>
+        </a>
+        <nav class="navlinks">
+            <a class="" href="/doc/general/index.html">
+                Inicio
+            </a>
+            <a class="active" href="/doc/empleo/empleos.html">
+                Empleos
+            </a>
+            <a class="" href="/doc/empresa/empresas.html">
+                Empresas
+            </a>
+            <a class="" href="/doc/general/recursos.html">
+                Recursos
+            </a>
+            <a class="" href="/doc/cursos-foros/foros.html">
+                Foros
+            </a>
+        </nav>
+        <div class="actions">
+            <a class="btn btn-sm" href="/doc/general/login.html">
+                Iniciar sesión
+            </a>
+            <a class="btn btn-primary btn-sm" href="/doc/general/registro.html">
+                Registrarse
+            </a>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <h1 class="page-title">
+                Encuentra tu próximo empleo
+            </h1>
+            <p class="lead">
+                Explora las oportunidades disponibles utilizando los filtros.
+            </p>
+            <div class="layout">
+                <aside class="sidebar">
+                    <form class="ld-filter-form" id="ld-filter-form">
+                        <div class="ld-filter-heading">
+                            <h3>Filtrar vacantes</h3><span class="ld-muted">Actualización inmediata</span>
+                        </div>
+                        <div class="field"><label for="ld-filter-keyword">Puesto o palabra clave</label><input
+                                id="ld-filter-keyword" placeholder="Ej. diseño, desarrollo" type="search" /></div>
+                        <div class="field"><label for="ld-filter-location">Ciudad</label><input id="ld-filter-location"
+                                placeholder="Ej. Santa Ana" type="search" /></div>
+                        <div class="field"><label for="ld-filter-modality">Modalidad</label><select
+                                id="ld-filter-modality">
+                                <option>Todas</option>
+                                <option>Presencial</option>
+                                <option>Remoto</option>
+                                <option>Híbrido</option>
+                            </select></div>
+                        <div class="field"><label for="ld-filter-contract">Contrato</label><select
+                                id="ld-filter-contract">
+                                <option>Todos</option>
+                                <option>Tiempo completo</option>
+                                <option>Medio tiempo</option>
+                                <option>No especificado</option>
+                            </select></div>
+                        <div class="field"><label for="ld-filter-experience">Experiencia</label><select
+                                id="ld-filter-experience">
+                                <option>Todas</option>
+                                <option>Junior</option>
+                                <option>Senior</option>
+                                <option>No especificada</option>
+                            </select></div><button class="btn btn-primary ld-block" type="submit">Aplicar
+                            filtros</button><button class="btn ld-block" id="ld-clear-filters" type="button">Limpiar
+                            filtros</button>
+                    </form>
+                </aside>
+                <div class="panel">
+                    <div class="ld-results-header">
+                        <div>
+                            <h3>Oportunidades laborales</h3>
+                            <p class="muted" id="ld-job-count">Cargando oportunidades…</p>
+                        </div>
+                        <div aria-label="Vista de empleos" class="ld-view-switch" role="group"><button
+                                data-job-view="list" type="button">☷ Lista</button><button data-job-view="map"
+                                type="button">⌖ Mapa</button></div>
+                    </div>
+                    <div id="ld-job-list-section">
+                        <div id="ld-job-list"></div>
+                        <div class="ld-empty" hidden="" id="ld-empty">
+                            <h3>No hay vacantes con esos filtros</h3>
+                            <p>Prueba con otra ciudad, modalidad o palabra clave.</p>
+                        </div>
+                    </div>
+                    <section hidden="" id="ld-map-section">
+                        <div class="ld-map-bar">
+                            <div><strong>Mapa de vacantes</strong>
+                                <p class="ld-muted" id="ld-map-result-count">Oportunidades filtradas</p>
+                            </div><span class="ld-demo-tag">Datos del prototipo</span>
+                        </div>
+                        <div aria-label="Mapa interactivo de oportunidades laborales" class="ld-map" id="ld-map"></div>
+                        <p class="ld-map-footnote" id="ld-map-error">Los marcadores representan la ciudad indicada en
+                            cada vacante.</p>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <div class="extra-wrap">
+            <section class="extra-panel">
+                <h2>Encuentra oportunidades en el mapa</h2>
+                <p>Busca ubicaciones en El Salvador mediante un mapa interactivo.</p><a class="extra-link"
+                    href="/doc/empleo/empleos.html?vista=mapa">Abrir mapa de empleos</a>
+            </section>
+        </div>
+    </main>
+    <footer class="footer">
+        LinkNoDin · Portal de empleo
+    </footer>
+    <script src="/js/app.js">
+    </script>
+    <script src="/js/acceso-demo.js"></script>
+     <script src="/js/linknodin.js"></script>
+    <script src="/js/notificaciones.js"></script>
+    <script src="/js/worklink-pendientes.js"></script>
+</body>
+
+</html>
