@@ -68,76 +68,149 @@
                     <a class="" href="/doc/admin/admin-empresas.html">
                         Empresas
                     </a>
-                    <a class="" href="/doc/admin/admin-vacantes.html">
-                        Vacantes
-                    </a>
                     <a class="active" href="/doc/admin/admin-moderacion.html">
                         Moderación
                     </a>
                     <a class="" href="/doc/admin/admin-estadisticas.html">
                         Estadísticas
                     </a>
+                    <a class="" href="/doc/admin/admin-seguridad.html">
+                        Seguridad y actividad
+                    </a>
                 </aside>
                 <div class="content">
                     <div class="panel">
-                        <h3>
-                            Publicaciones reportadas
-                        </h3>
+                        <div class="section-head">
+                            <div>
+                                <h3>Centro de confianza</h3>
+                                <p class="muted">Revisa reportes y decide qué contenido puede permanecer visible.</p>
+                            </div>
+                            <div class="moderation-header-actions">
+                                <button class="btn btn-soft" data-moderation-open="report-preview" type="button">Vista del reporte</button>
+                                <button class="btn btn-primary" data-moderation-open="rule" type="button">Configurar reglas</button>
+                            </div>
+                        </div>
+                        <div class="moderation-filters">
+                            <button class="btn btn-soft btn-sm is-active" data-moderation-filter="all" type="button">Todos <span>3</span></button>
+                            <button class="btn btn-sm" data-moderation-filter="high" type="button">Alta prioridad <span>1</span></button>
+                            <button class="btn btn-sm" data-moderation-filter="forum" type="button">Foros <span>1</span></button>
+                            <button class="btn btn-sm" data-moderation-filter="company" type="button">Empresas <span>1</span></button>
+                        </div>
                         <div class="rows">
-                            <div class="rowcard">
+                            <div class="rowcard moderation-item" data-moderation-type="company" data-moderation-priority="high" data-report-title="Comentario sobre empresa" data-report-reason="Comentario ofensivo" data-report-author="María López" data-report-date="27 de octubre de 2026 · 10:14" data-report-content="La atención recibida fue pésima y el equipo no tiene idea de lo que hace." data-report-source="Valoración de Banco Agrícola">
                                 <div>
-                                    <strong>
-                                        Comentario sobre empresa
-                                    </strong>
-                                    <p class="muted">
-                                        Reporte: lenguaje inapropiado
-                                    </p>
+                                    <span class="moderation-priority">Alta prioridad</span>
+                                    <strong>Comentario sobre empresa</strong>
+                                    <p class="muted">Reporte: lenguaje inapropiado · 2 reportes</p>
                                 </div>
                                 <div>
-                                    <button class="btn btn-soft btn-sm" data-demo="Aprobar" type="button">
-                                        Aprobar
+                                    <button class="btn btn-soft btn-sm" data-moderation-detail type="button">
+                                    Ver detalles
                                     </button>
-                                    <button class="btn btn-danger btn-sm" data-demo="Retirar" type="button">
-                                        Retirar
+                                    <button class="btn btn-soft btn-sm" data-moderation-action="keep" type="button">
+                                    Mantener visible
                                     </button>
-                                </div>
-                            </div>
-                            <div class="rowcard">
-                                <div>
-                                    <strong>
-                                        Publicación del foro
-                                    </strong>
-                                    <p class="muted">
-                                        Reporte: contenido no relacionado
-                                    </p>
-                                </div>
-                                <div>
-                                    <button class="btn btn-soft btn-sm" data-demo="Aprobar" type="button">
-                                        Aprobar
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" data-demo="Retirar" type="button">
-                                        Retirar
+                                    <button class="btn btn-danger btn-sm" data-moderation-action="remove" type="button">
+                                    Retirar comentario
                                     </button>
                                 </div>
                             </div>
-                            <div class="rowcard">
+                            <div class="rowcard moderation-item" data-moderation-type="forum" data-moderation-priority="normal" data-report-title="Publicación del foro" data-report-reason="Contenido fuera de tema" data-report-author="Carlos Rivera" data-report-date="26 de octubre de 2026 · 16:42" data-report-content="¿Alguien conoce una buena cafetería para reunirse este fin de semana?" data-report-source="Tema: Consejos para encontrar empleo">
                                 <div>
-                                    <strong>
-                                        Valoración de empleador
-                                    </strong>
-                                    <p class="muted">
-                                        Reporte: información cuestionada
-                                    </p>
+                                    <span class="moderation-priority">Prioridad normal</span>
+                                    <strong>Publicación del foro</strong>
+                                    <p class="muted">Reporte: contenido no relacionado · 1 reporte</p>
                                 </div>
                                 <div>
-                                    <button class="btn btn-soft btn-sm" data-demo="Aprobar" type="button">
-                                        Aprobar
+                                    <button class="btn btn-soft btn-sm" data-moderation-detail type="button">
+                                    Ver detalles
                                     </button>
-                                    <button class="btn btn-danger btn-sm" data-demo="Retirar" type="button">
-                                        Retirar
+                                    <button class="btn btn-soft btn-sm" data-moderation-action="keep" type="button">
+                                    Mantener visible
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" data-moderation-action="remove" type="button">
+                                    Retirar publicación
                                     </button>
                                 </div>
                             </div>
+                            <div class="rowcard moderation-item" data-moderation-type="company" data-moderation-priority="normal" data-report-title="Valoración de empleador" data-report-reason="Información cuestionada" data-report-author="Ana Martínez" data-report-date="26 de octubre de 2026 · 11:08" data-report-content="La empresa ofrece horarios y beneficios que no aparecen en la descripción de la vacante." data-report-source="Valoración de ADOC">
+                                <div>
+                                    <span class="moderation-priority">Prioridad normal</span>
+                                    <strong>Valoración de empleador</strong>
+                                    <p class="muted">Reporte: información cuestionada · 1 reporte</p>
+                                </div>
+                                <div>
+                                    <button class="btn btn-soft btn-sm" data-moderation-detail type="button">
+                                    Ver detalles
+                                    </button>
+                                    <button class="btn btn-soft btn-sm" data-moderation-action="keep" type="button">
+                                    Mantener visible
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" data-moderation-action="remove" type="button">
+                                    Retirar valoración
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="panel moderation-rules">
+                                <div class="section-head">
+                                    <h3>Reglas activas</h3>
+                                    <span class="tag">Automatización del prototipo</span>
+                                </div>
+                                <div class="rowcard moderation-rule" data-rule-name="Lenguaje ofensivo" data-rule-action="Enviar a revisión" data-rule-threshold="2">
+                                    <div><strong>Lenguaje ofensivo</strong><p class="muted">Enviar a revisión si recibe 2 reportes.</p></div>
+                                    <div>
+                                        <button class="rule-status is-active" data-rule-toggle aria-pressed="true" type="button">Activa</button>
+                                        <button class="btn btn-soft btn-sm" data-rule-action="edit" type="button">Editar</button>
+                                        <button class="btn btn-danger btn-sm" data-rule-action="delete" type="button">Eliminar</button>
+                                    </div>
+                                </div>
+                                <div class="rowcard moderation-rule" data-rule-name="Contenido fuera de tema" data-rule-action="Solicitar revisión" data-rule-threshold="1">
+                                    <div><strong>Contenido fuera de tema</strong><p class="muted">Solicitar revisión del moderador.</p></div>
+                                    <div>
+                                        <button class="rule-status is-active" data-rule-toggle aria-pressed="true" type="button">Activa</button>
+                                        <button class="btn btn-soft btn-sm" data-rule-action="edit" type="button">Editar</button>
+                                        <button class="btn btn-danger btn-sm" data-rule-action="delete" type="button">Eliminar</button>
+                                    </div>
+                                </div>
+                                <div class="rowcard moderation-rule" data-rule-name="Información falsa o engañosa" data-rule-action="Enviar a revisión" data-rule-threshold="2">
+                                    <div><strong>Información falsa o engañosa</strong><p class="muted">Enviar a revisión si recibe 2 reportes.</p></div>
+                                    <div><button class="rule-status is-active" data-rule-toggle aria-pressed="true" type="button">Activa</button><button class="btn btn-soft btn-sm" data-rule-action="edit" type="button">Editar</button><button class="btn btn-danger btn-sm" data-rule-action="delete" type="button">Eliminar</button></div>
+                                </div>
+                                <div class="rowcard moderation-rule" data-rule-name="Acoso o discriminación" data-rule-action="Ocultar temporalmente" data-rule-threshold="1">
+                                    <div><strong>Acoso o discriminación</strong><p class="muted">Ocultar temporalmente si recibe 1 reporte.</p></div>
+                                    <div><button class="rule-status is-active" data-rule-toggle aria-pressed="true" type="button">Activa</button><button class="btn btn-soft btn-sm" data-rule-action="edit" type="button">Editar</button><button class="btn btn-danger btn-sm" data-rule-action="delete" type="button">Eliminar</button></div>
+                                </div>
+                            </div>
+                        </div>
+                                <div class="moderation-detail-backdrop" id="moderation-detail-modal" hidden>
+                                    <section class="moderation-detail-modal" role="dialog" aria-modal="true" aria-labelledby="moderation-detail-title">
+                                        <div class="admin-modal-head"><div><span class="ld-overline">Reporte recibido</span><h2 id="moderation-detail-title">Detalle del contenido</h2></div><button class="admin-modal-close" data-moderation-close type="button" aria-label="Cerrar detalles">&times;</button></div>
+                                        <div class="moderation-content-preview"><small>Contenido reportado</small><blockquote data-report-content></blockquote></div>
+                                        <div class="moderation-detail-grid"><div><small>Motivo</small><strong data-report-reason></strong></div><div><small>Reportado por</small><strong data-report-author></strong></div><div><small>Fecha</small><strong data-report-date></strong></div><div><small>Área de origen</small><strong data-report-source></strong></div></div>
+                                        <p class="moderation-detail-note">Puedes consultar el área de origen para revisar el contexto completo antes de decidir.</p>
+                                        <div class="admin-modal-actions"><button class="btn" data-moderation-close type="button">Cerrar</button><button class="btn btn-soft" data-moderation-source type="button">Ir al contenido de origen</button></div>
+                                    </section>
+                                </div>
+                                <div class="moderation-report-backdrop" id="moderation-report-modal" hidden>
+                                    <section class="moderation-report-modal" role="dialog" aria-modal="true" aria-labelledby="moderation-report-title">
+                                        <div class="admin-modal-head"><div><span class="ld-overline">Así lo verá la comunidad</span><h2 id="moderation-report-title">Reportar contenido</h2></div><button class="admin-modal-close" data-moderation-close type="button" aria-label="Cerrar formulario">&times;</button></div>
+                                        <p class="muted">Selecciona el motivo que mejor describa el problema. Los reportes llegan al centro de moderación para su revisión.</p>
+                                        <label for="report-reason">Motivo del reporte</label>
+                                        <select id="report-reason">
+                                            <option>Comentario ofensivo o lenguaje inapropiado</option>
+                                            <option>Contenido fuera de tema</option>
+                                            <option>Acoso, discriminación o amenazas</option>
+                                            <option>Información falsa o engañosa</option>
+                                            <option>Spam o publicidad no solicitada</option>
+                                            <option>Datos personales expuestos</option>
+                                            <option>Otro motivo</option>
+                                        </select>
+                                        <label for="report-description">Cuéntanos qué ocurre <span class="muted">(opcional)</span></label>
+                                        <textarea id="report-description" rows="4" placeholder="Agrega contexto para ayudar a revisar el reporte"></textarea>
+                                        <p class="moderation-report-disclaimer">No se notificará públicamente quién realizó el reporte. Evita compartir contraseñas u otros datos sensibles.</p>
+                                        <div class="admin-modal-actions"><button class="btn" data-moderation-close type="button">Cancelar</button><button class="btn btn-primary" data-report-submit type="button">Enviar reporte</button></div>
+                                    </section>
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -147,12 +220,37 @@
     <footer class="footer">
         LinkNoDin · Portal de empleo
     </footer>
+    <div class="admin-modal-backdrop" id="moderation-modal" hidden>
+        <section class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="moderation-modal-title">
+            <div class="admin-modal-head">
+                <h2 id="moderation-modal-title">Nueva regla de moderación</h2>
+                <button class="admin-modal-close" data-moderation-close type="button" aria-label="Cerrar modal">&times;</button>
+            </div>
+            <form id="moderation-form">
+                <label for="rule-name">Nombre de la regla</label>
+                <input id="rule-name" required type="text" placeholder="Ej. Enlaces sospechosos">
+                <label for="rule-action">Acción automática</label>
+                <select id="rule-action">
+                    <option>Enviar a revisión</option>
+                    <option>Ocultar temporalmente</option>
+                    <option>Solicitar más información</option>
+                </select>
+                <label for="rule-threshold">Umbral de reportes</label>
+                <input id="rule-threshold" min="1" required type="number" value="2">
+                <div class="admin-modal-actions">
+                    <button class="btn" data-moderation-close type="button">Cancelar</button>
+                    <button class="btn btn-primary" type="submit">Guardar regla</button>
+                </div>
+            </form>
+        </section>
+    </div>
     <script src="/js/app.js">
     </script>
     <script src="/js/acceso-demo.js"></script>
      <script src="/js/linknodin.js"></script>
     <script src="/js/notificaciones.js"></script>
     <script src="/js/worklink-pendientes.js"></script>
+    <script src="/js/admin-moderacion.js"></script>
 </body>
 
 </html>
