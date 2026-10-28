@@ -58,6 +58,17 @@
     const n = $('ld-status'); if (n) { n.textContent = message; n.dataset.kind = kind; }
   }
   function nav() {
+    // Enlace público centralizado para mantener todos los menús sincronizados.
+    const menu = document.querySelector('.navlinks');
+    if (menu && !menu.querySelector('a[href="/doc/general/opiniones.html"]')) {
+      const link = document.createElement('a');
+      link.href = '/doc/general/opiniones.html';
+      link.textContent = 'Opiniones';
+      if (location.pathname === '/doc/general/opiniones.html') link.className = 'active';
+      const resources = menu.querySelector('a[href="/doc/general/recursos.html"]');
+      if (resources) menu.insertBefore(link, resources);
+      else menu.append(link);
+    }
     const actions = document.querySelector('.actions'); if (!actions) return;
     if (current()) {
       [...actions.querySelectorAll('a')].forEach(a => { if (['login.html','registro.html'].includes(a.getAttribute('href')?.split('/').pop())) a.remove(); });

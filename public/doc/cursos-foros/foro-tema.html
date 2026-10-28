@@ -11,6 +11,7 @@
      <link href="/css/estilos.css" rel="stylesheet" />
      <link href="/css/linknodin.css" rel="stylesheet" />
      <link rel="stylesheet" href="/css/worklink-pendientes.css">
+     <link rel="stylesheet" href="/css/cursos-foros/foro-tema.css">
 </head>
 
 <body>
@@ -50,40 +51,35 @@
           </div>
      </header>
      <main>
-          <div class="container">
-               <div class="panel">
-                    <p>
-                         <a class="" href="/doc/cursos-foros/foros.html">
-                              ← Volver al foro
-                         </a>
-                    </p>
-                    <h2>
-                         ¿Cómo preparar una entrevista?
-                    </h2>
-                    <p>
-                         Estoy buscando recomendaciones para mi primera entrevista laboral.
-                    </p>
-                    <div class="note">
-                         Respuesta de ejemplo: Investiga la empresa, practica tus respuestas y prepara preguntas.
-                    </div>
-                    <form class="panel demo-form">
-                         <h3>
-                              Responder a la conversación
-                         </h3>
-                         <div class="">
-                              <div class="field">
-                                   <label>
-                                        Escribe tu respuesta
-                                   </label>
-                                   <input placeholder="Escribe tu respuesta" required="" type="text" />
-                              </div>
-                         </div>
-                         <button class="btn btn-primary" type="submit">
-                              Publicar respuesta
-                         </button>
-                    </form>
-               </div>
-          </div>
+       <div class="container ld-forum">
+         <section class="panel">
+           <p><a href="/doc/cursos-foros/foros.html">← Volver al foro</a></p>
+           <p class="muted">Comunidad profesional / Consejos laborales</p>
+           <h1 class="page-title">¿Cómo preparar una entrevista?</h1>
+           <p>Estoy buscando recomendaciones para mi primera entrevista laboral.</p>
+           <p class="muted">Publicado por Comunidad LinkNoDin · Tema de demostración</p>
+         </section>
+         <section class="panel" aria-label="Respuestas de la conversación">
+           <div class="ld-forum-heading"><h2>Respuestas</h2><span id="ld-forum-total" class="muted">0 respuestas</span></div>
+           <div id="ld-forum-answers" aria-live="polite"></div>
+         </section>
+         <section class="panel">
+           <h2>Responder a la conversación</h2>
+           <div id="ld-forum-permission" class="note" hidden></div>
+           <form id="ld-forum-form">
+             <div class="field"><label for="ld-forum-message">Tu respuesta</label><textarea id="ld-forum-message" rows="4" maxlength="1000" required placeholder="Comparte una recomendación o experiencia respetuosa"></textarea></div>
+             <div class="ld-forum-heading"><small class="muted"><span id="ld-forum-count">0</span>/1000 caracteres</small><button class="btn btn-primary" type="submit">Publicar respuesta</button></div>
+           </form>
+           <p id="ld-forum-status" role="status" class="muted" aria-live="polite"></p>
+         </section>
+       </div>
+       <div class="ld-forum-overlay" id="ld-forum-modal" hidden>
+         <div class="ld-forum-dialog panel" role="dialog" aria-modal="true" aria-labelledby="ld-forum-modal-title">
+           <h2 id="ld-forum-modal-title">Eliminar respuesta</h2>
+           <p>¿Quieres eliminar tu respuesta? Esta acción no se puede deshacer.</p>
+           <div class="ld-forum-controls"><button class="btn" type="button" id="ld-forum-cancel">Cancelar</button><button class="btn btn-primary" type="button" id="ld-forum-confirm">Eliminar respuesta</button></div>
+         </div>
+       </div>
      </main>
      <footer class="footer">
           LinkNoDin · Portal de empleo
@@ -94,6 +90,7 @@
      <script src="/js/linknodin.js"></script>
      <script src="/js/notificaciones.js"></script>
      <script src="/js/worklink-pendientes.js"></script>
+     <script defer src="/js/cursos-foros/foro-tema.js"></script>
 </body>
 
 </html>

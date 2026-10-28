@@ -11,6 +11,7 @@
       <link href="/css/estilos.css" rel="stylesheet" />
       <link href="/css/linknodin.css" rel="stylesheet" />
       <link rel="stylesheet" href="/css/worklink-pendientes.css">
+      <link rel="stylesheet" href="/css/general-recursos.css">
 </head>
 
 <body>
@@ -57,8 +58,20 @@
                   <p class="lead">
                         Artículos y materiales para prepararte mejor.
                   </p>
+                  <section class="rc-tools" aria-label="Buscar y filtrar recursos">
+                        <label for="rc-search">Buscar recursos</label>
+                        <input id="rc-search" type="search" placeholder="Buscar por tema o palabra clave">
+                        <div class="rc-filters" role="group" aria-label="Filtrar temas">
+                              <button class="rc-filter selected" type="button" data-filter="todos">Todos</button>
+                              <button class="rc-filter" type="button" data-filter="cv">Currículum</button>
+                              <button class="rc-filter" type="button" data-filter="entrevista">Entrevistas</button>
+                              <button class="rc-filter" type="button" data-filter="habilidades">Habilidades</button>
+                              <button class="rc-filter" type="button" data-filter="favoritos">Guardados</button>
+                        </div>
+                        <p id="rc-count" class="rc-count" aria-live="polite"></p>
+                  </section>
                   <div class="cards">
-                        <div class="card">
+                        <div class="card rc-resource" data-topic="cv" data-resource="cv">
                               <span class="tag">
                                     Guía
                               </span>
@@ -68,11 +81,12 @@
                               <p>
                                     Organiza tu experiencia y habilidades.
                               </p>
-                              <a class="btn btn-primary" href="/doc/cursos-foros/recurso-detalle.html">
+                              <div class="rc-actions"><button type="button" class="btn rc-preview">Vista previa</button><button type="button" class="btn rc-save" aria-pressed="false">Guardar</button></div>
+                              <a class="btn btn-primary" href="/doc/cursos-foros/recurso-detalle.html?id=cv">
                                     Leer recurso
                               </a>
                         </div>
-                        <div class="card">
+                        <div class="card rc-resource" data-topic="entrevista" data-resource="entrevista">
                               <span class="tag">
                                     Guía
                               </span>
@@ -82,11 +96,12 @@
                               <p>
                                     Prepara tus respuestas para destacar.
                               </p>
-                              <a class="btn btn-primary" href="/doc/cursos-foros/recurso-detalle.html">
+                              <div class="rc-actions"><button type="button" class="btn rc-preview">Vista previa</button><button type="button" class="btn rc-save" aria-pressed="false">Guardar</button></div>
+                              <a class="btn btn-primary" href="/doc/cursos-foros/recurso-detalle.html?id=entrevista">
                                     Leer recurso
                               </a>
                         </div>
-                        <div class="card">
+                        <div class="card rc-resource" data-topic="habilidades" data-resource="habilidades">
                               <span class="tag">
                                     Guía
                               </span>
@@ -96,11 +111,19 @@
                               <p>
                                     Conoce capacidades útiles en el mercado laboral.
                               </p>
-                              <a class="btn btn-primary" href="/doc/cursos-foros/recurso-detalle.html">
+                              <div class="rc-actions"><button type="button" class="btn rc-preview">Vista previa</button><button type="button" class="btn rc-save" aria-pressed="false">Guardar</button></div>
+                              <a class="btn btn-primary" href="/doc/cursos-foros/recurso-detalle.html?id=habilidades">
                                     Leer recurso
                               </a>
                         </div>
                   </div>
+                  <p id="rc-empty" class="rc-empty" hidden>No se encontraron recursos con esos filtros.</p>
+                  <section id="rc-detail" class="rc-detail" hidden aria-live="polite">
+                        <button type="button" id="rc-close" class="btn">Cerrar información</button>
+                        <h2 id="rc-detail-title"></h2>
+                        <ol id="rc-detail-list"></ol>
+                        <p class="rc-note">Vista previa informativa. El botón Leer recurso conserva el acceso al detalle existente.</p>
+                  </section>
             </div>
             <section class="ld-premium-strip"><span class="ld-overline">FORMACIÓN PREMIUM</span>
                   <h2>Aprende a tu ritmo con nuestros cursos</h2>
@@ -120,6 +143,7 @@
       <footer class="footer">
             LinkNoDin · Portal de empleo
       </footer>
+      <script src="/js/general/recursos.js" defer></script>
       <script src="/js/app.js">
       </script>
       <script src="/js/acceso-demo.js"></script>

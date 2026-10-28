@@ -11,6 +11,7 @@
      <link href="/css/estilos.css" rel="stylesheet" />
      <link href="/css/linknodin.css" rel="stylesheet" />
      <link rel="stylesheet" href="/css/worklink-pendientes.css">
+     <link rel="stylesheet" href="/css/general-recuperar.css">
 </head>
 
 <body>
@@ -56,9 +57,9 @@
                          Recuperar contraseña
                     </h1>
                     <p>
-                         Ingresa el correo de tu cuenta para recibir instrucciones.
+                         Ingresa el correo asociado a tu cuenta para solicitar la recuperación de contraseña.
                     </p>
-                    <form class="panel demo-form">
+                    <form class="panel demo-form" id="ld-recuperar-form" novalidate>
                          <h3>
                               Recuperación
                          </h3>
@@ -67,12 +68,14 @@
                                    <label>
                                         Correo electrónico
                                    </label>
-                                   <input placeholder="Correo electrónico" required="" type="text" />
+                                   <input id="ld-recuperar-correo" name="correo" placeholder="Correo electrónico" autocomplete="email" required="" type="email" />
                               </div>
                          </div>
                          <button class="btn btn-primary" type="submit">
-                              Enviar instrucciones
+                              Solicitar recuperación
                          </button>
+                         <p id="ld-recuperar-estado" class="ld-recuperar-estado" role="status" aria-live="polite" hidden></p>
+                         <p class="ld-recuperar-ayuda">Esta función es una demostración. No se enviará ningún correo ni se modificará tu contraseña.</p>
                     </form>
                     <p>
                          <a class="" href="/doc/general/login.html">
@@ -88,6 +91,7 @@
      <script src="/js/app.js">
      </script>
      <script src="/js/acceso-demo.js"></script>
+     <script src="/js/general/recuperar.js" defer></script>
      <script src="/js/linknodin.js"></script>
      <script src="/js/notificaciones.js"></script>
      <script src="/js/worklink-pendientes.js"></script>
