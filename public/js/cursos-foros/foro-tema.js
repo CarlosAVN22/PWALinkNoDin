@@ -1,7 +1,19 @@
 (function () {
     'use strict';
 
-    const topicId = 'entrevista-demo';
+    const requested = new URLSearchParams(location.search).get('id');
+    const customTopic = (window.LinkNoDinPublicaciones?.get()||[]).find(x=>x.tipo==='foro'&&x.id===requested&&x.estado==='aprobado');
+    const topicId = requested || 'entrevista-demo';
+    if (requested && !customTopic) {
+        document.querySelector('.ld-forum > .panel:first-child h1').textContent = 'Tema no disponible';
+        document.querySelector('.ld-forum > .panel:first-child p:nth-of-type(2)').textContent = 'Este tema no existe o todavía no fue aprobado.';
+    } else if (customTopic) {
+        const header=document.querySelector('.ld-forum > .panel:first-child');
+        header.querySelector('h1').textContent=customTopic.titulo;
+        const ps=header.querySelectorAll('p');
+        ps[1].textContent=customTopic.descripcion;
+        ps[2].textContent='Publicado por '+customTopic.autor+' · '+customTopic.categoria;
+    }
     const key = 'linknodin-foro-respuestas-' + topicId;
     const example = { id: 'ejemplo', author: 'Comunidad LinkNoDin', message: 'Investiga la empresa, practica tus respuestas y prepara preguntas sobre el puesto.', date: 'Ejemplo de respuesta', demo: true };
     const list = document.getElementById('ld-forum-answers');
@@ -20,10 +32,10 @@
     }
     function getCandidate() {
         const s = getSession();
-        if (!s || s.role !== 'candidato' || !s.email) return null;
+        if (!s || !['candidato','empresa'].includes(s.role) || !s.email) return null;
         try {
             const accounts = JSON.parse(localStorage.getItem('linknodin-v3-accounts') || '[]');
-            if (!accounts.some(a => a.role === 'candidato' && String(a.email).toLowerCase() === String(s.email).toLowerCase())) return null;
+            if (!accounts.some(a => a.role === s.role && String(a.email).toLowerCase() === String(s.email).toLowerCase())) return null;
         } catch (e) { return null; }
         return s;
     }
@@ -35,7 +47,7 @@
     function accountName(session) {
         try {
             const accounts = JSON.parse(localStorage.getItem('linknodin-v3-accounts') || '[]');
-            const a = accounts.find(x => x.email === session.email && x.role === 'candidato');
+            const a = accounts.find(x => x.email === session.email && x.role === session.role);
             return (a && (a.nombre || a.name || a.nombreCompleto)) || session.name || session.nombre || session.email;
         } catch (e) { return session.email; }
     }
@@ -47,7 +59,7 @@
     }
     function render() {
         const candidate = getCandidate();
-        const items = [example].concat(load());
+        const items = (topicId === 'entrevista-demo' && !requested ? [example] : []).concat(load());
         list.replaceChildren();
         total.textContent = items.length + (items.length === 1 ? ' respuesta' : ' respuestas');
         items.forEach(item => {
@@ -65,12 +77,12 @@
             article.append(head, element('p', '', item.message));
             list.append(article);
         });
-        const isAllowed = Boolean(candidate);
+        const isAllowed = Boolean(candidate) && (!requested || Boolean(customTopic));
         input.disabled = !isAllowed;
         form.querySelector('button[type="submit"]').disabled = !isAllowed;
         permission.hidden = isAllowed;
         if (!isAllowed) {
-            permission.replaceChildren(document.createTextNode('Para responder debes iniciar sesión como candidato. '));
+            permission.replaceChildren(document.createTextNode('Para responder debes iniciar sesión como candidato o empresa. '));
             const a = element('a', '', 'Iniciar sesión');
             a.href = '/doc/general/login.html?next=' + encodeURIComponent(location.pathname + location.search);
             permission.append(a);
@@ -80,7 +92,7 @@
     form.addEventListener('submit', event => {
         event.preventDefault();
         const candidate = getCandidate();
-        if (!candidate) return render();
+        if (!candidate || (requested && !customTopic)) return render();
         const message = input.value.trim();
         if (!message || message.length > 1000) return;
         const items = load();

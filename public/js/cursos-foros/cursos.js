@@ -16,6 +16,19 @@ document.addEventListener('DOMContentLoaded', function () {
   ];
   // Se pueden agregar URLs verificadas de YouTube que permitan inserción, por ejemplo:
   // courses[0].lessons[0][2] = 'https://www.youtube-nocookie.com/embed/ID_VERIFICADO';
+  function approvedCourses() {
+    const api=window.LinkNoDinPublicaciones;
+    if(!api)return [];
+    return api.get().filter(x=>x.tipo==='curso'&&x.estado==='aprobado').map(x=>({
+      id:x.id,title:x.titulo,description:x.descripcion,level:x.nivel||'Básico',duration:(x.duracion||30)+' min',free:true,
+      lessons:[['Presentación del curso',x.descripcion,embedURL(x.video)]]
+    }));
+  }
+  function embedURL(link) {
+    if(!link)return '';
+    try {const u=new URL(link);let id='';if(u.hostname==='youtu.be'||u.hostname==='www.youtu.be')id=u.pathname.slice(1);else if(['youtube.com','www.youtube.com'].includes(u.hostname))id=u.searchParams.get('v')||((u.pathname.match(/^\/embed\/([\w-]+)/)||[])[1]);return /^[\w-]{11}$/.test(id)?'https://www.youtube-nocookie.com/embed/'+id:'';}catch{return '';}
+  }
+  function allCourses(){return courses.concat(approvedCourses());}
   let progress = progressKey ? read(progressKey, {}) : {};
   let active = null, step = 0;
   const root = $('ld-courses'); const detail = $('cf-detail');
@@ -23,14 +36,14 @@ document.addEventListener('DOMContentLoaded', function () {
   function done(id) { return Array.isArray(progress[id]) ? progress[id] : []; }
   function render() {
     const search = $('cf-search').value.toLowerCase().trim(), level = $('cf-level').value;
-    const visible = courses.filter(c => (level === 'todos' || c.level === level) && (c.title + ' ' + c.description).toLowerCase().includes(search));
+    const visible = allCourses().filter(c => (level === 'todos' || c.level === level) && (c.title + ' ' + c.description).toLowerCase().includes(search));
     root.innerHTML = visible.length ? '<div class="cf-grid">' + visible.map(c => {
       const count = done(c.id).length, locked = !c.free && !premium;
       return `<article class="cf-card"><div class="cf-cover"><strong>${escape(c.title)}</strong><span>FORMACIÓN LINKNODIN</span></div><div class="cf-card-content"><span class="ld-overline">${c.free?'GRATUITO':'PREMIUM DE PRUEBA'}</span><h2>${escape(c.title)}</h2><p>${escape(c.description)}</p><div class="cf-tags"><span>${c.level}</span><span>${c.duration}</span><span>${c.lessons.length} lecciones</span></div><p class="cf-lock">${locked?'Disponible con Premium de demostración':candidate?'Tu progreso: '+count+'/'+c.lessons.length+' lecciones':'Catálogo público. Inicia sesión como candidato para guardar progreso.'}</p><button type="button" class="btn btn-primary" data-open-course="${c.id}">${locked?'Ver acceso':'Ver curso'}</button></div></article>`;
     }).join('') + '</div>' : '<div class="cf-empty">No encontramos cursos con esos filtros.</div>';
   }
   function showCourse(id) {
-    const course = courses.find(c => c.id === id); if (!course) return;
+    const course = allCourses().find(c => c.id === id); if (!course) return;
     if (!course.free && !premium) { location.href = '/doc/general/planes.html'; return; }
     active = course; step = 0; detail.hidden = false; drawLesson(); detail.scrollIntoView({block:'start',behavior:'smooth'});
   }
@@ -76,4 +89,5 @@ document.addEventListener('DOMContentLoaded', function () {
     $('cf-message').textContent='Progreso guardado para tu cuenta.'; drawLesson();render();
   };
   render();
+  window.addEventListener('storage',render);
 });
