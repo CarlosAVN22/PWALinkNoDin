@@ -1,186 +1,264 @@
 
-document.addEventListener("DOMContentLoaded", () => {
+/* Complemento del perfil del candidato */
+
+document.addEventListener('DOMContentLoaded', () => {
   const C = window.LNC;
 
-  const form = document.querySelector(
-    ".content form.demo-form"
+  const form = document.getElementById(
+    'perfil-form'
   );
 
-  if (!form || !C.user()) return;
+  if (
+    !C?.user() ||
+    !form ||
+    form.querySelector('#lnc-disponibilidad')
+  ) return;
 
-  form.id = "lnc-profile-form";
+  // Recuperar información del prototipo anterior
+  // solamente cuando el campo actual esté vacío.
+  const legacy = C.get(
+    'candidate-profile-' + C.email(),
+    {}
+  );
 
-  const inputs = [...form.querySelectorAll("input")];
-
-  const fields = {
-    name: inputs[0],
-    email: inputs[1],
-    phone: inputs[2],
-    city: inputs[3],
-    title: inputs[4],
-    experience: inputs[5],
-    skills: form.querySelector("textarea")
+  const mapping = {
+    'perfil-telefono': 'phone',
+    'perfil-ubicacion': 'city',
+    'perfil-profesion': 'title',
+    'perfil-estudios': 'education',
+    'perfil-habilidades': 'skills',
+    'perfil-resumen': 'summary'
   };
 
-  fields.email.type = "email";
-  fields.email.readOnly = true;
+  let recovered = false;
 
-  fields.email.title =
-    "El correo de la cuenta no se modifica desde este formulario";
+  for (const [id, name] of Object.entries(mapping)) {
+    const el = document.getElementById(id);
 
-  // Campos adicionales del perfil
-  const extra = document.createElement("div");
+    if (
+      el &&
+      !el.value.trim() &&
+      legacy[name]
+    ) {
+      el.value = String(legacy[name]);
+      recovered = true;
+    }
+  }
 
-  extra.innerHTML = `
+  if (recovered) {
+    form.dispatchEvent(
+      new Event('input', { bubbles: true })
+    );
+  }
+
+  const extra = C.extraProfile();
+
+  const block = document.createElement('section');
+
+  block.className = 'lnc-perfil-extra';
+
+  block.innerHTML = `
+    <h3>Información adicional</h3>
+
     <div class="grid2">
 
       <div class="field">
-        <label for="lnc-education">
-          Formación académica
+        <label for="lnc-disponibilidad">
+          Disponibilidad laboral
         </label>
 
-        <input
-          id="lnc-education"
-          maxlength="140"
-          placeholder="Ej. Ingeniería en Software">
-      </div>
-
-      <div class="field">
-        <label for="lnc-availability">
-          Disponibilidad
-        </label>
-
-        <select id="lnc-availability">
-          <option value="">Seleccionar</option>
+        <select id="lnc-disponibilidad">
+          <option value="">Sin indicar</option>
           <option>Inmediata</option>
-          <option>15 días</option>
-          <option>30 días</option>
+          <option>En 15 días</option>
+          <option>En 30 días</option>
+          <option>A convenir</option>
         </select>
       </div>
 
+      <div class="field">
+        <label for="lnc-portafolio">
+          Portafolio o LinkedIn
+        </label>
+
+        <input
+          id="lnc-portafolio"
+          type="url"
+          placeholder="https://ejemplo.com"
+          maxlength="250">
+      </div>
+
     </div>
 
-    <div class="field">
-      <label for="lnc-summary">
-        Resumen profesional
-      </label>
+    <p class="lnc-muted">
+      Los datos se guardan solo en este navegador.
+    </p>
 
-      <textarea
-        id="lnc-summary"
-        rows="4"
-        maxlength="800"
-        placeholder="Cuéntales a las empresas qué sabes hacer">
-      </textarea>
-    </div>
-
-    <div class="field">
-      <label for="lnc-portfolio">
-        Portafolio o LinkedIn (URL)
-      </label>
-
-      <input
-        id="lnc-portfolio"
-        type="url"
-        placeholder="https://...">
-    </div>
-
-    <p id="lnc-cv-name" class="lnc-muted"></p>
+    <button
+      type="button"
+      class="btn btn-soft btn-sm"
+      id="lnc-preview-profile">
+      Vista previa de mi perfil
+    </button>
   `;
 
-  const button = form.querySelector(
+  const saveButton = form.querySelector(
     'button[type="submit"]'
   );
 
-  button.before(extra);
+  if (!saveButton) return;
 
-  const file = form.querySelector(
-    'input[type="file"]'
+  saveButton.before(block);
+
+  const availability = block.querySelector(
+    '#lnc-disponibilidad'
   );
 
-  file.removeAttribute("required");
+  const portfolio = block.querySelector(
+    '#lnc-portafolio'
+  );
 
-  // Cargar los datos guardados
-  const data = C.profile();
+  availability.value =
+    extra.disponibilidad ||
+    legacy.availability ||
+    '';
 
-  Object.entries(fields).forEach(([key, element]) => {
-    if (!element) return;
+  portfolio.value =
+    extra.portafolio ||
+    legacy.portfolio ||
+    '';
 
-    if (key === "name") {
-      element.value = C.user().name;
-    } else if (key === "email") {
-      element.value = C.user().email;
-    } else {
-      element.value = data[key] || "";
-    }
-  });
+  // El archivo general/perfil.js continúa
+  // administrando el guardado principal.
+  form.addEventListener('submit', () => {
+    if (!form.checkValidity()) return;
 
-  [
-    "education",
-    "availability",
-    "summary",
-    "portfolio"
-  ].forEach(key => {
-    extra.querySelector("#lnc-" + key).value =
-      data[key] || "";
-  });
-
-  const cvName = extra.querySelector("#lnc-cv-name");
-
-  if (data.cvName) {
-    cvName.textContent =
-      "Currículum seleccionado: " +
-      data.cvName +
-      " (referencia local; el archivo no se subió)";
-  }
-
-  // Guardar los cambios
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-
-    if (!form.reportValidity()) return;
-
-    if (
-      file.files[0] &&
-      !/\.(pdf|doc|docx)$/i.test(file.files[0].name)
-    ) {
-      C.notice(
-        "Solo se admiten archivos PDF, DOC o DOCX.",
-        "error"
+    try {
+      C.set(
+        'candidate-extra-' +
+        C.email().toLowerCase(),
+        {
+          disponibilidad: availability.value,
+          portafolio: portfolio.value.trim()
+        }
       );
-      return;
+    } catch {
+      C.notice(
+        'No se pudo guardar la información adicional.',
+        'error'
+      );
     }
+  });
 
-    const saved = {};
+  // Vista previa sin modificar los datos
+  block.querySelector(
+    '#lnc-preview-profile'
+  ).addEventListener('click', () => {
 
-    Object.entries(fields).forEach(([key, element]) => {
-      saved[key] = element.value.trim();
+    const val = id =>
+      document.getElementById(
+        'perfil-' + id
+      )?.value.trim() || 'Sin indicar';
+
+    const overlay = document.createElement('div');
+
+    overlay.className = 'lnc-dialog-backdrop';
+
+    overlay.innerHTML = `
+      <section
+        class="lnc-dialog panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="lnc-preview-title">
+
+        <h3 id="lnc-preview-title">
+          Vista previa del perfil
+        </h3>
+
+        <dl class="lnc-detail-list">
+          <dt>Nombre</dt>
+          <dd>${C.safe(val('nombre'))}</dd>
+
+          <dt>Profesión</dt>
+          <dd>${C.safe(val('profesion'))}</dd>
+
+          <dt>Ubicación</dt>
+          <dd>${C.safe(val('ubicacion'))}</dd>
+
+          <dt>Estudios</dt>
+          <dd>${C.safe(val('estudios'))}</dd>
+
+          <dt>Experiencia</dt>
+          <dd>
+            ${C.safe(val('experiencia'))} años
+          </dd>
+
+          <dt>Habilidades</dt>
+          <dd class="lnc-wrap">
+            ${C.safe(val('habilidades'))}
+          </dd>
+
+          <dt>Resumen</dt>
+          <dd class="lnc-wrap">
+            ${C.safe(val('resumen'))}
+          </dd>
+
+          <dt>Disponibilidad</dt>
+          <dd>
+            ${C.safe(
+              availability.value || 'Sin indicar'
+            )}
+          </dd>
+
+          <dt>Portafolio</dt>
+          <dd class="lnc-wrap">
+            ${C.safe(
+              portfolio.value || 'Sin indicar'
+            )}
+          </dd>
+        </dl>
+
+        <p class="lnc-muted">
+          Vista previa local:
+          no se publica en Internet.
+        </p>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-close>
+          Cerrar
+        </button>
+      </section>
+    `;
+
+    const close = () => {
+      overlay.remove();
+
+      document.removeEventListener(
+        'keydown',
+        onKey
+      );
+    };
+
+    const onKey = e => {
+      if (e.key === 'Escape') close();
+    };
+
+    overlay.querySelector(
+      '[data-close]'
+    ).onclick = close;
+
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) close();
     });
 
-    [
-      "education",
-      "availability",
-      "summary",
-      "portfolio"
-    ].forEach(key => {
-      saved[key] = extra
-        .querySelector("#lnc-" + key)
-        .value.trim();
-    });
+    document.addEventListener('keydown', onKey);
 
-    saved.cvName =
-      file.files[0]?.name || data.cvName || "";
+    document.body.append(overlay);
 
-    C.set(
-      "candidate-profile-" + C.email(),
-      saved
-    );
-
-    C.notice("Perfil guardado en este navegador.");
-
-    cvName.textContent = saved.cvName
-      ? "Currículum seleccionado: " +
-        saved.cvName +
-        " (no se subió ningún archivo)"
-      : "";
+    overlay.querySelector(
+      '[data-close]'
+    ).focus();
   });
 });

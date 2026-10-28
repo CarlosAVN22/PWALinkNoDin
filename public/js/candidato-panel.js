@@ -1,289 +1,88 @@
 
-document.addEventListener("DOMContentLoaded", () => {
+/* Estadísticas y actividad del candidato */
+
+document.addEventListener('DOMContentLoaded', () => {
   const C = window.LNC;
-  const ICON_PATH = "/img/";
+  const candidate = C?.user();
 
-  if (!C) return;
+  const content = document.querySelector('.content');
+  const stats = content?.querySelector('.stats');
 
-  const candidate = C.user();
+  if (!candidate || !stats) return;
 
-  if (!candidate) return;
-
-  const content = document.querySelector(".content");
-  const stats = content?.querySelector(".stats");
-
-  if (!content || !stats) return;
-
-  /* ==========================================
-     1. ICONOS DE TODAS LAS NOTIFICACIONES
-     ========================================== */
-
-  const notificationPanel = document.getElementById(
-    "ld-notif-dashboard"
-  );
-
-  function createNotificationIcon() {
-    const img = document.createElement("img");
-
-    img.src = ICON_PATH + "notificaciones.svg";
-    img.alt = "";
-    img.className = "lnc-notif-icon";
-    img.setAttribute("aria-hidden", "true");
-
-    return img;
-  }
-
-  function updateNotificationIcons() {
-    if (!notificationPanel) return;
-
-    // Cambiar los emojis que aparezcan en
-    // cualquier texto del panel de notificaciones.
-    const walker = document.createTreeWalker(
-      notificationPanel,
-      NodeFilter.SHOW_TEXT
-    );
-
-    const nodes = [];
-
-    while (walker.nextNode()) {
-      nodes.push(walker.currentNode);
-    }
-
-    nodes.forEach(node => {
-      const emojiRegex = /🔔|🔕|🛎️?/g;
-
-      if (!emojiRegex.test(node.textContent)) return;
-
-      const fragment = document.createDocumentFragment();
-
-      const parts = node.textContent.split(
-        /(🔔|🔕|🛎️?)/
-      );
-
-      parts.forEach(part => {
-        if (/^(🔔|🔕|🛎️?)$/.test(part)) {
-          fragment.append(createNotificationIcon());
-        } else if (part) {
-          fragment.append(
-            document.createTextNode(part)
-          );
-        }
-      });
-
-      node.replaceWith(fragment);
-    });
-
-    // Agregar campanita SVG a los títulos.
-    const headings = notificationPanel.querySelectorAll(
-      "h2, h3, h4"
-    );
-
-    headings.forEach(heading => {
-      if (
-        /notificaciones/i.test(heading.textContent) &&
-        !heading.querySelector(".lnc-notif-icon")
-      ) {
-        heading.prepend(createNotificationIcon());
-      }
-    });
-
-    // Icono para cada elemento de una lista de
-    // notificaciones, sin modificar sus botones.
-    const items = notificationPanel.querySelectorAll(
-      ".ld-notif-item, .ld-notification-item, " +
-      ".notification-item, .notif-item"
-    );
-
-    items.forEach(item => {
-      if (item.querySelector(".lnc-notif-icon")) {
-        return;
-      }
-
-      const iconBox = document.createElement("span");
-
-      iconBox.className = "lnc-notif-icon-wrap";
-      iconBox.setAttribute("aria-hidden", "true");
-      iconBox.append(createNotificationIcon());
-
-      item.prepend(iconBox);
-    });
-  }
-
-  // Ejecutar al cargar y también cuando el sistema
-  // agregue nuevas notificaciones dinámicamente.
-  if (notificationPanel) {
-    let updating = false;
-
-    const observer = new MutationObserver(() => {
-      if (updating) return;
-
-      updating = true;
-      observer.disconnect();
-
-      try {
-        updateNotificationIcons();
-      } finally {
-        observer.observe(notificationPanel, {
-          childList: true,
-          subtree: true,
-          characterData: true
-        });
-
-        updating = false;
-      }
-    });
-
-    updateNotificationIcons();
-
-    observer.observe(notificationPanel, {
-      childList: true,
-      subtree: true,
-      characterData: true
-    });
-  }
-
-  /* ==========================================
-     2. ESTADÍSTICAS DEL CANDIDATO
-     ========================================== */
-
-  const apps = C.applications();
-  const details = C.details();
-  const profile = C.profile();
-
-  const reviewing = apps.filter(id =>
-    ["En revisión", "Entrevista"].includes(
-      details[id]?.status
-    )
-  ).length;
-
-  const saved = C.get(
-    "saved-" + C.email(),
-    C.get("savedJobs-" + C.email(), [])
-  );
-
-  const profileFields = [
-    profile.phone,
-    profile.city,
-    profile.title,
-    profile.skills,
-    profile.summary,
-    profile.education,
-    profile.experience
-  ];
-
-  const completedFields = profileFields.filter(
-    value => {
-      if (Array.isArray(value)) {
-        return value.length > 0;
-      }
-
-      return Boolean(
-        typeof value === "string"
-          ? value.trim()
-          : value
-      );
-    }
-  ).length;
-
-  const completion = Math.round(
-    (completedFields / profileFields.length) * 100
-  );
-
-  const values = [
-    apps.length,
-    reviewing,
-    Array.isArray(saved) ? saved.length : 0,
-    completion + "%"
+  const iconFiles = [
+    'postulaciones.svg',
+    'revision.svg',
+    'guardados.svg',
+    'perfil.svg'
   ];
 
   const labels = [
-    "Postulaciones enviadas",
-    "En revisión",
-    "Empleos guardados",
-    "Perfil completado"
+    'Postulaciones enviadas',
+    'En revisión',
+    'Empleos guardados',
+    'Perfil completado'
   ];
 
-  const icons = [
-    "postulaciones.svg",
-    "revision.svg",
-    "guardados.svg",
-    "perfil.svg"
+  const cards = [
+    ...stats.querySelectorAll('.stat')
   ];
 
-  const statCards = stats.querySelectorAll(".stat");
+  // Iconos de las estadísticas
+  cards.slice(0, 4).forEach((card, i) => {
+    if (!card.querySelector('.lnc-stat-icon')) {
+      const wrap = document.createElement('div');
 
-  statCards.forEach((card, index) => {
-    if (index >= values.length) return;
+      wrap.className = 'lnc-stat-icon';
 
-    const number = card.querySelector("strong");
-    const label = card.querySelector("small");
+      const img = document.createElement('img');
 
-    if (number) {
-      number.textContent = values[index];
-    }
+      img.src = '/img/' + iconFiles[i];
+      img.alt = '';
 
-    if (label) {
-      label.textContent = labels[index];
-    }
+      img.setAttribute('aria-hidden', 'true');
 
-    if (!card.querySelector(".lnc-stat-icon")) {
-      const iconBox = document.createElement("div");
-
-      iconBox.className = "lnc-stat-icon";
-
-      const img = document.createElement("img");
-
-      img.src = ICON_PATH + icons[index];
-      img.alt = "";
-      img.setAttribute("aria-hidden", "true");
-
-      iconBox.append(img);
-      card.prepend(iconBox);
+      wrap.append(img);
+      card.prepend(wrap);
     }
   });
 
-  /* ==========================================
-     3. ORDEN DEL PANEL
-     ========================================== */
+  // Orden del panel
+  const notifications = document.getElementById(
+    'ld-notif-dashboard'
+  );
 
-  // Primero estadísticas.
   content.prepend(stats);
 
-  // Después notificaciones.
-  if (notificationPanel) {
-    stats.after(notificationPanel);
+  if (notifications) {
+    stats.after(notifications);
   }
 
-  /* ==========================================
-     4. VACANTES RECOMENDADAS
-     ========================================== */
-
-  const recommended = Array.from(
-    content.querySelectorAll(".panel")
-  ).find(panel =>
+  const recommended = [
+    ...content.querySelectorAll('.panel')
+  ].find(el =>
     /vacantes recomendadas/i.test(
-      panel.querySelector("h3")?.textContent || ""
+      el.querySelector('h3')?.textContent || ''
     )
   );
 
-  /* ==========================================
-     5. BIENVENIDA DEL CANDIDATO
-     ========================================== */
+  // Bienvenida
+  const welcome = document.createElement('section');
 
-  const welcome = document.createElement("section");
-
-  welcome.className = "panel lnc-section";
-
-  const firstName =
-    candidate.name?.split(" ")[0] || "candidato";
+  welcome.className = 'panel lnc-section';
 
   welcome.innerHTML = `
-    <h2>Bienvenido, ${C.safe(firstName)}</h2>
+    <h2>
+      Bienvenido,
+      ${C.safe(
+        candidate.name?.split(' ')[0] ||
+        'candidato'
+      )}
+    </h2>
 
     <p>
-      Consulta tus oportunidades laborales,
-      mantén actualizado tu perfil y da seguimiento
-      a tus postulaciones.
+      Consulta tus solicitudes, explora vacantes
+      y mantén actualizado tu perfil.
     </p>
 
     <div class="lnc-actions">
@@ -294,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <a class="btn btn-soft"
          href="/doc/general/perfil.html">
-        Actualizar perfil
+        Mi perfil
       </a>
 
       <a class="btn"
@@ -304,29 +103,23 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   `;
 
-  // Presentación después de las notificaciones,
-  // manteniendo estadísticas al inicio.
-  if (notificationPanel) {
-    notificationPanel.after(welcome);
+  if (notifications) {
+    notifications.after(welcome);
   } else {
     stats.after(welcome);
   }
 
-  /* ==========================================
-     6. ACTIVIDAD RECIENTE
-     ========================================== */
+  // Actividad reciente
+  const recent = document.createElement('section');
 
-  const activity = document.createElement("section");
+  recent.className = 'panel lnc-section';
 
-  activity.className = "panel lnc-section";
-
-  activity.innerHTML = `
+  recent.innerHTML = `
     <h3 class="lnc-title-icon">
       <img
         src="/img/actividad.svg"
         alt=""
         aria-hidden="true">
-
       Actividad reciente
     </h3>
 
@@ -334,63 +127,213 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
 
   if (recommended) {
-    recommended.after(activity);
+    recommended.after(recent);
   } else {
-    welcome.after(activity);
+    welcome.after(recent);
   }
 
-  const holder = activity.querySelector("#lnc-latest");
+  function render() {
+    const apps = C.applications();
+    const details = C.details();
 
-  if (!apps.length) {
-    holder.innerHTML = `
-      <p class="lnc-muted">
-        Aún no tienes postulaciones registradas.
-        Cuando solicites una vacante aparecerá aquí.
-      </p>
-    `;
+    const values = [
+      apps.length,
 
-    return;
+      apps.filter(id =>
+        ['En revisión', 'Entrevista'].includes(
+          details[id]?.status
+        )
+      ).length,
+
+      C.savedJobs().length,
+
+      C.completion() + '%'
+    ];
+
+    cards.slice(0, 4).forEach((card, i) => {
+      const value = card.querySelector('strong');
+      const label = card.querySelector('small');
+
+      if (value) {
+        value.textContent = values[i];
+      }
+
+      if (label) {
+        label.textContent = labels[i];
+      }
+    });
+
+    const holder = recent.querySelector(
+      '#lnc-latest'
+    );
+
+    holder.replaceChildren();
+
+    if (!apps.length) {
+      holder.innerHTML = `
+        <p class="lnc-muted">
+          Todavía no tienes postulaciones.
+          Busca una vacante para comenzar.
+        </p>
+      `;
+
+      return;
+    }
+
+    apps.slice(-3).reverse().forEach(id => {
+      const job = C.findJob(id);
+      const d = details[id] || {};
+
+      const item = document.createElement('div');
+
+      item.className = 'lnc-activity';
+
+      item.innerHTML = `
+        <div>
+          <strong>
+            ${C.safe(
+              d.title ||
+              job?.title ||
+              'Vacante'
+            )}
+          </strong>
+
+          <small>
+            ${C.safe(
+              d.company ||
+              job?.company ||
+              'Empresa'
+            )}
+            ·
+            ${C.safe(
+              d.status || 'Recibida'
+            )}
+          </small>
+        </div>
+
+        <a
+          class="btn btn-soft btn-sm"
+          href="/doc/candidato/postulaciones.html">
+          Ver seguimiento
+        </a>
+      `;
+
+      holder.append(item);
+    });
   }
 
-  const jobs = C.jobs();
+  // Cambiar iconos del panel de notificaciones
+  // sin modificar notificaciones.js
+  function decorateNotifications() {
+    if (!notifications) return;
 
-  apps.slice(-3).reverse().forEach(id => {
-    const job = jobs.find(item => item.id === id);
+    notifications.querySelectorAll(
+      '.ld-notif-item-icon'
+    ).forEach(node => {
+      if (node.querySelector('.lnc-notif-icon')) {
+        return;
+      }
 
-    const title =
-      job?.title ||
-      details[id]?.title ||
-      "Vacante";
+      const img = document.createElement('img');
 
-    const company =
-      job?.company ||
-      details[id]?.company ||
-      "Empresa";
+      img.src = '/img/notificaciones.svg';
+      img.alt = '';
+      img.className = 'lnc-notif-icon';
 
-    const status =
-      details[id]?.status || "Recibida";
+      img.setAttribute('aria-hidden', 'true');
 
-    const item = document.createElement("div");
+      node.replaceChildren(img);
+    });
 
-    item.className = "lnc-activity";
+    notifications.querySelectorAll(
+      'h2,h3,h4'
+    ).forEach(h => {
+      if (
+        !/notificaciones/i.test(h.textContent) ||
+        h.querySelector('.lnc-notif-icon')
+      ) {
+        return;
+      }
 
-    item.innerHTML = `
-      <div>
-        <strong>${C.safe(title)}</strong>
+      const text = [...h.childNodes].find(
+        n => n.nodeType === Node.TEXT_NODE
+      );
 
-        <small>
-          ${C.safe(company)}
-          ·
-          ${C.safe(status)}
-        </small>
-      </div>
+      if (text) {
+        text.textContent = text.textContent.replace(
+          /🔔|🔕|🛎️?/gu,
+          ''
+        );
+      }
 
-      <a class="btn btn-soft btn-sm"
-         href="/doc/candidato/postulaciones.html">
-        Ver seguimiento
-      </a>
-    `;
+      const img = document.createElement('img');
 
-    holder.append(item);
-  });
+      img.src = '/img/notificaciones.svg';
+      img.alt = '';
+      img.className = 'lnc-notif-icon';
+
+      img.setAttribute('aria-hidden', 'true');
+
+      h.prepend(img);
+    });
+
+    // Icono del botón de notificación de prueba
+    notifications.querySelectorAll(
+      '[data-notif-test]'
+    ).forEach(button => {
+      if (
+        button.querySelector('.lnc-notif-icon')
+      ) {
+        return;
+      }
+
+      const text = [...button.childNodes].find(
+        n => n.nodeType === Node.TEXT_NODE
+      );
+
+      if (text) {
+        text.textContent = text.textContent.replace(
+          /🔔|🔕|🛎️?/gu,
+          ''
+        );
+      }
+
+      const img = document.createElement('img');
+
+      img.src = '/img/notificaciones.svg';
+      img.alt = '';
+      img.className = 'lnc-notif-icon';
+
+      img.setAttribute('aria-hidden', 'true');
+
+      button.prepend(img);
+    });
+  }
+
+  if (notifications) {
+    const observer = new MutationObserver(() => {
+      observer.disconnect();
+
+      decorateNotifications();
+
+      observer.observe(notifications, {
+        childList: true,
+        subtree: true
+      });
+    });
+
+    decorateNotifications();
+
+    observer.observe(notifications, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  window.addEventListener(
+    'ld:activity-updated',
+    render
+  );
+
+  render();
 });
