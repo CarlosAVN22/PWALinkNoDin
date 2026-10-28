@@ -11,6 +11,7 @@
      <link href="/css/estilos.css" rel="stylesheet" />
      <link href="/css/linknodin.css" rel="stylesheet" />
      <link rel="stylesheet" href="/css/worklink-pendientes.css">
+     <link rel="stylesheet" href="/css/cursos-foros/recurso-detalle.css">
 </head>
 
 <body>
@@ -50,24 +51,28 @@
           </div>
      </header>
      <main>
-          <div class="container">
-               <div class="panel">
-                    <p>
-                         <a class="" href="/doc/general/recursos.html">
-                              ← Recursos
-                         </a>
-                    </p>
-                    <h1 class="page-title">
-                         Cómo crear un currículum profesional
-                    </h1>
-                    <p>
-                         Incluye tus datos de contacto, experiencia, formación y habilidades. Utiliza lenguaje claro y
-                         revisa la ortografía.
-                    </p>
-                    <p>
-                         Adapta tu currículum a la vacante y mantén tu información actualizada.
-                    </p>
+          <div class="container rd-wrapper">
+               <div class="panel rd-article">
+                    <p><a href="/doc/general/recursos.html">← Volver a Recursos</a></p>
+                    <div class="rd-topline"><span id="rd-category" class="rd-category">Orientación laboral</span><span id="rd-reading" class="rd-meta"></span></div>
+                    <h1 class="page-title" id="rd-title">Cómo crear un currículum profesional</h1>
+                    <p id="rd-intro" class="rd-intro"></p>
+                    <div class="rd-actions">
+                         <button type="button" class="btn" id="rd-save" aria-pressed="false">Guardar recurso</button>
+                         <button type="button" class="btn btn-primary" id="rd-read">Marcar como leído</button>
+                         <span id="rd-status" class="rd-status" role="status" aria-live="polite"></span>
+                    </div>
+                    <div id="rd-sections" class="rd-sections"></div>
+                    <div class="rd-summary">
+                         <h2>Lista práctica</h2>
+                         <ol id="rd-checklist"></ol>
+                    </div>
+                    <div class="rd-actions"><a class="btn" href="/doc/general/recursos.html">Volver a Recursos</a><a class="btn btn-primary" href="/doc/cursos-foros/cursos.html">Explorar cursos</a></div>
                </div>
+               <section class="panel rd-related">
+                    <h2>Otros recursos que pueden interesarte</h2>
+                    <div id="rd-related-list" class="rd-related-list"></div>
+               </section>
           </div>
      </main>
      <footer class="footer">
@@ -79,6 +84,7 @@
      <script src="/js/linknodin.js"></script>
      <script src="/js/notificaciones.js"></script>
      <script src="/js/worklink-pendientes.js"></script>
+     <script src="/js/cursos-foros/recurso-detalle.js"></script>
 </body>
 
 </html>

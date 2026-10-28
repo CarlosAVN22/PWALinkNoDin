@@ -1,0 +1,9 @@
+/* Complementos del listado de opiniones; conserva los estilos originales. */
+.co-opinions{margin:0 0 32px}.co-header h2{margin:8px 0}.co-header p{color:var(--muted,#8090aa)}
+.co-controls{display:flex;flex-wrap:wrap;gap:14px;margin:22px 0}.co-controls label{display:grid;gap:7px;font-weight:600;font-size:14px;flex:1;min-width:180px}.co-controls select{background:var(--card,#fff);color:inherit;border:1px solid #8694ab70;border-radius:9px;padding:11px}
+.co-count{font-size:13px;opacity:.8}.co-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:15px}.co-entry{border:1px solid #8293ae55;border-radius:15px;padding:19px;background:var(--card,#fff);color:inherit}.co-entry h3{margin:0 0 8px}.co-entry p{line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.co-entry small{opacity:.8}.co-entry-head{display:flex;justify-content:space-between;gap:12px;align-items:start}.co-entry .co-rating{font-weight:700}.co-entry a{display:inline-block;margin-top:10px}.co-entry button{margin-top:12px}.co-empty{padding:25px;border:1px dashed #8694ab;border-radius:12px}.co-form-note{margin:10px 0}.co-opinions .ld-overline{color:#4388dd}body.dark-mode .co-entry,body.dark-mode .co-controls select{background:#1a2232;color:#e6edfa;border-color:#33445c}
+
+/* Modal de confirmación de opiniones */
+.co-modal{width:min(420px,calc(100% - 32px));max-width:100%;border:1px solid #43536c;border-radius:16px;padding:25px;background:#1a2232;color:#edf2fa;box-shadow:0 20px 70px #0009}
+.co-modal::backdrop{background:rgba(7,14,25,.7)}
+.co-modal h2{margin:0 0 12px;font-size:22px}.co-modal p{line-height:1.5;color:#c3ccdc}.co-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;flex-wrap:wrap}

@@ -1,0 +1,38 @@
+/* Complemento de Recursos. Mantiene los estilos generales existentes. */
+.rc-tools{margin:22px 0 24px;padding:18px;border:1px solid var(--border,#dbe4f0);border-radius:14px}
+.rc-tools label{display:block;margin-bottom:8px;font-weight:600}
+.rc-tools input{width:100%;padding:12px 14px;border:1px solid #b8c8dc;border-radius:9px;background:var(--surface,#fff);color:inherit;font:inherit}
+.rc-filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
+.rc-filter{border:1px solid #bacce6;background:transparent;color:inherit;padding:8px 14px;border-radius:9px;cursor:pointer;font:inherit;font-size:14px}
+.rc-filter.selected{background:#155eef;color:white;border-color:#155eef}
+.rc-count{margin:10px 0 0;color:var(--muted,#667788);font-size:13px}
+.rc-resource .rc-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.rc-resource .rc-actions .btn{cursor:pointer}
+.rc-resource .rc-save[aria-pressed="true"]{border-color:#155eef;color:#155eef;font-weight:700}
+.rc-empty{padding:20px;text-align:center;color:var(--muted,#667788)}
+.rc-detail{border:1px solid #b8c8dc;border-radius:14px;padding:22px;margin:24px 0;background:var(--surface,#f8fbff)}
+.rc-detail h2{margin:16px 0 12px}.rc-detail li{margin-bottom:9px;line-height:1.6}
+.rc-note{color:var(--muted,#667788);font-size:13px;margin-top:16px}
+
+/* Vista previa: contraste y lectura consistente con LinkNoDin. */
+.rc-detail{
+    background:#1b2536;
+    border:1px solid #34445c;
+    border-radius:16px;
+    color:#eef2fa;
+    box-shadow:0 12px 28px rgba(0,0,0,.15);
+    padding:26px 30px;
+}
+.rc-detail h2{color:#f2f6ff;margin:20px 0 16px;font-size:25px;line-height:1.25}
+.rc-detail ol{color:#d4dff0;margin:0;padding-left:27px}
+.rc-detail li{padding-left:4px;margin:12px 0;line-height:1.65}
+.rc-detail .rc-note{color:#aabbd3;margin-top:22px;font-size:13px}
+.rc-detail #rc-close{
+    background:#25354d;
+    border:1px solid #465973;
+    color:#f2f6ff;
+    border-radius:9px;
+    padding:10px 17px;
+}
+.rc-detail #rc-close:hover{background:#314663}
+@media(max-width:640px){.rc-detail{padding:20px}.rc-detail h2{font-size:21px}}

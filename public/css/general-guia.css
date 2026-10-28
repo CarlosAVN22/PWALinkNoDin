@@ -1,0 +1,23 @@
+/* Complemento exclusivo de la guía: conserva las variables y paneles del diseño original. */
+.ld-guide-tabs{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0 18px}
+.ld-guide-tabs .btn{cursor:pointer}
+.ld-guide-progress{padding:22px 26px}
+.ld-guide-progress-line{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.ld-guide-progress-line h2{font-size:1.14rem;margin:0}
+.ld-guide-progress-line span{font-size:.92rem;opacity:.8}
+.ld-guide-track{background:var(--line,#394150);height:9px;border-radius:20px;overflow:hidden;margin:15px 0}
+#ld-guide-progress-fill{height:100%;width:0;background:var(--primary,#496cec);border-radius:20px;transition:width .2s ease}
+.ld-guide-note{font-size:.9rem;opacity:.8;margin:0}
+.ld-guide-cards{align-items:start}
+.ld-guide-cards .panel{padding:20px 22px}
+.ld-guide-toggle{border:0;background:transparent;color:inherit;font:inherit;cursor:pointer;text-align:left;width:100%;display:flex;align-items:center;gap:12px;padding:0}
+.ld-guide-number{border:1px solid var(--line,#444);border-radius:50%;width:30px;height:30px;display:grid;place-items:center;flex-shrink:0;font-size:.9rem}
+.ld-guide-card-title{font-weight:700;flex:1}
+.ld-guide-status{font-size:.8rem;opacity:.72}
+.ld-guide-arrow{font-size:1.35rem;font-weight:600;line-height:1}
+.ld-guide-detail{margin-top:14px;padding-top:12px;border-top:1px solid var(--line,#444)}
+.ld-guide-detail[hidden]{display:none}
+.ld-guide-detail ol{padding-left:22px;margin:0 0 18px}
+.ld-guide-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ld-guide-actions .btn{font-size:.9rem}
+@media(max-width:650px){.ld-guide-cards{grid-template-columns:1fr}.ld-guide-tabs .btn{flex:1}}

@@ -11,6 +11,7 @@
        <link href="/css/estilos.css" rel="stylesheet" />
        <link href="/css/linknodin.css" rel="stylesheet" />
        <link rel="stylesheet" href="/css/worklink-pendientes.css">
+       <link rel="stylesheet" href="/css/general-perfil.css">
 </head>
 
 <body>
@@ -79,65 +80,28 @@
                                    </a>
                             </aside>
                             <div class="content">
-                                   <form class="panel demo-form">
-                                          <h3>
-                                                 Datos personales
-                                          </h3>
+                                   <form class="panel demo-form" id="perfil-form">
+                                          <h3>Datos personales</h3>
+                                          <p class="ld-perfil-note">Completa tus datos para que las empresas conozcan mejor tu perfil profesional.</p>
                                           <div class="grid2">
-                                                 <div class="field">
-                                                        <label>
-                                                               Nombre completo
-                                                        </label>
-                                                        <input placeholder="Nombre completo" required="" type="text" />
-                                                 </div>
-                                                 <div class="field">
-                                                        <label>
-                                                               Correo electrónico
-                                                        </label>
-                                                        <input placeholder="Correo electrónico" required=""
-                                                               type="text" />
-                                                 </div>
-                                                 <div class="field">
-                                                        <label>
-                                                               Teléfono
-                                                        </label>
-                                                        <input placeholder="Teléfono" required="" type="text" />
-                                                 </div>
-                                                 <div class="field">
-                                                        <label>
-                                                               Ubicación
-                                                        </label>
-                                                        <input placeholder="Ubicación" required="" type="text" />
-                                                 </div>
-                                                 <div class="field">
-                                                        <label>
-                                                               Profesión
-                                                        </label>
-                                                        <input placeholder="Profesión" required="" type="text" />
-                                                 </div>
-                                                 <div class="field">
-                                                        <label>
-                                                               Nivel de experiencia
-                                                        </label>
-                                                        <input placeholder="Nivel de experiencia" required=""
-                                                               type="text" />
-                                                 </div>
+                                                 <div class="field"><label for="perfil-nombre">Nombre completo</label><input id="perfil-nombre" type="text" placeholder="Nombre completo" required maxlength="100"></div>
+                                                 <div class="field"><label for="perfil-correo">Correo electrónico</label><input id="perfil-correo" type="email" readonly></div>
+                                                 <div class="field"><label for="perfil-telefono">Teléfono</label><input id="perfil-telefono" type="tel" placeholder="Ej. 7000-0000" maxlength="24"></div>
+                                                 <div class="field"><label for="perfil-ubicacion">Ubicación</label><input id="perfil-ubicacion" type="text" placeholder="Ciudad, departamento" maxlength="100"></div>
                                           </div>
-                                          <div class="field">
-                                                 <label>
-                                                        Resumen profesional
-                                                 </label>
-                                                 <textarea placeholder="Describe tus habilidades"></textarea>
+                                          <h3>Información profesional</h3>
+                                          <div class="grid2">
+                                                 <div class="field"><label for="perfil-profesion">Profesión u ocupación</label><input id="perfil-profesion" type="text" placeholder="Ej. Desarrollo web" maxlength="100"></div>
+                                                 <div class="field"><label for="perfil-estudios">Estudios y formación académica</label><input id="perfil-estudios" type="text" placeholder="Ej. Ingeniería en sistemas" maxlength="150"></div>
                                           </div>
-                                          <div class="field">
-                                                 <label>
-                                                        Currículum (simulación)
-                                                 </label>
-                                                 <input accept=".pdf,.doc,.docx" type="file" />
-                                          </div>
-                                          <button class="btn btn-primary" type="submit">
-                                                 Guardar perfil
-                                          </button>
+                                          <div class="field"><label for="perfil-experiencia">Años de experiencia laboral: <strong id="perfil-experiencia-texto">0 años</strong></label><input id="perfil-experiencia" type="range" min="0" max="15" step="1" value="0"><div class="ld-perfil-range"><span>0 años</span><span>5 años</span><span>10 años</span><span>15+ años</span></div><p class="ld-perfil-note" id="perfil-nivel">Sin experiencia</p></div>
+                                          <div class="field"><label for="perfil-habilidades">Habilidades</label><textarea id="perfil-habilidades" placeholder="Ej. Atención al cliente, Excel, inglés" rows="3" maxlength="500"></textarea></div>
+                                          <div class="field"><label for="perfil-resumen">Presentación personal</label><textarea id="perfil-resumen" placeholder="Describe tu experiencia, fortalezas e intereses laborales" rows="4" maxlength="1000"></textarea></div>
+                                          <h3>Currículum</h3>
+                                          <div class="field"><label for="perfil-cv">Seleccionar currículum (PDF, DOC o DOCX)</label><input id="perfil-cv" accept=".pdf,.doc,.docx" type="file"><p class="ld-perfil-note">En el prototipo solo guardamos el nombre del archivo. Su contenido no se sube ni se conserva.</p><div class="ld-perfil-cv" id="perfil-cv-info" hidden><span id="perfil-cv-nombre"></span><button type="button" class="btn btn-sm" id="perfil-cv-quitar">Quitar currículum</button></div></div>
+                                          <div class="ld-perfil-progreso"><div class="ld-perfil-progreso-top"><strong>Perfil completado</strong><span id="perfil-porcentaje">0%</span></div><div class="ld-perfil-barra"><div id="perfil-barra-valor"></div></div></div>
+                                          <p id="perfil-mensaje" class="ld-perfil-mensaje" role="status" aria-live="polite"></p>
+                                          <button class="btn btn-primary" type="submit">Guardar perfil</button>
                                    </form>
                             </div>
                      </div>
@@ -159,6 +123,7 @@
      <script src="/js/linknodin.js"></script>
        <script src="/js/notificaciones.js"></script>
        <script src="/js/worklink-pendientes.js"></script>
+       <script src="/js/general/perfil.js"></script>
 </body>
 
 </html>
