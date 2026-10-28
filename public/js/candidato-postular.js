@@ -1,72 +1,108 @@
 
-document.addEventListener("DOMContentLoaded", () => {
+/* Postulaciones del candidato */
+
+document.addEventListener('DOMContentLoaded', () => {
   const C = window.LNC;
 
-  const box = document.getElementById("ld-apply-box");
+  const box = document.getElementById(
+    'ld-apply-box'
+  );
 
-  if (!box || !C.user()) return;
+  if (!C?.user() || !box) return;
 
-  // Obtener el ID de la vacante
-  const id =
-    new URLSearchParams(location.search).get("id") ||
-    "demo-web";
+  const id = new URLSearchParams(
+    location.search
+  ).get('id') || 'demo-web';
 
-  const job = C.jobs().find(item => item.id === id);
+  const job = C.findJob(id);
 
   if (!job) {
     C.notice(
-      "Esta vacante no está disponible.",
-      "error"
+      'La vacante ya no está disponible.',
+      'error'
     );
     return;
   }
 
-  // Quitar el botón anterior de demostración
-  box.querySelectorAll("button").forEach(button => {
+  if (
+    box.querySelector('#lnc-application-form')
+  ) return;
+
+  // Retirar solo el botón anterior de esta pantalla.
+  for (const button of box.querySelectorAll('button')) {
     if (
-      button.textContent.includes("Enviar postulación")
+      /enviar postulación de prueba/i.test(
+        button.textContent
+      )
     ) {
       button.remove();
     }
-  });
+  }
 
-  const previous = box.querySelector(".ld-status");
+  box.querySelector('.ld-status')?.remove();
 
-  if (previous) previous.remove();
+  const p = box.querySelector('p');
+
+  if (p) {
+    p.textContent =
+      'Revisa tu información antes de registrar ' +
+      'una solicitud de demostración.';
+  }
 
   const profile = C.profile();
 
-  // Crear formulario de postulación
-  const form = document.createElement("form");
+  const form = document.createElement('form');
 
-  form.className = "lnc-apply";
+  form.className = 'lnc-apply';
+  form.id = 'lnc-application-form';
 
   form.innerHTML = `
-    <p>
-      <strong>${C.safe(job.company)}</strong> ·
-      ${C.safe(job.city)} ·
-      ${C.safe(job.modality || "Modalidad por confirmar")}
-    </p>
+    <div class="lnc-job-summary">
+      <h3>Resumen de la vacante</h3>
 
-    <p class="lnc-muted">
-      Esta solicitud es una simulación local.
-      No se enviará a una empresa.
-    </p>
+      <p>
+        <strong>
+          ${C.safe(job.title)}
+        </strong>
+        ·
+        ${C.safe(job.company || 'Empresa')}
+      </p>
+
+      <p>
+        ${C.safe(job.city || 'Sin ubicación')}
+        ·
+        ${C.safe(
+          job.modality || 'Modalidad no indicada'
+        )}
+      </p>
+    </div>
 
     <div class="grid2">
 
       <div class="field">
-        <label>Nombre completo</label>
+        <label for="lnc-apply-name">
+          Nombre
+        </label>
+
         <input
-          value="${C.safe(C.user().name)}"
-          readonly>
+          id="lnc-apply-name"
+          readonly
+          value="${C.safe(
+            profile.nombre ||
+            C.user().name ||
+            ''
+          )}">
       </div>
 
       <div class="field">
-        <label>Correo electrónico</label>
+        <label for="lnc-apply-email">
+          Correo
+        </label>
+
         <input
-          value="${C.safe(C.user().email)}"
-          readonly>
+          id="lnc-apply-email"
+          readonly
+          value="${C.safe(C.email())}">
       </div>
 
     </div>
@@ -80,100 +116,152 @@ document.addEventListener("DOMContentLoaded", () => {
         id="lnc-letter"
         maxlength="1000"
         rows="5"
-        placeholder="Explica por qué te interesa la vacante">
+        placeholder="Explica por qué te interesa esta vacante">
       </textarea>
+
+      <small id="lnc-letter-count">
+        0 / 1000 caracteres
+      </small>
     </div>
 
-    <p class="lnc-muted">
-      ${
-        profile.cvName
-          ? "CV indicado en perfil: " +
-            C.safe(profile.cvName) +
-            " (archivo no enviado)"
-          : "Todavía no has registrado un CV. " +
-            "Puedes completar tu perfil antes de postularte."
-      }
-    </p>
+    <p class="lnc-muted" id="lnc-cv-hint"></p>
 
     <div class="lnc-actions">
-
-      <button type="submit"
-        class="btn btn-primary">
-        Confirmar postulación
+      <button
+        class="btn btn-primary"
+        id="lnc-apply-submit"
+        type="submit">
+        Registrar postulación
       </button>
 
-      <a class="btn btn-soft"
+      <a
+        class="btn btn-soft"
         href="/doc/general/perfil.html">
         Revisar mi perfil
       </a>
 
+      <a
+        class="btn"
+        href="/doc/candidato/postulaciones.html">
+        Mis postulaciones
+      </a>
     </div>
+
+    <p class="lnc-muted">
+      Esta operación solo se guarda en este navegador;
+      no se envía a una empresa.
+    </p>
   `;
 
   box.append(form);
 
+  form.querySelector('#lnc-cv-hint').textContent =
+    profile.curriculum
+      ? 'CV registrado en el perfil: ' +
+        profile.curriculum +
+        ' (solo su nombre, no el archivo).'
+      : 'No has indicado un currículum. ' +
+        'Puedes completar tu perfil antes de postularte.';
+
+  const letter = form.querySelector('#lnc-letter');
+
   const submit = form.querySelector(
-    'button[type="submit"]'
+    '#lnc-apply-submit'
   );
 
-  // Evitar solicitudes duplicadas
-  if (C.applications().includes(id)) {
-    submit.disabled = true;
-    submit.textContent = "Ya te postulaste";
+  letter.addEventListener('input', () => {
+    form.querySelector(
+      '#lnc-letter-count'
+    ).textContent =
+      letter.value.length +
+      ' / 1000 caracteres';
+  });
 
-    C.notice(
-      "Ya tienes una solicitud registrada para esta vacante."
+  const exists = () =>
+    C.applications().some(
+      value => String(value) === String(id)
     );
+
+  function check() {
+    submit.disabled = exists();
+
+    submit.textContent = exists()
+      ? 'Ya te postulaste'
+      : 'Registrar postulación';
   }
 
-  // Registrar una postulación
-  form.addEventListener("submit", event => {
-    event.preventDefault();
+  check();
 
-    if (C.applications().includes(id)) {
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    if (exists()) {
       C.notice(
-        "Ya existe esta postulación.",
-        "error"
+        'Esta postulación ya está registrada.',
+        'error'
       );
+
+      check();
       return;
     }
 
     C.confirmModal(
-      "¿Confirmas que deseas registrar " +
-      "esta postulación de demostración?",
+      '¿Registrar tu postulación de demostración a ' +
+      job.title +
+      '?',
       () => {
-        C.set(
-          "applications-" + C.email(),
-          [...C.applications(), id]
-        );
+        if (exists()) return check();
 
-        const details = C.details();
+        const now = new Date().toISOString();
 
-        details[id] = {
+        const d = C.details();
+
+        d[id] = {
+          ...(d[id] || {}),
+
           title: job.title,
-          company: job.company,
-          date: new Date().toISOString(),
-          status: "Recibida",
-          message: form
-            .querySelector("#lnc-letter")
-            .value.trim()
+          company: job.company || 'Empresa',
+
+          date: now,
+          status: 'Recibida',
+
+          message: letter.value.trim(),
+
+          history: [
+            {
+              date: now,
+              status: 'Recibida'
+            }
+          ]
         };
 
-        C.set(
-          "candidate-application-details-" +
-          C.email(),
-          details
-        );
+        try {
+          C.set(
+            'candidate-application-details-' +
+            C.email(),
+            d
+          );
 
-        submit.disabled = true;
+          C.set(
+            'applications-' + C.email(),
+            [
+              ...C.applications(),
+              job.id
+            ]
+          );
 
-        submit.textContent =
-          "Postulación registrada";
+          check();
 
-        C.notice(
-          "Postulación registrada. " +
-          "Puedes consultarla en Mis postulaciones."
-        );
+          C.notice(
+            'Postulación registrada. ' +
+            'Puedes consultarla en Mis postulaciones.'
+          );
+        } catch {
+          C.notice(
+            'No se pudo guardar la postulación.',
+            'error'
+          );
+        }
       }
     );
   });

@@ -290,3 +290,185 @@ body.dark-mode.lnc-candidate-ui
     saturate(1210%) hue-rotate(181deg)
     brightness(103%);
 }
+
+/* ==========================================
+   CANDIDATO V2 - FUNCIONES NUEVAS
+   ========================================== */
+
+/* Estadísticas de postulaciones */
+
+body.lnc-candidate-ui .lnc-post-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0 20px;
+}
+
+body.lnc-candidate-ui .lnc-post-summary > div {
+  padding: 16px;
+  border: 1px solid var(--lnc-border);
+  border-radius: 12px;
+  background: var(--lnc-surface);
+}
+
+body.lnc-candidate-ui .lnc-post-summary strong {
+  display: block;
+  font-size: 1.5rem;
+}
+
+body.lnc-candidate-ui .lnc-post-summary small {
+  display: block;
+  color: var(--lnc-text-muted);
+}
+
+/* Búsqueda y filtros */
+
+body.lnc-candidate-ui .lnc-post-filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+body.lnc-candidate-ui .lnc-post-filters label {
+  display: grid;
+  gap: 7px;
+}
+
+body.lnc-candidate-ui .lnc-post-filters input,
+body.lnc-candidate-ui .lnc-post-filters select,
+body.lnc-candidate-ui .lnc-perfil-extra select,
+body.lnc-candidate-ui .lnc-perfil-extra input {
+  min-width: 0;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid var(--lnc-border);
+  border-radius: 9px;
+  color: inherit;
+  background: var(--lnc-surface);
+}
+
+body.lnc-candidate-ui .lnc-post-tools {
+  margin-top: 20px;
+}
+
+body.lnc-candidate-ui #lnc-results {
+  margin-top: 20px;
+}
+
+/* Información adicional del perfil */
+
+body.lnc-candidate-ui .lnc-perfil-extra {
+  border-top: 1px solid var(--lnc-border);
+  padding-top: 18px;
+  margin: 18px 0;
+  display: grid;
+  gap: 14px;
+}
+
+/* Resumen de la vacante */
+
+body.lnc-candidate-ui .lnc-job-summary {
+  padding: 16px;
+  border: 1px solid var(--lnc-border);
+  border-radius: 12px;
+  background: var(--lnc-surface);
+}
+
+body.lnc-candidate-ui .lnc-wrap {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Modal de detalles y confirmación */
+
+body.lnc-candidate-ui .lnc-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  padding: 16px;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.lnc-candidate-ui .lnc-dialog {
+  box-sizing: border-box;
+  width: min(600px, 100%);
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--lnc-surface);
+  color: inherit;
+}
+
+body.lnc-candidate-ui .lnc-detail-list {
+  display: grid;
+  grid-template-columns: 115px 1fr;
+  gap: 12px 16px;
+  margin: 20px 0;
+}
+
+body.lnc-candidate-ui .lnc-detail-list dt {
+  font-weight: 600;
+  color: var(--lnc-text-muted);
+}
+
+body.lnc-candidate-ui .lnc-detail-list dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+body.lnc-candidate-ui .lnc-history {
+  padding-left: 24px;
+  color: var(--lnc-text-muted);
+}
+
+body.lnc-candidate-ui .lnc-history li {
+  padding: 5px 0;
+}
+
+body.lnc-candidate-ui
+#lnc-results .lnc-actions {
+  margin: 0;
+}
+
+/* Iconos de notificaciones */
+
+body.lnc-candidate-ui
+#ld-notif-dashboard
+.ld-notif-item-icon
+.lnc-notif-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Compatibilidad con modo oscuro */
+
+body.dark-mode.lnc-candidate-ui .lnc-dialog,
+body.dark-mode.lnc-candidate-ui
+.lnc-post-summary > div,
+body.dark-mode.lnc-candidate-ui
+.lnc-job-summary {
+  background: var(--lnc-surface);
+  border-color: var(--lnc-border);
+}
+
+/* Diseño adaptable */
+
+@media (max-width: 700px) {
+  body.lnc-candidate-ui .lnc-post-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.lnc-candidate-ui .lnc-post-filters {
+    grid-template-columns: 1fr;
+  }
+
+  body.lnc-candidate-ui .lnc-detail-list {
+    grid-template-columns: 1fr;
+  }
+}
