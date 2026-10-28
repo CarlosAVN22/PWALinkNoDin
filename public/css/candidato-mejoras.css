@@ -1,0 +1,292 @@
+
+/* ==========================================
+   LINKNODIN - MEJORAS DEL CANDIDATO
+   Estilos aislados del resto del proyecto
+   ========================================== */
+
+body.lnc-candidate-ui {
+  --lnc-surface: #ffffff;
+  --lnc-border: #dce4ee;
+  --lnc-text-muted: #66758a;
+  --lnc-icon-bg: #edf4ff;
+}
+
+/* SEPARACIÓN DE SECCIONES */
+
+body.lnc-candidate-ui .content > .stats {
+  margin-bottom: 30px;
+}
+
+body.lnc-candidate-ui .content > .ld-notif-dashboard {
+  margin-bottom: 30px;
+}
+
+body.lnc-candidate-ui .lnc-section {
+  margin-bottom: 30px;
+}
+
+body.lnc-candidate-ui .lnc-section h2 {
+  margin-top: 0;
+}
+
+/* TARJETAS DE ESTADÍSTICAS */
+
+body.lnc-candidate-ui .stats .stat {
+  position: relative;
+  padding: 22px;
+  min-height: 120px;
+}
+
+body.lnc-candidate-ui .lnc-stat-icon {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  padding: 9px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--lnc-icon-bg);
+  margin-bottom: 12px;
+}
+
+body.lnc-candidate-ui .lnc-stat-icon img {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* BOTONES Y ACCIONES */
+
+body.lnc-candidate-ui .lnc-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+body.lnc-candidate-ui .lnc-actions .btn {
+  white-space: nowrap;
+}
+
+/* ICONOS DE ENCABEZADOS */
+
+body.lnc-candidate-ui .lnc-title-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+body.lnc-candidate-ui .lnc-title-icon img {
+  width: 23px;
+  height: 23px;
+  object-fit: contain;
+}
+
+/* TODAS LAS NOTIFICACIONES DEL PANEL */
+
+body.lnc-candidate-ui
+#ld-notif-dashboard .lnc-notif-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-right: 9px;
+}
+
+body.lnc-candidate-ui
+#ld-notif-dashboard .lnc-notif-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+body.lnc-candidate-ui
+#ld-notif-dashboard .lnc-notif-icon-wrap img {
+  margin-right: 0;
+}
+
+body.lnc-candidate-ui
+#ld-notif-dashboard h2,
+body.lnc-candidate-ui
+#ld-notif-dashboard h3,
+body.lnc-candidate-ui
+#ld-notif-dashboard h4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ACTIVIDAD RECIENTE */
+
+body.lnc-candidate-ui .lnc-activity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--lnc-border);
+}
+
+body.lnc-candidate-ui .lnc-activity:last-child {
+  border-bottom: 0;
+}
+
+body.lnc-candidate-ui .lnc-activity small {
+  display: block;
+  margin-top: 5px;
+  color: var(--lnc-text-muted);
+}
+
+/* FILTROS */
+
+body.lnc-candidate-ui .lnc-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+body.lnc-candidate-ui .lnc-filters input,
+body.lnc-candidate-ui .lnc-filters select {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid var(--lnc-border);
+  border-radius: 9px;
+  background: var(--lnc-surface);
+  color: inherit;
+}
+
+body.lnc-candidate-ui .lnc-muted,
+body.lnc-candidate-ui .lnc-empty {
+  color: var(--lnc-text-muted);
+}
+
+body.lnc-candidate-ui .lnc-empty {
+  padding: 20px 0;
+}
+
+body.lnc-candidate-ui .lnc-apply {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+body.lnc-candidate-ui .lnc-apply textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ALERTAS DEL CANDIDATO */
+
+body.lnc-candidate-ui .lnc-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  padding: 13px 18px;
+  border-radius: 12px;
+  background: #17466b;
+  color: #ffffff;
+  box-shadow: 0 8px 25px #0003;
+  max-width: min(410px, 85vw);
+}
+
+body.lnc-candidate-ui .lnc-toast.error {
+  background: #992c3c;
+}
+
+body.lnc-candidate-ui .lnc-overlay {
+  z-index: 9998;
+}
+
+/* MODO OSCURO */
+
+body.dark-mode.lnc-candidate-ui {
+  --lnc-surface: #1a2232;
+  --lnc-border: #30394c;
+  --lnc-text-muted: #c2ccdc;
+  --lnc-icon-bg: #273a57;
+}
+
+body.dark-mode.lnc-candidate-ui
+.lnc-stat-icon img,
+body.dark-mode.lnc-candidate-ui
+.lnc-title-icon img,
+body.dark-mode.lnc-candidate-ui
+#ld-notif-dashboard .lnc-notif-icon {
+  filter: brightness(0) saturate(100%)
+    invert(79%) sepia(16%)
+    saturate(1210%) hue-rotate(181deg)
+    brightness(103%);
+}
+
+body.dark-mode.lnc-candidate-ui
+.lnc-filters input,
+body.dark-mode.lnc-candidate-ui
+.lnc-filters select {
+  background: #1a2232;
+  border-color: #30394c;
+  color: #eef2fa;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+  body.lnc-candidate-ui .lnc-activity {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  body.lnc-candidate-ui .lnc-filters {
+    flex-direction: column;
+  }
+
+  body.lnc-candidate-ui .stats .stat {
+    padding: 16px;
+    min-height: auto;
+  }
+}
+
+
+/* ICONOS DE LA BANDEJA DE NOTIFICACIONES */
+
+body.lnc-candidate-ui
+#ld-notif-inbox .lnc-notif-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-right: 9px;
+}
+
+body.lnc-candidate-ui
+#ld-notif-inbox .lnc-notif-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+body.lnc-candidate-ui
+#ld-notif-inbox .lnc-notif-icon-wrap img {
+  margin-right: 0;
+}
+
+/* MODO OSCURO */
+
+body.dark-mode.lnc-candidate-ui
+#ld-notif-inbox .lnc-notif-icon {
+  filter: brightness(0) saturate(100%)
+    invert(79%) sepia(16%)
+    saturate(1210%) hue-rotate(181deg)
+    brightness(103%);
+}
