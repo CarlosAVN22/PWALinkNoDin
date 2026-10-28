@@ -11,6 +11,7 @@
     <link href="/css/estilos.css" rel="stylesheet" />
     <link href="/css/linknodin.css" rel="stylesheet" />
     <link rel="stylesheet" href="/css/worklink-pendientes.css">
+    <link rel="stylesheet" href="/css/empleo/empleo.css">
 </head>
 
 <body>
@@ -80,105 +81,16 @@
                 </aside>
                 <div class="content">
                     <div class="panel">
-                        <h3>
-                            Ofertas de tu interés
-                        </h3>
-                        <div class="job">
-                            <div class="jobmain">
-                                <div class="logo">
-                                    C
-                                </div>
-                                <div>
-                                    <h3>
-                                        Diseñador UI/UX
-                                    </h3>
-                                    <small>
-                                        Súper Selectos · San Salvador
-                                    </small>
-                                    <p>
-                                        Remoto · Hace 1 día
-                                    </p>
-                                    <span class="tag">
-                                        Remoto
-                                    </span>
-                                </div>
-                            </div>
-                            <a class="btn btn-primary" href="/doc/empleo/detalle-empleo.html">
-                                Ver empleo
-                            </a>
+                        <h3>Ofertas de tu interés</h3>
+                        <p class="ld-em-muted">Guarda vacantes para consultarlas más adelante. Solo aparecen en tu cuenta de candidato y en este navegador.</p>
+                        <div class="ld-em-toolbar">
+                            <input id="em-busqueda" type="search" placeholder="Buscar por puesto, empresa o ciudad" aria-label="Buscar vacantes" />
+                            <select id="em-filtro" aria-label="Filtrar vacantes"><option value="guardados">Mis guardados</option><option value="todos">Explorar para guardar</option></select>
                         </div>
-                        <div class="job">
-                            <div class="jobmain">
-                                <div class="logo">
-                                    T
-                                </div>
-                                <div>
-                                    <h3>
-                                        Desarrollador Web
-                                    </h3>
-                                    <small>
-                                        Banco Agrícola · Santa Ana
-                                    </small>
-                                    <p>
-                                        Tiempo completo · Hace 2 días
-                                    </p>
-                                    <span class="tag">
-                                        Tiempo completo
-                                    </span>
-                                </div>
-                            </div>
-                            <a class="btn btn-primary" href="/doc/empleo/detalle-empleo.html">
-                                Ver empleo
-                            </a>
-                        </div>
-                        <div class="job">
-                            <div class="jobmain">
-                                <div class="logo">
-                                    D
-                                </div>
-                                <div>
-                                    <h3>
-                                        Analista de datos
-                                    </h3>
-                                    <small>
-                                        ADOC · San Miguel
-                                    </small>
-                                    <p>
-                                        Híbrido · Hace 3 días
-                                    </p>
-                                    <span class="tag">
-                                        Híbrido
-                                    </span>
-                                </div>
-                            </div>
-                            <a class="btn btn-primary" href="/doc/empleo/detalle-empleo.html">
-                                Ver empleo
-                            </a>
-                        </div>
-                        <div class="job">
-                            <div class="jobmain">
-                                <div class="logo">
-                                    G
-                                </div>
-                                <div>
-                                    <h3>
-                                        Asistente administrativo
-                                    </h3>
-                                    <small>
-                                        Grupo Central · San Salvador
-                                    </small>
-                                    <p>
-                                        Presencial · Hace 4 días
-                                    </p>
-                                    <span class="tag">
-                                        Presencial
-                                    </span>
-                                </div>
-                            </div>
-                            <a class="btn btn-primary" href="/doc/empleo/detalle-empleo.html">
-                                Ver empleo
-                            </a>
-                        </div>
+                        <p class="ld-status" id="em-resumen" aria-live="polite"></p>
+                        <div id="em-listado"></div>
+                        <p id="em-vacio" class="ld-em-muted" hidden>No hay vacantes que coincidan. Prueba con otro término o explora las disponibles.</p>
+                        <a class="btn" href="/doc/empleo/empleos.html">Ver todos los empleos</a>
                     </div>
                 </div>
             </div>
@@ -193,6 +105,7 @@
      <script src="/js/linknodin.js"></script>
     <script src="/js/notificaciones.js"></script>
     <script src="/js/worklink-pendientes.js"></script>
+    <script src="/js/empleo/guardados.js"></script>
 </body>
 
 </html>

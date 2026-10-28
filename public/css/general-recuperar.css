@@ -1,0 +1,18 @@
+/* Complementos exclusivos de la pantalla de recuperación. */
+.ld-recuperar-estado {
+    margin-top: 15px;
+    padding: 12px 14px;
+    border: 1px solid rgba(80, 170, 140, .45);
+    border-radius: 9px;
+    background: rgba(80, 170, 140, .09);
+    line-height: 1.5;
+}
+.ld-recuperar-estado.ld-recuperar-error {
+    border-color: rgba(220, 110, 110, .45);
+    background: rgba(220, 110, 110, .09);
+}
+.ld-recuperar-ayuda {
+    margin-top: 12px;
+    font-size: .88rem;
+    opacity: .78;
+}

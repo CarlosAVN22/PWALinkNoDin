@@ -1,0 +1,16 @@
+/* Complementos discretos para el formulario original de Perfil. */
+#perfil-form h3:not(:first-child) { margin-top: 24px; }
+.ld-perfil-note { color: #aeb9cd; font-size: .88rem; line-height: 1.5; margin: 5px 0 12px; }
+#perfil-correo[readonly] { opacity: .8; cursor: not-allowed; }
+#perfil-experiencia { width: 100%; accent-color: #4f9cfd; cursor: pointer; }
+.ld-perfil-range, .ld-perfil-progreso-top { display: flex; justify-content: space-between; gap: 8px; }
+.ld-perfil-range { font-size: .75rem; color: #aeb9cd; }
+.ld-perfil-progreso { margin: 25px 0 18px; }
+.ld-perfil-progreso-top { margin-bottom: 9px; }
+.ld-perfil-barra { height: 10px; background: rgba(125,145,170,.25); border-radius: 20px; overflow: hidden; }
+#perfil-barra-valor { height: 100%; width: 0; background: #4f9cfd; border-radius: 20px; transition: width .2s ease; }
+.ld-perfil-cv { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 12px; overflow-wrap: anywhere; }
+.ld-perfil-cv[hidden] { display: none; }
+.ld-perfil-mensaje { min-height: 20px; font-size: .91rem; }
+.ld-perfil-mensaje[data-error="true"] { color: #f19b9b; }
+.ld-perfil-mensaje[data-error="false"] { color: #8ddcb5; }

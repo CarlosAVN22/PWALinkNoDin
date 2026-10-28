@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <title>Seguridad y actividad | LinkNoDin</title>
+    <link href="/css/estilos.css" rel="stylesheet" />
+    <link href="/css/linknodin.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/worklink-pendientes.css">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="/doc/general/index.html">
+            <img alt="" class="brand-logo" src="/img/logo.png" />
+            <span class="brand-copy">
+                <span class="brand-title"><span class="brand-link">Link</span><span class="brand-no">No</span><span class="brand-din">Din</span></span>
+                <span class="brand-tagline">CONECTANDO OPORTUNIDADES</span>
+            </span>
+        </a>
+        <nav class="navlinks">
+            <a href="/doc/general/index.html">Inicio</a>
+            <a href="/doc/empleo/empleos.html">Empleos</a>
+            <a href="/doc/empresa/empresas.html">Empresas</a>
+            <a href="/doc/general/recursos.html">Recursos</a>
+            <a href="/doc/cursos-foros/foros.html">Foros</a>
+        </nav>
+        <div class="actions"><a class="btn btn-sm" href="/doc/general/index.html">Salir al inicio</a></div>
+    </header>
+    <main>
+        <div class="container">
+            <h1 class="page-title">Seguridad y actividad</h1>
+            <p class="lead">Controla cambios importantes y revisa señales que requieren atención.</p>
+            <div class="layout">
+                <aside class="sidebar">
+                    <h4>Menú de navegación</h4>
+                    <a href="/doc/admin/admin.html">Panel principal</a>
+                    <a href="/doc/admin/admin-usuarios.html">Usuarios</a>
+                    <a href="/doc/admin/admin-empresas.html">Empresas</a>
+                    <a href="/doc/admin/admin-moderacion.html">Moderación</a>
+                    <a href="/doc/admin/admin-estadisticas.html">Estadísticas</a>
+                    <a class="active" href="/doc/admin/admin-seguridad.html">Seguridad y actividad</a>
+                </aside>
+                <div class="content">
+                    <div class="security-summary">
+                        <div class="stat"><small>Alertas abiertas</small><strong>3</strong><span class="security-stat-note security-stat-warning">Requieren revisión</span></div>
+                        <div class="stat"><small>Acciones administrativas</small><strong>48</strong><span class="security-stat-note">Últimos 7 días</span></div>
+                        <div class="stat"><small>Último acceso seguro</small><strong>Hoy</strong><span class="security-stat-note">Hace 18 minutos</span></div>
+                    </div>
+                    <div class="security-grid">
+                        <section class="panel">
+                            <div class="section-head security-section-head">
+                                <div><h3>Alertas de seguridad</h3><p class="muted">Situaciones que conviene revisar, sin mezclar tareas de moderación.</p></div>
+                                <button class="btn btn-soft btn-sm" data-security-open="settings" type="button">Configurar</button>
+                            </div>
+                            <div class="security-alerts">
+                                <article class="security-alert security-alert-high">
+                                    <span class="security-alert-icon">!</span>
+                                    <div><strong>Varios restablecimientos recientes</strong><p>3 cuentas solicitaron ayuda con su contraseña en menos de una hora.</p><small>Hace 12 minutos</small></div>
+                                    <button class="btn btn-sm" data-security-detail="reset" type="button">Ver detalle</button>
+                                </article>
+                                <article class="security-alert security-alert-medium">
+                                    <span class="security-alert-icon">i</span>
+                                    <div><strong>Empresa pendiente de verificación</strong><p>La documentación de Grupo Norte lleva 4 días sin revisar.</p><small>Ayer</small></div>
+                                    <button class="btn btn-sm" data-security-detail="company" type="button">Ver detalle</button>
+                                </article>
+                                <article class="security-alert security-alert-low">
+                                    <span class="security-alert-icon">•</span>
+                                    <div><strong>8 cuentas sin actividad</strong><p>Podrías revisar su estado antes del próximo ciclo de limpieza.</p><small>Esta semana</small></div>
+                                    <button class="btn btn-sm" data-security-detail="inactive" type="button">Ver detalle</button>
+                                </article>
+                            </div>
+                        </section>
+                        <section class="panel">
+                            <div class="section-head security-section-head">
+                                <div><h3>Accesos rápidos</h3><p class="muted">Atajos hacia las áreas que resuelven cada alerta.</p></div>
+                            </div>
+                            <div class="security-shortcuts">
+                                <a class="security-shortcut" href="/doc/admin/admin-usuarios.html"><span>Usuarios</span><small>Revisar cuentas inactivas <b>→</b></small></a>
+                                <a class="security-shortcut" href="/doc/admin/admin-empresas.html"><span>Empresas</span><small>Ver pendientes de validación <b>→</b></small></a>
+                                <a class="security-shortcut" href="/doc/admin/admin-moderacion.html"><span>Moderación</span><small>Consultar reportes abiertos <b>→</b></small></a>
+                            </div>
+                        </section>
+                    </div>
+                    <section class="panel security-log-panel">
+                        <div class="section-head security-section-head">
+                            <div><h3>Bitácora de actividad</h3><p class="muted">Registro de acciones administrativas; no reemplaza las estadísticas del portal.</p></div>
+                            <button class="btn btn-sm" data-security-export type="button">Exportar vista</button>
+                        </div>
+                        <div class="security-filters">
+                            <label>Buscar <input data-security-search type="search" placeholder="Usuario, acción o registro"></label>
+                            <label>Tipo
+                                <select data-security-filter>
+                                    <option value="all">Todos los tipos</option>
+                                    <option value="access">Accesos</option>
+                                    <option value="account">Cuentas</option>
+                                    <option value="content">Contenido</option>
+                                </select>
+                            </label>
+                            <button class="btn btn-primary" data-security-apply type="button">Aplicar filtros</button>
+                        </div>
+                        <div class="tablewrap">
+                            <table class="security-log">
+                                <thead><tr><th>Fecha</th><th>Acción</th><th>Registro afectado</th><th>Responsable</th><th>Detalle</th></tr></thead>
+                                <tbody>
+                                    <tr data-security-row data-security-type="account"><td>Hoy · 10:42</td><td><span class="security-action security-action-account">Cuenta</span><strong> Contraseña restablecida</strong></td><td>ana@ejemplo.com</td><td>Administrador</td><td><button class="btn btn-soft btn-sm" data-security-log-detail="reset" type="button">Consultar</button></td></tr>
+                                    <tr data-security-row data-security-type="account"><td>Hoy · 09:18</td><td><span class="security-action security-action-account">Cuenta</span><strong> Empresa editada</strong></td><td>Banco Agrícola</td><td>Administrador</td><td><button class="btn btn-soft btn-sm" data-security-log-detail="company-edit" type="button">Consultar</button></td></tr>
+                                    <tr data-security-row data-security-type="content"><td>Ayer · 16:05</td><td><span class="security-action security-action-content">Contenido</span><strong> Reporte revisado</strong></td><td>Valoración de empleador</td><td>Moderador</td><td><button class="btn btn-soft btn-sm" data-security-log-detail="report" type="button">Consultar</button></td></tr>
+                                    <tr data-security-row data-security-type="access"><td>Ayer · 08:31</td><td><span class="security-action security-action-access">Acceso</span><strong> Sesión iniciada</strong></td><td>Panel administrativo</td><td>Administrador</td><td><button class="btn btn-soft btn-sm" data-security-log-detail="login" type="button">Consultar</button></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="security-empty" data-security-empty hidden>No encontramos acciones con esos filtros.</p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="footer">LinkNoDin · Portal de empleo</footer>
+    <div class="security-modal-backdrop" id="security-detail-modal" hidden>
+        <section class="security-modal" role="dialog" aria-modal="true" aria-labelledby="security-detail-title">
+            <div class="security-modal-head"><div><span class="ld-overline">Bitácora administrativa</span><h2 id="security-detail-title">Detalle de actividad</h2></div><button class="security-modal-close" data-security-close type="button" aria-label="Cerrar diálogo">&times;</button></div>
+            <div class="security-detail"><div><small>Acción</small><strong data-detail-action>Contraseña restablecida</strong></div><div><small>Registro</small><strong data-detail-record>ana@ejemplo.com</strong></div><div><small>Fecha y hora</small><strong data-detail-date>27 de octubre de 2026 · 10:42</strong></div><div><small>Responsable</small><strong>Administrador del portal</strong></div></div>
+            <p class="security-modal-note" data-detail-note>Se generó una contraseña temporal. La cuenta deberá cambiarla al iniciar sesión.</p>
+            <div class="security-modal-actions"><button class="btn" data-security-close type="button">Cerrar</button><button class="btn btn-primary" data-security-mark type="button">Marcar revisada</button></div>
+        </section>
+    </div>
+    <div class="security-modal-backdrop" id="security-settings-modal" hidden>
+        <section class="security-modal" role="dialog" aria-modal="true" aria-labelledby="security-settings-title">
+            <div class="security-modal-head"><div><span class="ld-overline">Preferencias del panel</span><h2 id="security-settings-title">Configurar alertas</h2></div><button class="security-modal-close" data-security-close type="button" aria-label="Cerrar diálogo">&times;</button></div>
+            <p class="muted">Define qué situaciones deben aparecer en este centro de seguridad.</p>
+            <label class="security-toggle"><input type="checkbox" checked> <span><strong>Restablecimientos repetidos</strong><small>Avisar cuando una cuenta solicite ayuda varias veces.</small></span></label>
+            <label class="security-toggle"><input type="checkbox" checked> <span><strong>Empresas sin verificar</strong><small>Mostrar registros pendientes por más de 72 horas.</small></span></label>
+            <label class="security-toggle"><input type="checkbox"> <span><strong>Cuentas sin actividad</strong><small>Incluir cuentas sin movimientos durante 90 días.</small></span></label>
+            <div class="security-modal-actions"><button class="btn" data-security-close type="button">Cancelar</button><button class="btn btn-primary" data-security-save type="button">Guardar preferencias</button></div>
+        </section>
+    </div>
+    <script src="/js/app.js"></script>
+    <script src="/js/acceso-demo.js"></script>
+    <script src="/js/linknodin.js"></script>
+    <script src="/js/notificaciones.js"></script>
+    <script src="/js/worklink-pendientes.js"></script>
+    <script src="/js/admin-seguridad.js"></script>
+</body>
+</html>
