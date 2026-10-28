@@ -18,7 +18,7 @@
 
   const key = 'alert-preferences-' + account.email;
   const demoKey = 'notification-tests-' + account.email;
-  const defaults = { empleos: true, empresas: true, sistema: true, email: account.email };
+  const defaults = { empleos: true, empresas: true, postulaciones: true, sistema: true, email: account.email };
   let preferences = { ...defaults, ...read(key, {}) };
   let selected = 'todos';
 
@@ -30,6 +30,7 @@
     <div class="ld-alert-options">
       <label><input type="checkbox" name="empleos"> Empleos</label>
       <label><input type="checkbox" name="empresas"> Empresas</label>
+      <label><input type="checkbox" name="postulaciones"> Postulaciones</label>
       <label><input type="checkbox" name="sistema"> Sistema</label>
     </div>
     <form id="ld-alert-mail-form">
@@ -46,11 +47,12 @@
       <button class="btn btn-sm" type="button" data-filter="todos">Todas</button>
       <button class="btn btn-sm" type="button" data-filter="empleos">Empleos</button>
       <button class="btn btn-sm" type="button" data-filter="empresas">Empresas</button>
+      <button class="btn btn-sm" type="button" data-filter="postulaciones">Postulaciones</button>
       <button class="btn btn-sm" type="button" data-filter="sistema">Sistema</button>
     </div>`;
   inbox.before(settings);
 
-  for (const type of ['empleos','empresas','sistema']) {
+  for (const type of ['empleos','empresas','postulaciones','sistema']) {
     const cb = settings.querySelector(`[name="${type}"]`);
     cb.checked = preferences[type];
     cb.addEventListener('change', () => {
@@ -76,7 +78,8 @@
   function category(row) {
     const meta = row.querySelector('small')?.textContent?.toLowerCase() || '';
     if (meta.includes('empleos')) return 'empleos';
-    if (meta.includes('empresa') || meta.includes('postulaciones')) return 'empresas';
+    if (meta.includes('postulaciones')) return 'postulaciones';
+    if (meta.includes('empresa')) return 'empresas';
     return 'sistema';
   }
   function filterRows() {
@@ -95,8 +98,10 @@
     if (!original) return;
     e.preventDefault();
     e.stopImmediatePropagation();
-    if (!preferences.empleos) {
-      settings.querySelector('#ld-alert-feedback').textContent = 'Activa las alertas de Empleos para recibir este aviso.';
+    const companyAccount = account.role === 'empresa';
+    const categoryName = companyAccount ? 'postulaciones' : 'empleos';
+    if (!preferences[categoryName]) {
+      settings.querySelector('#ld-alert-feedback').textContent = `Activa las alertas de ${companyAccount ? 'Empresas' : 'Empleos'} para recibir este aviso.`;
       return;
     }
     const current = read(demoKey, []);

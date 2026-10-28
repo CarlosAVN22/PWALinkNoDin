@@ -11,6 +11,7 @@
     <link href="/css/estilos.css" rel="stylesheet" />
     <link href="/css/linknodin.css" rel="stylesheet" />
     <link rel="stylesheet" href="/css/worklink-pendientes.css">
+    <link rel="stylesheet" href="/css/empresa-prototipo.css">
 </head>
 
 <body>
@@ -51,17 +52,20 @@
     </header>
     <main class="container wl-profile">
         <p><a href="/doc/empresa/empresas.html">← Volver a empresas</a></p>
-        <section class="panel wl-profile-head"><img id="wl-company-logo" src="/img/agricola.png" alt="Logo empresarial">
-            <div><span class="tag">Perfil empresarial · Demostración</span>
-                <h1 class="page-title" id="wl-company-name">Banco Agrícola</h1>
-                <p id="wl-company-about">Conoce su información y las opiniones de la comunidad.</p>
+        <section class="panel wl-profile-head company-public-hero"><div class="wl-company-brand" id="wl-company-brand"><img id="wl-company-logo" src="/img/agricola.png" alt="Logo empresarial"></div>
+            <div class="company-public-identity"><span class="tag">Perfil empresarial</span>
+                <h1 class="page-title" id="wl-company-name">Banco Agricola</h1>
+                <p id="wl-company-about">Conoce su informacion y las opiniones de la comunidad.</p>
                 <p id="wl-company-location">Santa Ana, El Salvador</p>
+                <div class="company-public-facts"><span id="wl-company-sector">Sector no indicado</span><span id="wl-company-size" hidden></span><span id="wl-company-founded" hidden></span></div>
+                <div class="company-public-links"><a id="wl-company-contact" hidden></a><a id="wl-company-website" target="_blank" rel="noopener noreferrer" hidden>Sitio web</a><a id="wl-company-linkedin" target="_blank" rel="noopener noreferrer" hidden>LinkedIn</a></div>
             </div>
         </section>
+        <section class="panel company-public-culture" id="wl-company-culture-section" hidden><h2>Como es trabajar aqui</h2><p id="wl-company-culture"></p></section>
         <div class="wl-columns">
             <section class="panel">
                 <h2>Ofertas de empleo</h2>
-                <p>Oportunidades de ejemplo disponibles en esta empresa.</p>
+                <p>Vacantes publicadas por esta empresa.</p>
                 <div id="wl-company-jobs"></div><a class="btn" href="/doc/empleo/empleos.html">Explorar todos los empleos</a>
             </section>
             <section class="panel">
@@ -98,6 +102,7 @@
      <script src="/js/linknodin.js"></script>
     <script src="/js/notificaciones.js"></script>
     <script src="/js/worklink-pendientes.js"></script>
+    <script src="/js/empresa-prototipo.js"></script>
 </body>
 
 </html>

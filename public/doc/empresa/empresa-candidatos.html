@@ -11,6 +11,7 @@
     <link href="/css/estilos.css" rel="stylesheet" />
     <link href="/css/linknodin.css" rel="stylesheet" />
     <link rel="stylesheet" href="/css/worklink-pendientes.css">
+    <link rel="stylesheet" href="/css/empresa-prototipo.css">
 </head>
 
 <body>
@@ -76,83 +77,20 @@
                     </a>
                 </aside>
                 <div class="content">
-                    <div class="panel">
-                        <h3>
-                            Postulaciones por vacante
-                        </h3>
-                        <div class="tablewrap">
-                            <table>
-                                <tr>
-                                    <th>
-                                        Candidato
-                                    </th>
-                                    <th>
-                                        Vacante
-                                    </th>
-                                    <th>
-                                        Estado
-                                    </th>
-                                    <th>
-                                        Acción
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Ana Martínez
-                                    </td>
-                                    <td>
-                                        Desarrollador Web
-                                    </td>
-                                    <td>
-                                        <span class="pill">
-                                            Nueva
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a class="btn btn-soft btn-sm" href="/doc/candidato/candidato-detalle.html">
-                                            Ver perfil
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        José Pérez
-                                    </td>
-                                    <td>
-                                        Diseñador UI/UX
-                                    </td>
-                                    <td>
-                                        <span class="pill">
-                                            En revisión
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a class="btn btn-soft btn-sm" href="/doc/candidato/candidato-detalle.html">
-                                            Ver perfil
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Luis Gómez
-                                    </td>
-                                    <td>
-                                        Analista de datos
-                                    </td>
-                                    <td>
-                                        <span class="pill">
-                                            Entrevista
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a class="btn btn-soft btn-sm" href="/doc/candidato/candidato-detalle.html">
-                                            Ver perfil
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+                    <section class="company-candidate-workspace" id="company-candidates-root">
+                        <div class="company-candidate-heading">
+                            <div>
+                                <p class="company-eyebrow">RECLUTAMIENTO</p>
+                                <h2>Postulaciones</h2>
+                                <p>Organiza el proceso, revisa perfiles y da seguimiento a cada candidatura.</p>
+                            </div>
+                            <a class="btn btn-primary" href="/doc/empleo/publicar.html">Publicar vacante</a>
                         </div>
-                    </div>
+                        <div class="company-candidate-stats" id="company-candidate-stats" aria-label="Resumen de postulaciones"></div>
+                        <div class="company-candidate-toolbar" id="company-candidate-toolbar"></div>
+                        <div class="company-candidate-list" id="company-candidate-list" aria-live="polite"></div>
+                        <p class="company-status" id="company-candidate-status" role="status" aria-live="polite"></p>
+                    </section>
                 </div>
             </div>
         </div>
@@ -166,6 +104,7 @@
      <script src="/js/linknodin.js"></script>
     <script src="/js/notificaciones.js"></script>
     <script src="/js/worklink-pendientes.js"></script>
+    <script src="/js/empresa-prototipo.js"></script>
 </body>
 
 </html>

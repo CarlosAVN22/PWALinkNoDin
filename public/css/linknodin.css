@@ -44,6 +44,17 @@
 .ld-modal{width:min(490px,100%);background:white;border-radius:23px;padding:32px;box-shadow:0 25px 70px #0005;color:#173158}.ld-modal-top{display:flex;justify-content:space-between;align-items:center}.ld-close{border:0;background:#eff3ff;border-radius:50%;width:34px;height:34px;font-size:26px;cursor:pointer;color:#2b5082}.ld-guide-icon{font-size:45px;display:grid;place-items:center;width:81px;height:81px;border-radius:20px;background:#e8f0ff;margin:25px 0 17px;color:#155eef}.ld-modal h2{font-size:27px;letter-spacing:-.6px;margin:8px 0 12px}.ld-modal>p{color:#66809f;line-height:1.7}.ld-step-progress{display:flex;gap:7px;margin:25px 0}.ld-step-progress span{height:6px;flex:1;border-radius:7px;background:#d9e5f4}.ld-step-progress span.selected{background:#155eef}.ld-modal-buttons{display:flex;justify-content:space-between}
 .ld-login-note{margin:10px 0 0;font-size:11px}
 body.dark-mode .ld-carousel-card,body.dark-mode .ld-opinion-compose,body.dark-mode .ld-price-card,body.dark-mode .ld-locked,body.dark-mode .ld-course,body.dark-mode .ld-lesson{background:#1a2232;border-color:#33445c;color:#e6edfa}body.dark-mode .ld-course h3,body.dark-mode .ld-locked h2,body.dark-mode .ld-carousel-card blockquote,body.dark-mode .ld-person strong,body.dark-mode .ld-heading h1{color:#eef4ff}body.dark-mode .ld-carousel-bottom{border-color:#39475f}body.dark-mode .ld-view-switch{background:#273650}body.dark-mode .ld-member-callout,body.dark-mode .ld-premium-strip,body.dark-mode .ld-current-plan{background:#1d3558;border-color:#334e77;color:#e6edfa}body.dark-mode .ld-member-callout strong,body.dark-mode .ld-member-callout p{color:#e6edfa}body.dark-mode .ld-price-premium{background:#223454}body.dark-mode .ld-plan-teaser{background:#243759}body.dark-mode .ld-price-card li{color:#dae4f4}
+/* Contraste de los diálogos y ayudas emergentes en el tema oscuro. */
+body.dark-mode .ld-modal{background:#1a2232;color:#eef2fa;border:1px solid #39475f}
+body.dark-mode .ld-modal .ld-overline{color:#8db7ff}
+body.dark-mode .ld-modal .ld-muted,body.dark-mode .ld-modal>p{color:#c2ccdc}
+body.dark-mode .ld-close{background:#26344a;color:#eaf1ff}
+body.dark-mode .ld-guide-icon{background:#263b58;color:#8bb8ff}
+body.dark-mode .ld-step-progress span{background:#3a4b66}
+body.dark-mode .ld-step-progress span.selected{background:#4c84ff}
+body.dark-mode .ld-notif-disclaimer{color:#c2ccdc!important}
+body.dark-mode .ld-popup{color:#172f58}
+body.dark-mode .ld-popup strong{color:#173660}
 @media(max-width:900px){.ld-testimonial-inner{padding:35px;gap:24px;grid-template-columns:1fr}.ld-testimonial-intro h2 br{display:none}.ld-testimonial-intro h2{font-size:30px}.ld-testimonial-intro p{max-width:none}.ld-pricing-grid{gap:12px}.ld-price-card{padding:25px}}
 @media(max-width:680px){.ld-testimonials{border-radius:18px;margin:25px 0}.ld-testimonial-inner{padding:23px;gap:20px}.ld-carousel-card{padding:22px;min-height:315px}.ld-carousel-card blockquote{font-size:21px}.ld-opinion-compose{display:block;padding:20px}.ld-pricing-grid,.ld-course-grid{grid-template-columns:1fr}.ld-member-callout{display:block}.ld-member-callout .btn{margin-top:15px}.ld-results-header{flex-direction:column;align-items:stretch}.ld-view-switch button{flex:1}.ld-map{height:370px}.ld-job{flex-wrap:wrap}.ld-job .btn{margin-left:58px}.ld-modal{padding:24px}}
 .extra-wrap{max-width:1150px;margin:30px auto;padding:0 20px}

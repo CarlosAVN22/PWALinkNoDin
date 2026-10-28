@@ -12,6 +12,9 @@
     <link href="/css/linknodin.css" rel="stylesheet" />
     <link rel="stylesheet" href="/css/worklink-pendientes.css">
     <link rel="stylesheet" href="/css/empleo/empleo.css">
+    <link rel="stylesheet" href="/css/empresa-prototipo.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
 <body>
@@ -78,73 +81,81 @@
                 </aside>
                 <div class="content">
                     <form class="panel demo-form" id="ld-publish">
-                        <h3>
-                            Nueva oferta laboral
-                        </h3>
-                        <div class="grid2">
-                            <div class="field">
-                                <label>
-                                    Título del puesto
-                                </label>
-                                <input placeholder="Título del puesto" required="" type="text" />
+                        <h3>Nueva oferta laboral</h3>
+                        <fieldset class="job-form-section">
+                            <legend>Información del puesto</legend>
+                            <div class="grid2">
+                                <div class="field"><label for="job-title">Título del puesto</label><input id="job-title" name="titulo" maxlength="100" placeholder="Ej. Auxiliar contable" required type="text"></div>
+                                <div class="field"><label for="job-openings">Cantidad de plazas</label><input id="job-openings" name="plazas" type="number" min="1" max="500" value="1" required></div>
+                                <div class="field"><label for="job-contract">Tipo de contratación</label><select id="job-contract" name="contrato" required><option>Indefinido</option><option>Plazo fijo</option><option>Por obra determinada</option><option>Prácticas profesionales</option><option>Aprendizaje</option></select></div>
+                                <div class="field"><label for="ld-job-modality">Modalidad</label><select id="ld-job-modality" name="modalidad" required><option>Presencial</option><option>Híbrido</option><option>Remoto</option></select></div>
+                                <div class="field"><label for="job-experience">Experiencia requerida</label><select id="job-experience" name="experiencia" required><option>Sin experiencia</option><option>Junior (1–2 años)</option><option>Intermedio (3–5 años)</option><option>Senior (más de 5 años)</option><option>No especificada</option></select></div>
+                                <div class="field"><label for="job-education">Escolaridad requerida</label><select id="job-education" name="escolaridad" required><option>Indiferente</option><option>Educación básica</option><option>Bachillerato</option><option>Técnico</option><option>Universitario</option><option>Posgrado</option></select></div>
+                                <div class="field"><label for="job-work-time">Tiempo de trabajo</label><select id="job-work-time" name="tiempoTrabajo" required><option>Tiempo completo</option><option>Medio tiempo</option><option>Por horas</option><option>Por turnos</option></select></div>
+                                <div class="field"><label for="job-schedule">Jornada / turno</label><select id="job-schedule" name="jornada" required><option>Diurna</option><option>Nocturna</option><option>Mixta</option><option>Turnos rotativos</option><option>Flexible</option></select></div>
+                                <div class="field"><label for="job-hours">Horario o días de trabajo</label><input id="job-hours" name="horario" maxlength="120" placeholder="Ej. lunes a viernes, 8:00 a. m. – 5:00 p. m."></div>
                             </div>
-                            <div class="field">
-                                <label>
-                                    Ubicación
-                                </label>
-                                <input placeholder="Ubicación" required="" type="text" />
+                            <div class="grid2">
+                                <div class="field"><label for="job-area">Area o rubro de la vacante (opcional)</label><input id="job-area" name="area" maxlength="100" placeholder="Ej. Ventas, contabilidad, tecnologia"></div>
                             </div>
-                            <div class="field">
-                                <label>
-                                    Tipo de contrato
-                                </label>
-                                <input placeholder="Tipo de contrato" required="" type="text" />
+                            <div class="field"><label for="job-description">Objetivo o resumen del puesto</label><textarea id="job-description" name="descripcion" maxlength="2000" placeholder="Resume el objetivo del puesto y su aporte al equipo." required></textarea></div>
+                            <div class="field"><label for="job-responsibilities">Responsabilidades principales</label><textarea id="job-responsibilities" name="responsabilidades" maxlength="4000" placeholder="Detalla las tareas y resultados esperados." required></textarea></div>
+                            <div class="grid2">
+                                <div class="field"><label for="job-license">Licencia de conducir</label><select id="job-license" name="licencia"><option value="No requerida">No requerida</option><option value="Requerida">Requerida</option><option value="Deseable">Deseable</option></select></div>
+                                <div class="field"><label for="job-vehicle">Vehiculo propio</label><select id="job-vehicle" name="vehiculo"><option value="No requerido">No requerido</option><option value="Requerido">Requerido</option><option value="Deseable">Deseable</option></select></div>
                             </div>
-                            <div class="field"><label for="ld-job-modality">Modalidad de trabajo</label><select
-                                    id="ld-job-modality" name="modalidad">
-                                    <option>Presencial</option>
-                                    <option>Remoto</option>
-                                    <option>Híbrido</option>
-                                </select></div>
-                            <div class="field">
-                                <label>
-                                    Salario aproximado
-                                </label>
-                                <input placeholder="Salario aproximado" required="" type="text" />
+                            <div class="field"><label for="job-competencies">Competencias deseables (opcional)</label><textarea id="job-competencies" name="competencias" maxlength="1500" placeholder="Ej. liderazgo, negociacion, organizacion."></textarea></div>
+                            <div class="field"><label for="job-requirements">Requisitos y habilidades</label><textarea id="job-requirements" name="requisitos" maxlength="2500" placeholder="Conocimientos, experiencia, estudios o herramientas necesarias." required></textarea></div>
+                            <div class="field"><label for="job-benefits">Prestaciones y beneficios</label><textarea id="job-benefits" name="beneficios" maxlength="1500" placeholder="Prestaciones, capacitacion, transporte, alimentacion u otros beneficios ofrecidos."></textarea></div>
+                        </fieldset>
+                        <fieldset class="job-form-section">
+                            <legend>Preguntas para la postulacion (opcional)</legend>
+                            <p class="ld-muted">Si agregas preguntas, la persona candidata debera responderlas para completar su postulacion. Puedes agregar hasta 5.</p>
+                            <div id="job-questions-list"></div>
+                            <input type="hidden" name="preguntas" value="[]">
+                            <button class="btn btn-soft" type="button" id="job-question-add">Agregar pregunta</button>
+                        </fieldset>
+                        <fieldset class="job-form-section">
+                            <legend>Salario y fechas</legend>
+                            <div class="grid2">
+                                <div class="field"><label for="job-salary-min">Salario mínimo (USD)</label><input id="job-salary-min" name="salarioMin" type="number" min="0" step="0.01" placeholder="Ej. 500"></div>
+                                <div class="field"><label for="job-salary-max">Salario máximo (USD)</label><input id="job-salary-max" name="salarioMax" type="number" min="0" step="0.01" placeholder="Ej. 650"></div>
+                                <div class="field"><label for="job-salary-period">Frecuencia de pago</label><select id="job-salary-period" name="frecuenciaPago"><option>Mensual</option><option>Quincenal</option><option>Semanal</option><option>Por hora</option><option>Por proyecto</option></select></div>
+                                <div class="field"><label for="job-deadline">Fecha límite para postularse</label><input id="job-deadline" name="fechaLimite" type="date"></div>
                             </div>
-                            <div class="field">
-                                <label>
-                                    Experiencia requerida
-                                </label>
-                                <input placeholder="Experiencia requerida" required="" type="text" />
+                            <label class="job-check"><input name="salarioConfidencial" type="checkbox"> No mostrar el salario en la publicación</label>
+                        </fieldset>
+                        <fieldset class="job-form-section">
+                            <legend>Lugar de trabajo</legend>
+                            <p class="ld-muted">Indica dónde se realizará el trabajo. En modalidad remota, puedes marcar la sede de referencia o dejar el punto del mapa sin seleccionar.</p>
+                            <div class="grid2">
+                                <div class="field"><label for="job-department">Departamento</label><select id="job-department" name="departamento" required><option value="">Selecciona departamento</option><option>Ahuachapán</option><option>Cabañas</option><option>Chalatenango</option><option>Cuscatlán</option><option>La Libertad</option><option>La Paz</option><option>La Unión</option><option>Morazán</option><option>San Miguel</option><option>San Salvador</option><option>San Vicente</option><option>Santa Ana</option><option>Sonsonate</option><option>Usulután</option></select></div>
+                                <div class="field"><label for="job-city">Municipio o ciudad</label><input id="job-city" name="ciudad" maxlength="80" placeholder="Ej. Santa Tecla" required></div>
+                                <div class="field"><label for="job-address">Dirección o zona</label><input id="job-address" name="direccion" maxlength="180" placeholder="Colonia, calle, número de local o parque empresarial"></div>
+                                <div class="field"><label for="job-reference">Punto de referencia (opcional)</label><input id="job-reference" name="referencia" maxlength="160" placeholder="Ej. frente al parque central"></div>
                             </div>
-                            <div class="field">
-                                <label>
-                                    Correo de contacto
-                                </label>
-                                <input placeholder="Correo de contacto" required="" type="email" />
+                            <label class="job-check"><input id="job-map-private" name="ubicacionAproximada" type="checkbox" checked> Mostrar solo la ubicación aproximada en el mapa</label>
+                            <div id="job-location-map" class="job-location-map" role="application" aria-label="Mapa para seleccionar la ubicación del trabajo"></div>
+                            <small class="ld-muted">El mapa y la sugerencia de direccion usan OpenStreetMap. Verifica los datos antes de publicar.</small>
+                            <p id="job-location-status" class="ld-muted" aria-live="polite">Selecciona un punto del mapa para indicar la ubicación exacta; puedes mover el marcador después.</p>
+                            <input type="hidden" name="latitud"><input type="hidden" name="longitud">
+                        </fieldset>
+                        <fieldset class="job-form-section">
+                            <legend>Postulación y contacto</legend>
+                            <div class="grid2">
+                                <div class="field"><label for="job-contact-email">Correo de contacto (si aplica)</label><input id="job-contact-email" name="contacto" placeholder="reclutamiento@empresa.com" type="email"></div>
+                                <div class="field"><label for="job-contact-method">Cómo postularse</label><select id="job-contact-method" name="metodoPostulacion"><option value="portal">Enviar postulación desde LinkNoDin</option><option value="email">Contactar por correo</option><option value="both">Ambas opciones</option></select></div>
                             </div>
-                        </div>
-                        <div class="field">
-                            <label>
-                                Descripción del puesto
-                            </label>
-                            <textarea required></textarea>
-                        </div>
-                        <div class="field">
-                            <label>
-                                Requisitos y beneficios
-                            </label>
-                            <textarea required></textarea>
-                        </div>
+                            <div class="field"><label for="job-application-instructions">Instrucciones adicionales (opcional)</label><textarea id="job-application-instructions" name="instrucciones" maxlength="800" placeholder="Documentos o información que debe enviar la persona candidata."></textarea></div>
+                        </fieldset>
+                        <label class="job-check"><input name="confirmacion" type="checkbox" required> Confirmo que la información de esta vacante es correcta y no contiene criterios discriminatorios.</label>
                         <button class="btn" type="button" id="em-preview-open">Vista previa</button>
                         <button class="btn btn-primary" type="submit">
                             Publicar vacante
                         </button>
                         <p aria-live="polite" class="ld-status" id="ld-status" role="status"></p>
                         <section id="em-publicadas" class="ld-em-posts" aria-live="polite"><h3>Mis últimas vacantes</h3><div id="em-publicadas-lista"></div></section>
-                        <p class="ld-muted">La vacante se guardará únicamente en este navegador y aparecerá en Empleos y
-                            en el mapa cuando la ciudad sea reconocida.</p>
+                        <p class="ld-muted">Esta publicación de demostración se guarda solo en este navegador. Las vacantes activas aparecen en Empleos; el mapa usa el punto elegido o la ubicación aproximada del municipio.</p>
                     </form>
                 </div>
             </div>
@@ -159,6 +170,7 @@
      <script src="/js/linknodin.js"></script>
     <script src="/js/notificaciones.js"></script>
     <script src="/js/worklink-pendientes.js"></script>
+    <script src="/js/empresa-prototipo.js"></script>
     <div class="ld-em-overlay" id="em-preview-modal" hidden><section class="ld-em-dialog panel" role="dialog" aria-modal="true" aria-labelledby="em-preview-title"><h2 id="em-preview-title">Vista previa de la vacante</h2><div id="em-preview-data"></div><div class="ld-em-actions"><button type="button" class="btn" id="em-preview-close">Volver a editar</button><button type="button" class="btn btn-primary" id="em-preview-confirm">Confirmar publicación</button></div></section></div>
     <script src="/js/empleo/publicar.js"></script>
 </body>

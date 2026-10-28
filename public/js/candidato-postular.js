@@ -50,6 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const profile = C.profile();
+  const questions = Array.isArray(job.questions) ? job.questions.filter(question => String(question).trim()) : [];
+  const questionFields = questions.map((question, index) => `
+    <div class="field lnc-screening-question">
+      <label for="lnc-question-${index}">${C.safe(question)} <span aria-hidden="true">*</span></label>
+      <textarea id="lnc-question-${index}" name="respuesta-${index}" rows="3" maxlength="1000" required placeholder="Escribe tu respuesta"></textarea>
+    </div>
+  `).join('');
 
   const form = document.createElement('form');
 
@@ -107,6 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     </div>
 
+    ${questions.length ? `<fieldset class="lnc-question-group"><legend>Preguntas de la empresa</legend><p class="lnc-muted">Responde todas las preguntas para poder enviar tu postulacion.</p>${questionFields}</fieldset>` : ''}
+
     <div class="field">
       <label for="lnc-letter">
         Mensaje de presentación (opcional)
@@ -148,8 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 
     <p class="lnc-muted">
-      Esta operación solo se guarda en este navegador;
-      no se envía a una empresa.
+      Esta postulacion se guarda en este navegador y aparece en el panel de la empresa dentro de este prototipo.
     </p>
   `;
 
@@ -205,6 +213,18 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    const answers = questions.map((question, index) => ({
+      question: String(question),
+      answer: form.querySelector(`#lnc-question-${index}`)?.value.trim() || ''
+    }));
+    const unanswered = answers.findIndex(item => !item.answer);
+    if (unanswered !== -1) {
+      const input = form.querySelector(`#lnc-question-${unanswered}`);
+      C.notice('Responde todas las preguntas de la empresa antes de postularte.', 'error');
+      input?.focus();
+      return;
+    }
+
     C.confirmModal(
       '¿Registrar tu postulación de demostración a ' +
       job.title +
@@ -221,11 +241,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
           title: job.title,
           company: job.company || 'Empresa',
+          candidateEmail: C.email(),
+          candidateName: C.user().name,
 
           date: now,
           status: 'Recibida',
 
           message: letter.value.trim(),
+          answers,
 
           history: [
             {

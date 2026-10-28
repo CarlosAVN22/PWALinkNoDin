@@ -48,8 +48,8 @@
     'san vicente':[13.6411,-88.7858], 'cojutepeque':[13.7167,-88.9333], 'sensuntepeque':[13.8667,-88.6333],
     'chalatenango':[14.0333,-88.9333], 'metapan':[14.3333,-89.4500], 'apopa':[13.8074,-89.1792]
   };
-  const coords = (city) => { const location = norm(city).replace(/,\s*el salvador$/,''); const name = Object.keys(cityCoords).find(n => location === n || location.startsWith(n + ',') || location.startsWith(n + ' ')); return name ? cityCoords[name] : null; };
-  const jobs = () => [...baseJobs, ...get('jobs', []).filter(x => x && x.id && x.title && x.city)];
+  const coords = (city, job) => { const location = norm(city).replace(/,\s*el salvador$/,''); const name = Object.keys(cityCoords).find(n => location === n || location.startsWith(n + ',') || location.startsWith(n + ' ')); if(job && Number(job.latitude) && Number(job.longitude)){if(!job.approximateLocation)return [Number(job.latitude),Number(job.longitude)];if(name)return cityCoords[name];return [Math.round(Number(job.latitude)*100)/100,Math.round(Number(job.longitude)*100)/100];}return name ? cityCoords[name] : null; };
+  const jobs = () => [...baseJobs, ...get('jobs', []).filter(x => x && x.id && x.title && x.city && (!x.status || x.status === 'Activa'))];
   function updateAccount(changes) {
     const user = current(); if (!user) return false;
     put('accounts', accounts().map(a => a.email === user.email ? {...a, ...changes} : a)); return true;
@@ -58,17 +58,6 @@
     const n = $('ld-status'); if (n) { n.textContent = message; n.dataset.kind = kind; }
   }
   function nav() {
-    // Enlace público centralizado para mantener todos los menús sincronizados.
-    const menu = document.querySelector('.navlinks');
-    if (menu && !menu.querySelector('a[href="/doc/general/opiniones.html"]')) {
-      const link = document.createElement('a');
-      link.href = '/doc/general/opiniones.html';
-      link.textContent = 'Opiniones';
-      if (location.pathname === '/doc/general/opiniones.html') link.className = 'active';
-      const resources = menu.querySelector('a[href="/doc/general/recursos.html"]');
-      if (resources) menu.insertBefore(link, resources);
-      else menu.append(link);
-    }
     const actions = document.querySelector('.actions'); if (!actions) return;
     if (current()) {
       [...actions.querySelectorAll('a')].forEach(a => { if (['login.html','registro.html'].includes(a.getAttribute('href')?.split('/').pop())) a.remove(); });
@@ -110,7 +99,8 @@
       if (email === ADMIN_EMAIL) return banner('Este correo está reservado para el administrador.','error');
       if (accounts().some(a => a.email === email)) return banner('Ya existe esa cuenta de demostración. Inicia sesión.','error');
       // Contraseña de prueba guardada solo en el navegador. No usar credenciales reales.
-      put('accounts', [...accounts(), {email,name,password:pw,role:reg.dataset.role || 'candidato',plan:'Gratuito',onboardingSeen:false,notificationsEnabled:null}]);
+      const extra = reg.dataset.role === 'empresa' ? {representative: items[1]?.value.trim() || '', phone: items.find(i => /teléfono/i.test(i.placeholder))?.value.trim() || '', sector:reg.querySelector('#company-sector')?.value || '', city:reg.querySelector('#company-city')?.value || ''} : {};
+      put('accounts', [...accounts(), {email,name,password:pw,role:reg.dataset.role || 'candidato',plan:'Gratuito',onboardingSeen:false,notificationsEnabled:null,...extra}]);
       sessionStorage.setItem('ld-registration-email', email);
       location.href = page('login.html') + '?registrado=1';
     });
@@ -198,8 +188,8 @@
     });
   }
   function jobCard(job) {const a=document.createElement('article');a.className='job ld-job';a.dataset.jobId=job.id;
-    const marker=coords(job.city)?'<span class="ld-map-indicator">⌁ En mapa</span>':'<span class="ld-map-indicator">Sin coordenadas</span>';
-    a.innerHTML=`<div class="jobmain"><div class="logo">${encode(job.company.charAt(0))}</div><div><h3>${encode(job.title)}</h3><small>${encode(job.company)} · ${encode(job.city)}</small><p>${encode(job.modality)} · ${encode(job.contract)}</p><span class="tag">${encode(job.modality)}</span>${marker}</div></div><a class="btn btn-primary" href="${page('detalle-empleo.html')}?id=${encode(encodeURIComponent(job.id))}">Ver empleo</a>`;return a;
+    const marker=coords(job.city,job)?'<span class="ld-map-indicator">⌁ En mapa</span>':'<span class="ld-map-indicator">Sin coordenadas</span>';
+    a.innerHTML=`<div class="jobmain"><div class="logo">${encode(job.company.charAt(0))}</div><div><h3>${encode(job.title)}</h3><small>${encode(job.company)} · ${encode(job.city)}${job.department?' · '+encode(job.department):''}</small><p>${encode(job.modality)} · ${encode(job.workTime||job.contract)}</p><span class="tag">${encode(job.modality)}</span>${marker}</div></div><a class="btn btn-primary" href="${page('detalle-empleo.html')}?id=${encode(encodeURIComponent(job.id))}">Ver empleo</a>`;return a;
   }
   let sharedMap=null, layer=null;
   function makeMap(){if(sharedMap)return true; if(typeof window.L==='undefined') {const e=$('ld-map-error');if(e)e.textContent='No se pudo cargar el mapa. Se necesita Internet para visualizar OpenStreetMap. La lista de ofertas sí está disponible.';return false}
@@ -207,7 +197,7 @@
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(sharedMap);
     layer=L.layerGroup().addTo(sharedMap);return true;
   }
-  function syncMap(jobsToDraw) {if(!makeMap())return;layer.clearLayers();const locations=[];jobsToDraw.forEach(j=>{const pt=coords(j.city);if(!pt)return; const icon=L.divIcon({className:'ld-map-pin-wrap',html:'<span class="ld-map-pin">⌖</span>',iconSize:[32,38],iconAnchor:[16,36]});const marker=L.marker(pt,{icon}).addTo(layer);
+  function syncMap(jobsToDraw) {if(!makeMap())return;layer.clearLayers();const locations=[];jobsToDraw.forEach(j=>{const pt=coords(j.city,j);if(!pt)return; const icon=L.divIcon({className:'ld-map-pin-wrap',html:'<span class="ld-map-pin">⌖</span>',iconSize:[32,38],iconAnchor:[16,36]});const marker=L.marker(pt,{icon}).addTo(layer);
     const popup=document.createElement('div');popup.className='ld-popup';const h=document.createElement('strong');h.textContent=j.title;const c=document.createElement('p');c.textContent=j.company+' · '+j.city+' · '+j.modality;const a=document.createElement('a');a.href=page('detalle-empleo.html')+'?id='+encodeURIComponent(j.id);a.textContent='Ver vacante →';popup.append(h,c,a);marker.bindPopup(popup);locations.push(pt);});
     if(locations.length)sharedMap.fitBounds(L.latLngBounds(locations).pad(.32),{maxZoom:11});else sharedMap.setView([13.73,-89.05],8);
     const el=$('ld-map-error');if(el)el.textContent=`${locations.length} de ${jobsToDraw.length} vacantes filtradas con ubicación en el mapa. Las ubicaciones se colocan en el centro aproximado de cada ciudad, no en una dirección exacta. Una vacante remota se ubica según la ciudad de la empresa.`;
@@ -217,7 +207,7 @@
     const loc=$('ld-filter-location'),keyword=$('ld-filter-keyword'),contract=$('ld-filter-contract'),exp=$('ld-filter-experience'),modality=$('ld-filter-modality');
     const qs=new URLSearchParams(location.search);keyword.value=qs.get('q')||'';loc.value=qs.get('ubicacion')||'';if(qs.get('modalidad'))modality.value=qs.get('modalidad');
     let selected=qs.get('vista')==='mapa'?'map':'list';
-    const update=()=>{const filtered=jobs().filter(j=>(!loc.value.trim()||norm(j.city).includes(norm(loc.value))) && (!keyword.value.trim()||norm([j.title,j.company,j.description].join(' ')).includes(norm(keyword.value))) && (contract.value==='Todos'||norm(j.contract)===norm(contract.value)) && (exp.value==='Todas'||norm(j.experience)===norm(exp.value)) && (modality.value==='Todas'||norm(j.modality)===norm(modality.value)));
+    const update=()=>{const filtered=jobs().filter(j=>(!loc.value.trim()||norm(j.city).includes(norm(loc.value))) && (!keyword.value.trim()||norm([j.title,j.company,j.description].join(' ')).includes(norm(keyword.value))) && (contract.value==='Todos'||norm(j.workTime||j.contract)===norm(contract.value)) && (exp.value==='Todas'||norm(j.experience)===norm(exp.value)) && (modality.value==='Todas'||norm(j.modality)===norm(modality.value)));
       list.replaceChildren(...filtered.map(jobCard));const cnt=$('ld-job-count');cnt.textContent=filtered.length+' '+(filtered.length===1?'vacante encontrada':'vacantes encontradas')+' en el prototipo';
       $('ld-empty').hidden=filtered.length!==0;
       if(selected==='map')syncMap(filtered);
@@ -232,22 +222,61 @@
   }
   function initSearch(){const form=$('ld-home-search');if(!form)return;form.onsubmit=e=>{e.preventDefault();const q=new URLSearchParams(); const keyword=form.querySelector('[name=q]').value.trim(),loc=form.querySelector('[name=ubicacion]').value,mode=form.querySelector('[name=modalidad]').value;if(keyword)q.set('q',keyword);if(loc)q.set('ubicacion',loc);if(mode)q.set('modalidad',mode);location.href=page('empleos.html')+'?'+q.toString();};}
   function initFeatured(){const container=$('ld-featured');if(!container)return;container.replaceChildren(...jobs().slice(0,4).map(jobCard));}
-  function initPublish(){const f=$('ld-publish');if(!f)return;f.addEventListener('submit',e=>{e.preventDefault();const fields=[...f.querySelectorAll('input')];const [title,city,contract,salary,experience,contact]=fields.map(x=>x.value.trim());if(!title||!city||!contact)return banner('Completa los campos obligatorios.','error');const newJob={id:'local-'+Date.now(),createdAt:new Date().toISOString(),title,city,contract:contract||'No especificado',experience:experience||'No especificada',salary,contact,company:current()?.role==='empresa'?current().name:'Empresa de demostración',owner:current()?.email||null,modality:f.querySelector('[name=modalidad]').value,description:f.querySelector('textarea')?.value.trim()||'Sin descripción',requirements:f.querySelectorAll('textarea')[1]?.value.trim()||'',isDemo:true};put('jobs',[...get('jobs',[]),newJob]);window.dispatchEvent(new CustomEvent('ld:activity-updated'));f.reset();banner('Vacante agregada a la lista y al mapa de este navegador. No se publicó en Internet.','success');});}
+  function initPublish(){
+    const f=$('ld-publish');if(!f)return;
+    const field=name=>f.elements.namedItem(name),editId=new URLSearchParams(location.search).get('editar');
+    const old=editId?get('jobs',[]).find(j=>j.id===editId&&j.owner===current()?.email):null;
+    const names=['titulo','ciudad','departamento','direccion','referencia','plazas','contrato','tiempoTrabajo','modalidad','salarioMin','salarioMax','frecuenciaPago','experiencia','escolaridad','jornada','horario','contacto','metodoPostulacion','instrucciones','fechaLimite','latitud','longitud','area','responsabilidades','licencia','vehiculo','competencias','preguntas'];
+    const areas=['descripcion','responsabilidades','requisitos','beneficios'].map(field);
+    if(old){const vals={titulo:old.title,ciudad:old.city,departamento:old.department,direccion:old.address,referencia:old.reference,plazas:old.openings,contrato:['Indefinido','Plazo fijo','Por obra determinada','Prácticas profesionales','Aprendizaje'].includes(old.contract)?old.contract:'Indefinido',tiempoTrabajo:old.workTime||'Tiempo completo',modalidad:old.modality||'Presencial',salarioMin:old.salaryMin||'',salarioMax:old.salaryMax,frecuenciaPago:old.salaryPeriod||'Mensual',experiencia:['Sin experiencia','Junior (1–2 años)','Intermedio (3–5 años)','Senior (más de 5 años)','No especificada'].includes(old.experience)?old.experience:'No especificada',escolaridad:old.education||'Indiferente',jornada:old.schedule||'Diurna',horario:old.hours,contacto:old.contact,metodoPostulacion:old.applicationMethod||'portal',instrucciones:old.instructions,fechaLimite:old.deadline,latitud:old.latitude,longitud:old.longitude,area:old.area,licencia:old.license,vehiculo:old.vehicle,competencias:old.competencies,responsabilidades:old.responsibilities||old.description,preguntas:JSON.stringify(Array.isArray(old.questions)?old.questions:[])};names.forEach(k=>{if(field(k)&&vals[k]!=null)field(k).value=vals[k]});if(field('salarioConfidencial'))field('salarioConfidencial').checked=Boolean(old.salaryHidden);if(field('ubicacionAproximada'))field('ubicacionAproximada').checked=old.approximateLocation!==false;areas.forEach((x,i)=>{if(x)x.value=[old.description,old.responsibilities||old.description,old.requirements,old.benefits][i]||''});const h=f.querySelector('h3');if(h)h.textContent='Editar vacante';const b=f.querySelector('button[type=submit]');if(b)b.textContent='Guardar cambios';}
+    f.addEventListener('submit',e=>{e.preventDefault();const title=field('titulo').value.trim(),city=field('ciudad').value.trim(),contact=field('contacto').value.trim(),method=field('metodoPostulacion').value,min=Number(field('salarioMin').value),max=Number(field('salarioMax').value);if(!title||!city||(method!=='portal'&&!contact))return banner('Completa los campos obligatorios.','error');if(window.L&&field('modalidad').value!=='Remoto'&&(!field('latitud').value||!field('longitud').value)){document.getElementById('job-location-status').textContent='Selecciona el punto del lugar de trabajo en el mapa para continuar.';return;}if(field('salarioMin').value&&field('salarioMax').value&&min>max)return banner('El salario maximo debe ser igual o mayor al minimo.','error');const all=get('jobs',[]);const job={...(old||{}),id:old?.id||'local-'+Date.now(),createdAt:old?.createdAt||new Date().toISOString(),title,openings:Number(field('plazas').value)||1,city,department:field('departamento').value,address:field('direccion').value.trim(),reference:field('referencia').value.trim(),contract:field('contrato').value,workTime:field('tiempoTrabajo').value,modality:field('modalidad').value,salaryMin:field('salarioMin').value,salaryMax:field('salarioMax').value,salaryPeriod:field('frecuenciaPago').value,salaryHidden:field('salarioConfidencial').checked,experience:field('experiencia').value,education:field('escolaridad').value,schedule:field('jornada').value,hours:field('horario').value.trim(),contact,applicationMethod:method,instructions:field('instrucciones').value.trim(),deadline:field('fechaLimite').value,questions:(()=>{try{return JSON.parse(field('preguntas').value||'[]')}catch{return []}})(),area:field('area').value.trim(),license:field('licencia').value,vehicle:field('vehiculo').value,competencies:field('competencias').value.trim(),responsibilities:areas[1]?.value.trim()||'',latitude:field('latitud').value,longitude:field('longitud').value,approximateLocation:field('ubicacionAproximada').checked,company:current()?.name||'Empresa de demostracion',owner:current()?.email||null,description:areas[0]?.value.trim()||'',requirements:areas[2]?.value.trim()||'',benefits:areas[3]?.value.trim()||'',status:old?.status||'Activa',isDemo:true};put('jobs',old?all.map(j=>j.id===old.id?job:j):[...all,job]);window.dispatchEvent(new CustomEvent('ld:activity-updated'));if(old){banner('Vacante actualizada en este navegador.','success');location.href='/doc/empresa/empresa-vacantes.html';}else{f.reset();banner('Vacante guardada en el prototipo de este navegador.','success');}});
+  }
   function initDetail(){
     const id=new URLSearchParams(location.search).get('id');
-    if(!id)return;
-    const job=jobs().find(j=>j.id===id);if(!job)return;
+    const content=$('ld-detail-content'),status=$('ld-detail-status');
+    const job=id?jobs().find(j=>j.id===id):null;
+    if(!job){if(content)content.hidden=true;if(status){status.hidden=false;status.textContent='No encontramos esta vacante. Puede haber vencido o ya no estar disponible.';}return;}
+    const set=(name,value,fallback='No especificado')=>{const el=$('ld-detail-'+name);if(el)el.textContent=value||fallback;};
     const title=$('ld-detail-title'),info=$('ld-detail-info'),desc=$('ld-detail-desc'),company=$('ld-detail-company');
     if(title)title.textContent=job.title;
-    if(info)info.textContent=job.company+' · '+job.city+' · '+job.modality+' · '+job.contract;
-    if(desc)desc.textContent=job.description;
+    if(info)info.textContent=[job.company,job.city,job.department,job.modality].filter(Boolean).join(' | ');
+    const salary=job.salaryHidden?'No publicado':job.salaryMin||job.salaryMax?`$${job.salaryMin||'-'} - $${job.salaryMax||'-'} USD | ${job.salaryPeriod||'Mensual'}`:job.salary||'No especificado';set('salary',salary);
+    set('contract',job.contract);set('worktime',job.workTime);set('modality',job.modality);set('experience',job.experience);set('education',job.education);
+    set('schedule',[job.schedule,job.hours].filter(Boolean).join(' | '),'No especificada');
+    set('openings',String(job.openings||1));
+    set('deadline',job.deadline?new Date(job.deadline+'T12:00:00').toLocaleDateString('es-SV',{year:'numeric',month:'long',day:'numeric'}):'No especificada');
+    const method=job.applicationMethod||'portal';
+    const hasQuestions=Array.isArray(job.questions)&&job.questions.some(question=>String(question).trim());
+    set('contact',method==='portal'||hasQuestions?'Postulacion gestionada desde LinkNoDin':job.contact,'No especificado');
+    const locationLabel=[job.approximateLocation?null:job.address,job.city,job.department,'El Salvador',job.approximateLocation?null:job.reference].filter(Boolean).join(', ')||'No especificada';set('location',locationLabel);
+    if(desc)desc.textContent=job.description||'La empresa no agrego una descripcion.';
     if(company)company.textContent=job.company;
-    const req=$('ld-detail-requirements'),benefits=$('ld-detail-benefits');
-    if(req)req.textContent=job.id==='demo-web'?'Conocimientos de HTML, CSS, Bootstrap y trabajo en equipo.':job.requirements||'La vacante de demostración no detalla requisitos adicionales.';
-    if(benefits)benefits.textContent=job.id==='demo-web'?'Capacitación, horario flexible y oportunidades de crecimiento.':'Los beneficios no fueron especificados en esta vacante.';
-    const apply=$('ld-apply-link');if(apply)apply.href='/doc/candidato/postular.html?id='+encodeURIComponent(job.id);
-    const companyDesc=$('ld-company-desc');if(companyDesc)companyDesc.textContent=job.id==='demo-web'?'Empresa dedicada a soluciones tecnológicas y servicios digitales.':'Consulta el perfil y los detalles de la empresa.';
-    const logo=$('ld-company-logo');if(logo)logo.textContent=job.company.charAt(0);
+    const req=$('ld-detail-requirements'),benefits=$('ld-detail-benefits'),responsibilities=$('ld-detail-responsibilities'),competencies=$('ld-detail-competencies');
+    if(responsibilities)responsibilities.textContent=job.responsibilities||job.description||'No se especificaron responsabilidades.';
+    if(req)req.textContent=job.requirements||'No se especificaron requisitos adicionales.';
+    if(competencies)competencies.textContent=job.competencies||'No se especificaron competencias adicionales.';
+    set('area',job.area,'No especificada');set('license',job.license,'No requerida');set('vehicle',job.vehicle,'No requerido');
+    set('published',job.createdAt?new Date(job.createdAt).toLocaleDateString('es-SV',{year:'numeric',month:'long',day:'numeric'}):'No especificada','No especificada');
+    if(benefits)benefits.textContent=job.benefits||'No se especificaron beneficios adicionales.';
+    set('instructions',job.instructions,'Sigue las indicaciones al iniciar tu postulacion.');
+    const tag=$('ld-detail-status-tag');if(tag)tag.textContent=job.status||'Oferta activa';
+    const questionNote=$('ld-detail-questions-note');if(questionNote&&hasQuestions){questionNote.hidden=false;questionNote.textContent=`Esta vacante incluye preguntas obligatorias. Responde todas desde LinkNoDin para completar tu postulacion.`;}
+    const apply=$('ld-apply-link'),email=$('ld-apply-email'),applyBottom=$('ld-apply-link-bottom'),emailBottom=$('ld-apply-email-bottom');
+    if(apply){apply.href='/doc/candidato/postular.html?id='+encodeURIComponent(job.id);apply.textContent=hasQuestions?'Responder preguntas y postularme':'Postularme en LinkNoDin';apply.hidden=method==='email'&&!hasQuestions;}
+    if(applyBottom){applyBottom.href='/doc/candidato/postular.html?id='+encodeURIComponent(job.id);applyBottom.hidden=method==='email'&&!hasQuestions;}
+    if(email){email.hidden=hasQuestions||!(method==='email'||method==='both');email.href='mailto:'+encodeURIComponent(job.contact||'')+'?subject='+encodeURIComponent('Postulacion: '+job.title);}
+    if(emailBottom){emailBottom.hidden=hasQuestions||!(method==='email'||method==='both');emailBottom.href='mailto:'+encodeURIComponent(job.contact||'')+'?subject='+encodeURIComponent('Postulacion: '+job.title);}
+    const companyAccount=get('accounts',[]).find(a=>a.role==='empresa'&&a.name===job.company);const demoSlugs={'banco agricola':'banco-agricola','super selectos':'super-selectos','adoc':'adoc','grupo central':'grupo-central'};const slug=companyAccount?'empresa-'+encodeURIComponent(companyAccount.email.toLowerCase()):(demoSlugs[norm(job.company)]||'banco-agricola');document.querySelectorAll('[data-company-profile-link]').forEach(a=>a.href='/doc/empresa/empresa-detalle.html?empresa='+encodeURIComponent(slug));
+    const companyDesc=$('ld-company-desc');if(companyDesc)companyDesc.textContent=job.id==='demo-web'?'Empresa dedicada a soluciones tecnologicas y servicios digitales.':'Consulta el perfil y los detalles de la empresa.';
+    const logo=$('ld-company-logo');if(logo)logo.textContent=(job.company||'E').charAt(0);
+    const point=coords(job.city,job);const map=$('ld-detail-map'),note=$('ld-detail-map-note');
+    if(map&&point&&typeof window.L!=='undefined'){
+      map.hidden=false;const detailMap=L.map(map,{scrollWheelZoom:false});
+      detailMap.setView(point,job.latitude&&job.longitude&&!job.approximateLocation?15:12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'OpenStreetMap contributors'}).addTo(detailMap);
+      L.marker(point).addTo(detailMap).bindPopup(job.title).openPopup();
+      if(note){note.hidden=false;note.textContent=job.approximateLocation?'El marcador muestra una zona aproximada del municipio.':'El marcador indica la ubicacion compartida por la empresa.';}
+    }else if(note){note.hidden=false;note.textContent='No hay coordenadas disponibles para mostrar el mapa de esta vacante.';}
     document.title=job.title+' | LinkNoDin';
   }
   function initApplication(){

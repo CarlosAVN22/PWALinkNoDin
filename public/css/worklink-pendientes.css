@@ -3,5 +3,15 @@
 .wl-section{margin:32px 0;padding:28px;border-radius:16px;background:var(--light);border:1px solid var(--line)}
 .wl-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:20px}.wl-heading h2{margin:0 0 8px}.wl-heading p{margin:0}.wl-arrow{padding:9px 15px;border:1px solid var(--line);background:white;border-radius:9px;cursor:pointer;font-size:20px}
 .wl-company-carousel{display:flex;gap:18px;overflow-x:auto;scroll-behavior:smooth;scroll-snap-type:x mandatory;padding:5px 0 12px}.wl-company-tile{flex:0 0 245px;scroll-snap-align:start;border:1px solid var(--line);padding:22px;background:#fff;border-radius:14px;color:#172b4d}.wl-company-tile img{display:block;width:150px;height:82px;object-fit:contain;margin:0 auto 15px}.wl-company-tile h3{margin:8px 0}.wl-company-tile p{min-height:45px}.wl-company-tile span{color:#155eef;font-weight:700}.wl-note{font-size:13px;color:var(--muted)}
+body.dark-mode .wl-company-tile{background:#1a2232;color:#eef2fa;border-color:#39475f}
+body.dark-mode .wl-company-tile h3{color:#eef2fa}
+body.dark-mode .wl-company-tile p{color:#c2ccdc}
+body.dark-mode .wl-company-tile span{color:#8bb8ff}
+body.dark-mode .wl-company-tile img{background:#fff;border-radius:8px;padding:7px;box-sizing:border-box}
+body.dark-mode .wl-arrow{background:#26344a;color:#eef2fa;border-color:#46536b}
+.wl-company-carousel{scrollbar-color:#53647d #1a2232}
+.wl-company-carousel::-webkit-scrollbar{height:10px}
+.wl-company-carousel::-webkit-scrollbar-track{background:#1a2232;border-radius:8px}
+.wl-company-carousel::-webkit-scrollbar-thumb{background:#53647d;border-radius:8px}
 .wl-profile{padding-top:30px;padding-bottom:50px}.wl-profile-head{display:flex;align-items:center;gap:25px;margin-bottom:24px}.wl-profile-head img{width:160px;height:105px;object-fit:contain;background:white;border-radius:12px;padding:10px}.wl-columns{display:grid;grid-template-columns:1fr 1fr;gap:22px}.wl-review{border-top:1px solid var(--line);padding:14px 0}.wl-review strong{display:block}.wl-review p{margin:6px 0}.wl-stars{color:#e3a422;font-weight:700;font-size:19px}.wl-job-entry{padding:16px 0;border-bottom:1px solid var(--line)}.wl-job-entry a{display:inline-block;margin-top:8px}.wl-guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:28px 0}.wl-guide-grid .panel{padding:26px}.wl-guide-grid li{margin:10px 0}.wl-guide-link{padding:22px 26px;margin:28px 0;display:flex;align-items:center;justify-content:space-between;gap:20px;border:1px solid var(--line);border-radius:14px;background:var(--light)}.wl-guide-link h2{margin:0 0 8px}.wl-guide-link p{margin:0}
 @media(max-width:720px){.wl-columns,.wl-guide-grid{grid-template-columns:1fr}.wl-profile-head,.wl-guide-link{flex-direction:column;align-items:flex-start}.wl-company-tile{flex-basis:215px}.wl-section{padding:17px}}

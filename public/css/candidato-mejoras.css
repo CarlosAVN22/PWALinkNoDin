@@ -472,3 +472,6 @@ body.dark-mode.lnc-candidate-ui
     grid-template-columns: 1fr;
   }
 }
+
+.lnc-question-group { margin: 1.25rem 0; padding: 1rem; border: 1px solid #d7e0ea; border-radius: .8rem; }
+.lnc-question-group legend { padding: 0 .45rem; font-weight: 700; }

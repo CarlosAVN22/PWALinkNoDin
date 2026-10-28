@@ -10,6 +10,7 @@
       </title>
       <link href="/css/estilos.css" rel="stylesheet" />
       <link href="/css/linknodin.css" rel="stylesheet" />
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
       <link rel="stylesheet" href="/css/worklink-pendientes.css">
 </head>
 
@@ -56,9 +57,10 @@
                               ← Volver a resultados
                         </a>
                   </p>
-                  <div class="grid2">
+                  <p class="ld-status" id="ld-detail-status" role="status" hidden></p>
+                  <div class="grid2" id="ld-detail-content">
                         <div class="panel">
-                              <span class="tag">
+                              <span class="tag" id="ld-detail-status-tag">
                                     Oferta activa
                               </span>
                               <h1 class="page-title" id="ld-detail-title">
@@ -67,31 +69,49 @@
                               <p class="muted" id="ld-detail-info">
                                     Banco Agrícola · Santa Ana · Tiempo completo
                               </p>
+                              <div class="ld-detail-facts">
+                                    <p><strong>Salario:</strong> <span id="ld-detail-salary">No especificado</span></p>
+                                    <p><strong>Contrato:</strong> <span id="ld-detail-contract">No especificado</span></p>
+                                    <p><strong>Duración de jornada:</strong> <span id="ld-detail-worktime">No especificada</span></p>
+                                    <p><strong>Modalidad:</strong> <span id="ld-detail-modality">No especificada</span></p>
+                                    <p><strong>Experiencia:</strong> <span id="ld-detail-experience">No especificada</span></p>
+                                    <p><strong>Escolaridad:</strong> <span id="ld-detail-education">No especificada</span></p>
+                                    <p><strong>Jornada y horario:</strong> <span id="ld-detail-schedule">No especificada</span></p>
+                                    <p><strong>Plazas disponibles:</strong> <span id="ld-detail-openings">1</span></p>
+                                    <p><strong>Area o rubro:</strong> <span id="ld-detail-area">No especificada</span></p>
+                                    <p><strong>Publicado:</strong> <span id="ld-detail-published">No especificada</span></p>
+                                    <p><strong>Fecha límite:</strong> <span id="ld-detail-deadline">No especificada</span></p>
+                                    <p><strong>Contacto:</strong> <span id="ld-detail-contact">No especificado</span></p>
+                              </div>
+                              <h3>Ubicación del trabajo</h3>
+                              <p id="ld-detail-location">No especificada</p>
+                              <div class="ld-map ld-detail-map" id="ld-detail-map" role="img" aria-label="Mapa de ubicación del empleo" hidden></div>
+                              <p class="ld-map-footnote" id="ld-detail-map-note" hidden></p>
+                              <p class="ld-muted" id="ld-detail-questions-note" hidden></p>
                               <a class="btn btn-primary" href="/doc/candidato/postular.html" id="ld-apply-link">
                                     Postularme
                               </a>
+                              <a class="btn btn-soft" id="ld-apply-email" hidden>Postular por correo</a>
                               <a class="btn btn-soft" href="/doc/general/login.html">
                                     Guardar empleo
                               </a>
-                              <h3>
-                                    Descripción del puesto
-                              </h3>
-                              <p id="ld-detail-desc">
-                                    Buscamos una persona creativa que apoye el desarrollo de nuestro portal web y sus
-                                    interfaces.
-                              </p>
-                              <h3>
-                                    Requisitos
-                              </h3>
-                              <p id="ld-detail-requirements">
-                                    Conocimientos de HTML, CSS, Bootstrap y trabajo en equipo.
-                              </p>
-                              <h3>
-                                    Beneficios
-                              </h3>
-                              <p id="ld-detail-benefits">
-                                    Capacitación, horario flexible y oportunidades de crecimiento.
-                              </p>
+                              <h3>Objetivo del puesto</h3>
+                              <p id="ld-detail-desc">La empresa no agrego un resumen del puesto.</p>
+                              <h3>Responsabilidades principales</h3>
+                              <p id="ld-detail-responsibilities">No se especificaron responsabilidades.</p>
+                              <h3>Requisitos</h3>
+                              <p id="ld-detail-requirements">No se especificaron requisitos adicionales.</p>
+                              <h3>Licencia y movilidad</h3>
+                              <p><strong>Licencia de conducir:</strong> <span id="ld-detail-license">No requerida</span></p>
+                              <p><strong>Vehiculo propio:</strong> <span id="ld-detail-vehicle">No requerido</span></p>
+                              <h3>Competencias deseables</h3>
+                              <p id="ld-detail-competencies">No se especificaron competencias adicionales.</p>
+                              <h3>Prestaciones y beneficios</h3>
+                              <p id="ld-detail-benefits">No se especificaron beneficios adicionales.</p>
+                              <h3>Instrucciones para postularse</h3>
+                              <p id="ld-detail-instructions">Sigue las indicaciones al iniciar tu postulación.</p>
+                              <a class="btn btn-primary" href="/doc/candidato/postular.html" id="ld-apply-link-bottom">Postularme</a>
+                              <a class="btn btn-soft" id="ld-apply-email-bottom" hidden>Postular por correo</a>
                         </div>
                         <div class="panel">
                               <div class="logo" id="ld-company-logo">
@@ -103,7 +123,7 @@
                               <p id="ld-company-desc">
                                     Empresa dedicada a soluciones tecnológicas y servicios digitales.
                               </p>
-                              <a class="btn btn-primary" href="/doc/empresa/empresa-detalle.html">
+                              <a class="btn btn-primary" data-company-profile-link href="/doc/empresa/empresa-detalle.html">
                                     Ver empresa
                               </a>
                               <h3>
@@ -112,7 +132,7 @@
                               <p>
                                     ★★★★☆ · Opiniones de candidatos y trabajadores.
                               </p>
-                              <a class="btn btn-primary" href="/doc/empresa/empresa-detalle.html">
+                              <a class="btn btn-primary" data-company-profile-link href="/doc/empresa/empresa-detalle.html">
                                     Leer opiniones
                               </a>
                         </div>
@@ -125,6 +145,7 @@
       <script src="/js/app.js">
       </script>
       <script src="/js/acceso-demo.js"></script>
+      <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
      <script src="/js/linknodin.js"></script>
       <script src="/js/notificaciones.js"></script>
       <script src="/js/worklink-pendientes.js"></script>

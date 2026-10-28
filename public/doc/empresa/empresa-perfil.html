@@ -11,6 +11,7 @@
     <link href="/css/estilos.css" rel="stylesheet" />
     <link href="/css/linknodin.css" rel="stylesheet" />
     <link rel="stylesheet" href="/css/worklink-pendientes.css">
+    <link rel="stylesheet" href="/css/empresa-prototipo.css">
 </head>
 
 <body>
@@ -76,57 +77,51 @@
                     </a>
                 </aside>
                 <div class="content">
-                    <form class="panel demo-form">
-                        <h3>
-                            Información empresarial
-                        </h3>
-                        <div class="grid2">
-                            <div class="field">
-                                <label>
-                                    Nombre comercial
-                                </label>
-                                <input placeholder="Nombre comercial" required="" type="text" />
-                            </div>
-                            <div class="field">
-                                <label>
-                                    Sector
-                                </label>
-                                <input placeholder="Sector" required="" type="text" />
-                            </div>
-                            <div class="field">
-                                <label>
-                                    Ubicación
-                                </label>
-                                <input placeholder="Ubicación" required="" type="text" />
-                            </div>
-                            <div class="field">
-                                <label>
-                                    Correo de contacto
-                                </label>
-                                <input placeholder="Correo de contacto" required="" type="text" />
-                            </div>
-                            <div class="field">
-                                <label>
-                                    Teléfono
-                                </label>
-                                <input placeholder="Teléfono" required="" type="text" />
-                            </div>
-                            <div class="field">
-                                <label>
-                                    Sitio web
-                                </label>
-                                <input placeholder="Sitio web" required="" type="text" />
-                            </div>
+                    <form class="panel demo-form company-profile-form" id="company-profile-form">
+                        <div class="company-profile-form-head">
+                            <div><p class="company-eyebrow">PRESENCIA DE TU EMPRESA</p><h2>Completa el perfil de tu empresa</h2><p>Esta informacion ayuda a las personas candidatas a conocer quien publica las vacantes.</p></div>
+                            <a class="btn btn-soft" href="/doc/empresa/empresa-detalle.html" data-company-public-preview>Ver perfil publico</a>
                         </div>
-                        <div class="field">
-                            <label>
-                                Descripción
-                            </label>
-                            <textarea></textarea>
-                        </div>
-                        <button class="btn btn-primary" type="submit">
-                            Guardar información
-                        </button>
+                        <section class="company-profile-section">
+                            <h3>Identidad empresarial</h3>
+                            <p class="company-section-hint">Usa los datos con los que te reconocen candidatos y clientes.</p>
+                            <div class="company-logo-editor">
+                                <div class="company-profile-logo-preview" id="company-profile-logo-preview" aria-label="Vista previa del logo">E</div>
+                                <div class="field"><label for="company-logo-file">Logo de la empresa (opcional)</label><input id="company-logo-file" type="file" accept="image/png,image/jpeg,image/webp"><small>PNG, JPG o WebP. Maximo 1 MB.</small><button class="btn btn-soft btn-sm" type="button" id="company-logo-remove" hidden>Quitar logo</button></div>
+                            </div>
+                            <div class="grid2">
+                                <div class="field"><label for="company-name">Nombre comercial</label><input id="company-name" name="name" required maxlength="100" placeholder="Ej. Cafes del Volcan"></div>
+                                <div class="field"><label for="company-legal-name">Razon social (opcional)</label><input id="company-legal-name" name="legalName" maxlength="150" placeholder="Nombre legal de la organizacion"></div>
+                                <div class="field"><label for="company-sector">Sector o actividad</label><input id="company-sector" name="sector" required maxlength="100" placeholder="Ej. Comercio, tecnologia, salud"></div>
+                                <div class="field"><label for="company-size">Tamano de la empresa (opcional)</label><select id="company-size" name="employeeRange"><option value="">Selecciona un rango</option><option>1-10 personas</option><option>11-50 personas</option><option>51-200 personas</option><option>201-500 personas</option><option>Mas de 500 personas</option></select></div>
+                                <div class="field"><label for="company-founded">Ano de fundacion (opcional)</label><input id="company-founded" name="foundedYear" type="number" min="1800" max="2100" placeholder="Ej. 2012"></div>
+                            </div>
+                        </section>
+                        <section class="company-profile-section">
+                            <h3>Ubicacion y contacto publico</h3>
+                            <p class="company-section-hint">El correo y telefono pueden ser usados por candidatos. Agrega una direccion solo si quieres mostrarla publicamente.</p>
+                            <div class="grid2">
+                                <div class="field"><label for="company-department">Departamento</label><select id="company-department" name="department"><option value="">Selecciona un departamento</option><option>Ahuachapan</option><option>Cabanas</option><option>Chalatenango</option><option>Cuscatlan</option><option>La Libertad</option><option>La Paz</option><option>La Union</option><option>Morazan</option><option>San Miguel</option><option>San Salvador</option><option>San Vicente</option><option>Santa Ana</option><option>Sonsonate</option><option>Usulutan</option></select></div>
+                                <div class="field"><label for="company-city">Municipio o ciudad</label><input id="company-city" name="city" maxlength="90" placeholder="Ej. Santa Ana"></div>
+                                <div class="field"><label for="company-address">Direccion de oficina (opcional)</label><input id="company-address" name="address" maxlength="180" placeholder="Colonia, calle y numero"></div>
+                                <div class="field"><label for="company-public-email">Correo publico de contacto</label><input id="company-public-email" name="publicEmail" type="email" required maxlength="160" placeholder="talento@empresa.com"></div>
+                                <div class="field"><label for="company-phone">Telefono publico (opcional)</label><input id="company-phone" name="phone" type="tel" maxlength="30" placeholder="+503 2222-2222"></div>
+                            </div>
+                        </section>
+                        <section class="company-profile-section">
+                            <h3>Presencia digital</h3>
+                            <div class="grid2">
+                                <div class="field"><label for="company-website">Sitio web (opcional)</label><input id="company-website" name="website" type="url" maxlength="240" placeholder="https://www.empresa.com"></div>
+                                <div class="field"><label for="company-linkedin">LinkedIn (opcional)</label><input id="company-linkedin" name="linkedin" type="url" maxlength="240" placeholder="https://www.linkedin.com/company/empresa"></div>
+                            </div>
+                        </section>
+                        <section class="company-profile-section">
+                            <h3>Conoce a la empresa</h3>
+                            <div class="field"><label for="company-description">Presentacion</label><textarea id="company-description" name="description" rows="5" maxlength="900" required placeholder="Que hace la empresa, a quienes atiende y que la distingue."></textarea><small><span id="company-description-count">0</span>/900 caracteres</small></div>
+                            <div class="field"><label for="company-culture">Cultura y propuesta para el talento (opcional)</label><textarea id="company-culture" name="culture" rows="4" maxlength="900" placeholder="Describe el ambiente, el aprendizaje o los beneficios que ofrece trabajar aqui."></textarea></div>
+                        </section>
+                        <div class="company-profile-completeness"><div><strong>Perfil completo</strong><span id="company-profile-progress-label">0%</span></div><div class="company-progress-track"><span id="company-profile-progress"></span></div><p id="company-profile-hint">Completa los datos principales para que el perfil publico sea util.</p></div>
+                        <div class="company-profile-save"><button class="btn btn-primary" type="submit">Guardar perfil</button><p id="company-profile-status" class="company-status" role="status" aria-live="polite"></p></div>
                     </form>
                 </div>
             </div>
@@ -141,6 +136,7 @@
      <script src="/js/linknodin.js"></script>
     <script src="/js/notificaciones.js"></script>
     <script src="/js/worklink-pendientes.js"></script>
+    <script src="/js/empresa-prototipo.js"></script>
 </body>
 
 </html>

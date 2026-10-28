@@ -229,8 +229,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         <p class="lnc-muted">
           Solo se muestran movimientos guardados
-          localmente. La empresa no actualiza
-          estos estados todavía.
+          localmente. La empresa puede actualizar estos estados y
+          los cambios se guardan en este navegador.
         </p>
 
         <button
