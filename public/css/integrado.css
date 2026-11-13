@@ -64,3 +64,145 @@ body.dark-mode .ln-lesson-form textarea {
 .ln-lesson-form select:focus-visible,
 .ln-lesson-form input:focus-visible {outline: 2px solid #2266e5; outline-offset: 2px;}
 @media (max-width: 650px) { .ln-lesson-form {width: 100%;} }
+
+
+/* Mejoras para el módulo candidato */
+
+/* Tarjetas */
+#em-listado .ln-integ-card,
+#ld-notif-inbox + .ln-integ-section .ln-integ-card,
+main .content .panel > div > .ln-integ-card {
+  margin-bottom: 15px;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+/* Filtros de empleos guardados */
+.ld-em-toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+#em-busqueda,
+#em-filtro {
+  flex: 1;
+  min-width: 180px;
+  padding: 12px;
+  border: 1px solid #d6e1f0;
+  border-radius: 9px;
+  background: #fff;
+  color: #173052;
+}
+
+/* Botones de las tarjetas */
+#em-listado .ln-integ-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* Modo oscuro */
+body.dark-mode #em-busqueda,
+body.dark-mode #em-filtro {
+  background: #1a2232;
+  color: #eef2fa;
+  border-color: #3d4d65;
+}
+
+/* Adaptación a móviles */
+@media (max-width: 600px) {
+  .ld-em-toolbar {
+    flex-direction: column;
+  }
+
+  #em-busqueda,
+  #em-filtro {
+    width: 100%;
+    flex: auto;
+    min-width: 0;
+  }
+
+  #em-listado .ln-integ-actions .btn {
+    width: 100%;
+  }
+}
+
+/* Ajustes finales: actividad del candidato */
+
+#em-busqueda,
+#em-filtro {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  background: #fff;
+  color: #173052;
+  border: 1px solid #d6e1f0;
+  border-radius: 10px;
+}
+
+.ld-em-toolbar {
+  display: flex;
+  gap: 12px;
+  margin: 18px 0;
+  flex-wrap: wrap;
+}
+
+.ld-em-toolbar > * {
+  flex: 1 1 200px;
+}
+
+.content .ld-em-muted {
+  color: #64748b;
+}
+
+/* Tarjetas de guardados y postulaciones */
+#em-listado .ln-integ-card,
+.content > .panel > div > .ln-integ-card,
+#ld-notif-inbox + .ln-integ-section .ln-integ-card {
+  padding: 20px;
+  margin-bottom: 14px;
+  border-radius: 13px;
+}
+
+#em-listado .ln-integ-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Bandeja de notificaciones */
+#ld-notif-inbox + .ln-integ-section {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+}
+
+/* Modo oscuro */
+body.dark-mode #em-busqueda,
+body.dark-mode #em-filtro {
+  background: #1a2232;
+  color: #eef2fa;
+  border-color: #3d4d65;
+}
+
+body.dark-mode .content .ld-em-muted {
+  color: #c2ccdc;
+}
+
+@media (max-width: 650px) {
+  .ld-em-toolbar {
+    flex-direction: column;
+  }
+
+  .ld-em-toolbar > * {
+    flex: auto;
+    width: 100%;
+  }
+
+  #em-listado .ln-integ-actions .btn {
+    width: 100%;
+  }
+}
