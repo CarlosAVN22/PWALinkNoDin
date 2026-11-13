@@ -29,6 +29,10 @@ async function loadDashboard(path) {
     try {
         const data = await adminRequest("/dashboard");
         if (path.endsWith("/admin.html")) {
+            const statValues = [data.registeredUsers, data.companies, data.jobs, data.applications];
+            $(".content .stats")?.querySelectorAll(".stat strong").forEach((node, index) => {
+                if (index < statValues.length) node.textContent = number(statValues[index]);
+            });
             for (const [key, value] of Object.entries({
                 registeredUsers: data.registeredUsers,
                 companies: data.companies,
@@ -71,6 +75,14 @@ async function loadDashboard(path) {
                 activeJobs: ["Vacantes activas", data.activeJobs],
                 openReports: ["Reportes pendientes", data.openReports],
             };
+            $(".content .stats")?.querySelectorAll(".stat").forEach((node, index) => {
+                const item = Object.values(metrics)[index];
+                if (!item) return;
+                const label = node.querySelector("small");
+                const value = node.querySelector("strong");
+                if (label) label.textContent = item[0];
+                if (value) value.textContent = number(item[1]);
+            });
             for (const [key, [label, value]] of Object.entries(metrics)) {
                 setText(`[data-admin-stat="${key}"]`, number(value));
                 setText(`[data-admin-stat-label="${key}"]`, label);
@@ -250,6 +262,13 @@ function openUserModal(user, save) {
 }
 
 async function loadUsers() {
+    const content = $("main .content");
+    const old = content.querySelector(".panel");
+    if (old) old.hidden = true;
+    const panel = document.createElement("section");
+    panel.className = "panel";
+    panel.innerHTML = '<h2>Usuarios registrados</h2><input data-user-search type="search" placeholder="Buscar usuario"><p id="users-status" role="status"></p><button class="btn btn-primary" data-user-action="add" type="button">Agregar nuevo</button><div class="tablewrap"><table><thead><tr><th>Nombre</th><th>Rol</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="admin-users-body"></tbody></table></div>';
+    content.prepend(panel);
     const tbody = $("#admin-users-body");
     const search = $("[data-user-search]");
     const status = $("#users-status");

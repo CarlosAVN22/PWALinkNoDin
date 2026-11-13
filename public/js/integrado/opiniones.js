@@ -1,4 +1,5 @@
 import {supabase,$,dom,run,who,status,messageError} from './base.js';
+import { generalRequest } from '/js/general/api-general.js';
 async function init(){
  const parent=$('co-listado');if(!parent)return;
  parent.hidden=true;
@@ -21,7 +22,7 @@ async function init(){
  }
  root.append(send,feedback,list);
  const me=await who();if(me?.role_id!==1){send.disabled=true;status(feedback,'Inicia sesión como candidato para publicar una valoración.');}
- const companies=await run(supabase.from('companies').select('id,commercial_name,verification_status').eq('verification_status','verified'));
+ const companies=await generalRequest('/review-companies');
  for(const c of companies){
   const opt=dom('option','',c.commercial_name);
   opt.value=String(c.id);
@@ -29,19 +30,18 @@ async function init(){
  }
  const requested=new URLSearchParams(location.search).get('empresa');
  if(requested&&companies.some(c=>String(c.id)===requested))select.value=requested;
- else if(companies.length)select.value=String(companies[0].id);
  if(!companies.length){
   send.disabled=true;
   status(feedback,'Todavía no hay empresas verificadas disponibles para valorar.');
  }
 
  async function refresh(){
-  const q=await run(supabase.from('company_reviews').select('id,company_id,user_id,display_name,rating,comment,created_at,status').order('created_at',{ascending:false}));
-  list.replaceChildren();for(const r of q.filter(x=>(!select.value||x.company_id===Number(select.value)) && Number(r.rating)>=Number(filter.value||0))){
+  const q=await generalRequest('/reviews');
+  list.replaceChildren();for(const r of q.filter(x=>(!select.value||x.company_id===Number(select.value)) && Number(x.rating)>=Number(filter.value||0))){
    const c=companies.find(x=>x.id===r.company_id);const box=dom('article','ln-integ-card');
    box.append(dom('strong','',c?.commercial_name||'Empresa'),dom('p','',`${r.rating}/5 · ${r.display_name}`),dom('p','',r.comment));
    if(me?.id===r.user_id){const btn=dom('button','btn','Eliminar mi valoración');btn.type='button';btn.onclick=async()=>{
-    btn.disabled=true;try{await run(supabase.from('company_reviews').delete().eq('id',r.id));await refresh();}catch(e){status(feedback,messageError(e),true);btn.disabled=false;}
+    btn.disabled=true;try{await generalRequest('/reviews/'+r.id,'DELETE');await refresh();}catch(e){status(feedback,messageError(e),true);btn.disabled=false;}
    };box.append(btn);}list.append(box);
   }
   if(!list.children.length)list.append(dom('p','muted','Aún no hay valoraciones reales.'));
@@ -52,8 +52,8 @@ async function init(){
   if(!select.value){status(feedback,'Selecciona una empresa para publicar.',true);return;}
   if(message.value.trim().length<15){status(feedback,'Escribe al menos 15 caracteres.',true);return;}
   send.disabled=true;
-  try{await run(supabase.from('company_reviews').insert({user_id:me.id,company_id:Number(select.value),
-    display_name:me.email.slice(0,100),rating:Number(stars.value),comment:message.value.trim(),status:'visible'}));
+  try{await generalRequest('/reviews','POST',{
+    company_id:Number(select.value),rating:Number(stars.value),comment:message.value.trim()});
    message.value='';status(feedback,'Tu valoración se publicó correctamente.');await refresh();}
   catch(e){status(feedback,messageError(e),true);}finally{send.disabled=false;}
  });

@@ -1,17 +1,12 @@
 import {supabase,$,dom,run,who,status,messageError,money,date} from './base.js';
+import {empleoRequest} from '/js/empleo/api-empleo.js';
 const detail=id=>'/doc/empleo/detalle-empleo.html?id='+encodeURIComponent(id);
 const apply=id=>'/doc/candidato/postular.html?id='+encodeURIComponent(id);
 let identity=null;
 async function my(){if(identity===null)identity=await who();return identity;}
 async function companies(){return run(supabase.from('companies').select('id,commercial_name,city,verification_status'));}
 async function jobs(){
- const [all,orgs]=await Promise.all([
-  run(supabase.from('jobs').select('*').eq('status','active').order('created_at',{ascending:false})),companies()
- ]);
- const verified=new Map(orgs.filter(c=>c.verification_status==='verified').map(c=>[c.id,c.commercial_name]));
- const today=new Date().toISOString().slice(0,10);
- return all.filter(j=>verified.has(j.company_id)&&(!j.application_deadline||j.application_deadline>=today))
-  .map(j=>({...j,company:verified.get(j.company_id)}));
+ return empleoRequest('/jobs');
 }
 async function ensureCandidate(me){
   if(!me||me.role_id!==1)throw new Error('Inicia sesión con una cuenta de candidato.');
@@ -32,8 +27,8 @@ function cards(target,records,options={}){
    actions.append(button(isSaved?'Quitar guardado':'Guardar',async ev=>{
     const node=ev.currentTarget||ev.target;node.disabled=true;
     try{
-     if(isSaved)await run(supabase.from('saved_jobs').delete().eq('job_id',job.id).eq('candidate_id',options.me.id));
-     else await run(supabase.from('saved_jobs').insert({job_id:job.id,candidate_id:options.me.id}));
+     if(isSaved)await empleoRequest(`/saved/${job.id}`,'DELETE');
+     else await empleoRequest(`/saved/${job.id}`,'POST');
      await options.refresh();
     }catch(e){alert(messageError(e));node.disabled=false;}
    }));
@@ -115,10 +110,12 @@ async function jobDetail(){
  for(const key of ['ld-apply-link','ld-apply-link-bottom'])if($(key))$(key).href=apply(id);
  const companyLink='/doc/empresa/empresa-detalle.html?empresa='+encodeURIComponent(job.company_id);
  document.querySelectorAll('[data-company-profile-link]').forEach(a=>a.href=companyLink);
+ const reviewsLink='/doc/general/opiniones.html?empresa='+encodeURIComponent(job.company_id);
+ document.querySelectorAll('[data-company-reviews-link]').forEach(a=>a.href=reviewsLink);
  const companyName=$('ld-detail-company');
  if(companyName)companyName.textContent=job.company;
  const companyDescription=$('ld-company-desc');
- const companyRecord=(await run(supabase.from('companies').select('description,logo_storage_key').eq('id',job.company_id).limit(1)))[0];
+ const companyRecord=(await empleoRequest(`/companies/${job.company_id}`))[0];
  if(companyDescription)companyDescription.textContent=companyRecord?.description||'Consulta el perfil para conocer esta empresa.';
  const companyLogo=$('ld-company-logo');
  if(companyLogo){
@@ -153,21 +150,39 @@ async function jobDetail(){
  if($('ld-detail-status-tag'))$('ld-detail-status-tag').textContent='Oferta publicada';
  const me=await my();const action=dom('div','ln-integ-actions');
  if(me?.role_id===1){
-  action.append(button('Guardar esta vacante',async ev=>{
-   ev.currentTarget.disabled=true;
-   try{await ensureCandidate(me);try{await run(supabase.from('saved_jobs').insert({candidate_id:me.id,job_id:id}));}
-   catch(e){if(e.code!=='23505')throw e;}ev.currentTarget.textContent='Guardada';}
-   catch(e){alert(messageError(e));ev.currentTarget.disabled=false;}
-  }));
+  const notice=dom('p','ld-status');
+  const saveButton=button('Guardar esta vacante',async()=>{
+   saveButton.disabled=true;
+   try{
+    if(saved){
+     await empleoRequest(`/saved/${id}`,'DELETE');
+     saved=false;
+    }else{
+     await empleoRequest(`/saved/${id}`,'POST');
+     saved=true;
+    }
+    updateButton();
+    status(notice,saved?'Vacante guardada en tu cuenta.':'Vacante eliminada de tus guardados.');
+   }catch(e){
+    status(notice,'No se pudo actualizar el guardado: '+messageError(e),true);
+   }finally{
+    saveButton.disabled=false;
+   }
+  });
+  let saved=false;
+  function updateButton(){saveButton.textContent=saved?'Quitar guardado':'Guardar esta vacante';}
+  action.append(saveButton,notice);
+  const stored=await empleoRequest('/saved');
+  saved=stored.some(row=>row.job_id===id);
+  updateButton();
  }
  root.querySelector('.panel')?.append(action);
 }
 async function savedJobs(){
  const list=$('em-listado');if(!list)return;const me=await my();
  if(!me||me.role_id!==1){status($('em-resumen'),'Inicia sesión como candidato para ver tus guardados.');list.replaceChildren();return;}
- await ensureCandidate(me);
  async function refresh(){
-  const [all,stored]=await Promise.all([jobs(),run(supabase.from('saved_jobs').select('job_id').eq('candidate_id',me.id))]);
+  const [all,stored]=await Promise.all([jobs(),empleoRequest('/saved')]);
   const saved=new Set(stored.map(x=>x.job_id)),q=($('em-busqueda')?.value||'').toLowerCase();
   const mode=$('em-filtro')?.value||'guardados';
   cards(list,all.filter(j=>(mode==='todos'||saved.has(j.id))&&[j.title,j.company,j.city].join(' ').toLowerCase().includes(q)),{saved,me,refresh});
@@ -182,10 +197,14 @@ async function publish(){
  const form=$('ld-publish');if(!form)return;
  const me=await my(),output=$('ld-status'),target=$('em-publicadas-lista');
  if(!me||me.role_id!==2){status(output,'Solo empresas verificadas pueden publicar vacantes.',true);form.querySelector('button[type="submit"]')?.setAttribute('disabled','');return;}
- const owned=await run(supabase.from('companies').select('id,verification_status').eq('user_id',me.id));
- const company=owned.find(c=>c.verification_status==='verified');
- if(!company){status(output,'La empresa debe estar verificada por un administrador antes de publicar.',true);form.querySelector('button[type="submit"]')?.setAttribute('disabled','');return;}
- async function refresh(){const list=await run(supabase.from('jobs').select('id,title,city,status').eq('company_id',company.id).order('created_at',{ascending:false}).limit(10));target?.replaceChildren();for(const j of list){const p=dom('p');const a=dom('a','',`${j.title} · ${j.city} · ${j.status}`);a.href=detail(j.id);p.append(a);target?.append(p);}}
+ try {
+  await empleoRequest('/company/jobs');
+ } catch(error) {
+  status(output,'Tu empresa debe estar verificada para publicar vacantes.',true);
+  form.querySelector('button[type="submit"]')?.setAttribute('disabled','');
+  return;
+ }
+ async function refresh(){const list=await empleoRequest('/company/jobs');target?.replaceChildren();for(const j of list){const p=dom('p');const a=dom('a','',`${j.title} · ${j.city} · ${j.status}`);a.href=detail(j.id);p.append(a);target?.append(p);}}
  form.addEventListener('submit',async e=>{
   e.preventDefault();e.stopImmediatePropagation();if(!form.reportValidity())return;
   const submit=form.querySelector('button[type="submit"]');submit.disabled=true;
@@ -206,7 +225,7 @@ async function publish(){
    if(payload.salary_min!==null&&payload.salary_max!==null&&payload.salary_min>payload.salary_max)throw Error('El salario mínimo no debe superar al máximo.');
    const questions=JSON.parse(val('preguntas')||'[]');
    if(!Array.isArray(questions)||questions.length>5)throw Error('Se permiten como máximo cinco preguntas.');
-   await run(supabase.rpc('ln26_publicar_vacante',{p_job:payload,p_questions:questions.filter(q=>typeof q==='string'&&q.trim()).map(q=>q.trim())}));
+   await empleoRequest('/company/jobs','POST',{job:payload,questions:questions.filter(q=>typeof q==='string'&&q.trim()).map(q=>q.trim())});
    status(output,'Vacante publicada correctamente.');form.reset();await refresh();
   }catch(err){status(output,'No se pudo publicar: '+messageError(err),true);}finally{submit.disabled=false;}
  },true);

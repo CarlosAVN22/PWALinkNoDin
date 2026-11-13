@@ -1,13 +1,11 @@
 import {supabase,dom,run} from './base.js';
+import { generalRequest } from '/js/general/api-general.js';
 const $=id=>document.getElementById(id);
 const link=(text,url,cls='btn')=>{const a=dom('a',cls,text);a.href=url;return a;};
 async function init(){
  if(!location.pathname.endsWith('/general/index.html'))return;
  const featured=$('ld-featured'),carousel=document.querySelector('[data-company-carousel]');
- const [companies,jobs]=await Promise.all([
-  run(supabase.from('companies').select('id,commercial_name,sector,city,verification_status,logo_storage_key').eq('verification_status','verified').order('commercial_name')),
-  run(supabase.from('jobs').select('id,title,company_id,city,modality,salary_min,salary_max,status,application_deadline,created_at').eq('status','active').order('created_at',{ascending:false}).limit(40))
- ]);
+ const {companies,jobs,reviews:homeReviews}=await generalRequest('/home');
  const names=new Map(companies.map(c=>[c.id,c.commercial_name]));
  if(carousel){carousel.replaceChildren();
   for(const c of companies){const a=dom('a','wl-company-tile');a.href='/doc/empresa/empresa-detalle.html?empresa='+c.id;
@@ -28,13 +26,10 @@ async function init(){
  if(testimonials){
   testimonials.hidden=true;
   try{
-   const reviews=await run(supabase.from('company_reviews')
-    .select('company_id,display_name,comment,rating,created_at')
-    .eq('status','visible').order('created_at',{ascending:false}).limit(8));
    const carousel=testimonials.querySelector('[data-carousel]');
    if(carousel){
     carousel.replaceChildren();
-    for(const review of reviews){
+    for(const review of homeReviews){
      const company=companies.find(item=>item.id===review.company_id);
      if(!company)continue;
      const card=dom('article','ln-integ-card');

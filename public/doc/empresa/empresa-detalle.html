@@ -12,6 +12,7 @@
     <link href="/css/linknodin.css" rel="stylesheet" />
     <link rel="stylesheet" href="/css/worklink-pendientes.css">
     <link rel="stylesheet" href="/css/empresa-prototipo.css">
+  <link rel="stylesheet" href="/css/integrado.css">
 </head>
 
 <body>
@@ -52,11 +53,11 @@
     </header>
     <main class="container wl-profile">
         <p><a href="/doc/empresa/empresas.html">← Volver a empresas</a></p>
-        <section class="panel wl-profile-head company-public-hero"><div class="wl-company-brand" id="wl-company-brand"><img id="wl-company-logo" src="/img/agricola.png" alt="Logo empresarial"></div>
+        <section class="panel wl-profile-head company-public-hero"><div class="wl-company-brand" id="wl-company-brand"><img id="wl-company-logo" alt="Logo empresarial" hidden></div>
             <div class="company-public-identity"><span class="tag">Perfil empresarial</span>
-                <h1 class="page-title" id="wl-company-name">Banco Agricola</h1>
+                <h1 class="page-title" id="wl-company-name">Cargando empresa...</h1>
                 <p id="wl-company-about">Conoce su informacion y las opiniones de la comunidad.</p>
-                <p id="wl-company-location">Santa Ana, El Salvador</p>
+                <p id="wl-company-location">Ubicación por confirmar</p>
                 <div class="company-public-facts"><span id="wl-company-sector">Sector no indicado</span><span id="wl-company-size" hidden></span><span id="wl-company-founded" hidden></span></div>
                 <div class="company-public-links"><a id="wl-company-contact" hidden></a><a id="wl-company-website" target="_blank" rel="noopener noreferrer" hidden>Sitio web</a><a id="wl-company-linkedin" target="_blank" rel="noopener noreferrer" hidden>LinkedIn</a></div>
             </div>
@@ -71,11 +72,11 @@
             <section class="panel">
                 <h2>Valoraciones de la empresa</h2>
                 <p class="wl-stars" id="wl-rating-summary">★★★★★</p>
-                <p class="wl-note">Opiniones de demostración y comentarios guardados solo en este navegador.</p>
+                <p class="wl-note">Valoraciones compartidas por la comunidad.</p>
                 <div id="wl-reviews"></div>
                 <h3>Deja tu valoración</h3>
                 <form id="wl-review-form">
-                    <div class="field"><label for="wl-review-name">Tu nombre</label><input id="wl-review-name" required
+                    <div class="field"><label for="wl-review-name">Tu correo</label><input id="wl-review-name" readonly
                             maxlength="40" placeholder="Tu nombre o Visitante"></div>
                     <div class="field"><label for="wl-review-stars">Calificación</label><select id="wl-review-stars">
                             <option value="5">5 estrellas</option>
@@ -87,7 +88,7 @@
                     <div class="field"><label for="wl-review-text">Tu comentario</label><textarea id="wl-review-text"
                             rows="3" minlength="5" maxlength="300" required
                             placeholder="Comparte tu experiencia"></textarea></div><button class="btn btn-primary"
-                        type="submit">Publicar valoración de prueba</button>
+                        type="submit">Publicar valoración</button>
                     <p id="wl-review-message" aria-live="polite"></p>
                 </form>
             </section>
@@ -98,11 +99,13 @@
     </footer>
     <script src="/js/app.js">
     </script>
-    <script src="/js/acceso-demo.js"></script>
-     <script src="/js/linknodin.js"></script>
-    <script src="/js/notificaciones.js"></script>
-    <script src="/js/worklink-pendientes.js"></script>
-    <script src="/js/empresa-prototipo.js"></script>
+    
+     
+    
+    
+    
+    <script type="module" src="/js/integrado/portales.js"></script>
+    <script type="module" src="/js/integrado/navegacion.js"></script>
 </body>
 
 </html>

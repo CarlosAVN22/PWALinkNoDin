@@ -1,5 +1,7 @@
 /* LinkNoDin / Cursos reales. Autorizacion de publicaciones en RLS, no en el navegador. */
 import { supabase } from '/js/supabase-config.js';
+import { cursosForosRequest } from './api-cursos-foros.js';
+import { generalRequest } from '/js/general/api-general.js';
 
 const $ = id => document.getElementById(id);
 const make = (tag, className, text) => {
@@ -32,27 +34,19 @@ function youtubeEmbed(raw) {
 }
 
 async function identity() {
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) return null;
-  const p = await query(supabase.from('users').select('id,full_name,role_id,status').eq('auth_user_id',user.id).single());
-  if (p.status !== 'active') return null;
-  return { ...p, authId: user.id };
+  const { data } = await supabase.auth.getSession();
+  if (!data.session) return null;
+  const user = await generalRequest('/account');
+  return user.status === 'active' ? { ...user, authId: data.session.user.id } : null;
 }
 async function canPublish(me) {
-  if (!me) return false;
-  if (me.role_id === 3) return true;
-  if (me.role_id !== 2) return false;
-  const businesses = await query(supabase.from('companies').select('verification_status').eq('user_id',me.id));
-  return businesses.some(c => c.verification_status === 'verified');
+  if (!me || ![2,3].includes(me.role_id)) return false;
+  const permission = await cursosForosRequest('/courses/publishing-permission');
+  return permission.allowed;
 }
 
 async function load() {
-  const [categories, courses, modules] = await Promise.all([
-    query(supabase.from('course_categories').select('id,name,is_active').order('name')),
-    query(supabase.from('courses').select('id,slug,title,description,level,status,category_id,duration_minutes,created_by,created_at').order('created_at',{ascending:false})),
-    query(supabase.from('course_modules').select('id,course_id,title,description,content,video_url,video_storage_key,sort_order').order('sort_order'))
-  ]);
-  return { categories, courses, modules };
+  return cursosForosRequest('/courses');
 }
 
 async function init() {
@@ -112,7 +106,7 @@ async function init() {
     progress = new Set();
     if (me?.role_id === 1) {
       try {
-        const rows = await query(supabase.from('course_module_progress').select('module_id,completed_at').eq('user_id',me.id));
+        const rows = await cursosForosRequest('/courses/progress');
         progress = new Set(rows.filter(x=>x.completed_at).map(x=>x.module_id));
       } catch(err) {notify(status,'No se pudo consultar tu progreso: '+errorText(err));}
     }
@@ -156,13 +150,7 @@ async function init() {
       complete.onclick=async()=>{
         complete.disabled=true;
         try {
-          // Insertar matrícula una única vez, sin conceder cambios de propietario.
-          const {error:enrollErr}=await supabase.from('course_enrollments').insert({course_id:active.id,user_id:me.id});
-          if (enrollErr && enrollErr.code!=='23505')throw enrollErr;
-          const {error:progressError}=await supabase.from('course_module_progress').insert({user_id:me.id,module_id:mod.id,completed_at:new Date().toISOString()});
-          if(progressError && progressError.code==='23505') {
-            await query(supabase.from('course_module_progress').update({completed_at:new Date().toISOString()}).eq('user_id',me.id).eq('module_id',mod.id));
-          } else if(progressError) throw progressError;
+          await cursosForosRequest(`/courses/${active.id}/modules/${mod.id}/complete`, 'POST');
           progress.add(mod.id);await drawLesson();
         }catch(err){notify(progressMsg,'No se pudo guardar el progreso: '+errorText(err));complete.disabled=false;}
       };
@@ -218,14 +206,12 @@ async function init() {
           const {error}=await supabase.storage.from('course-videos').upload(storageKey,selected,{contentType:selected.type,upsert:false});
           if(error)throw error;
         }
-        const inserted=await query(supabase.from('courses').insert({slug:slug(),title:title.value.trim(),description:description.value.trim(),level:level.value,category_id:Number(category.value),duration_minutes:Number(duration.value),created_by:me.id}).select('id').single());
-        try {
-          await query(supabase.from('course_modules').insert({course_id:inserted.id,title:lessonTitle.value.trim(),description:lessonText.value.trim()||null,content:lessonText.value.trim()||null,video_url:url.value.trim()||null,video_storage_key:storageKey,sort_order:1,duration_minutes:Number(duration.value)}));
-        } catch(error) {
-          // La lección no quedó registrada: ocultar el curso para que no quede público incompleto.
-          await supabase.from('courses').update({status:'hidden'}).eq('id',inserted.id);
-          throw error;
-        }
+        await cursosForosRequest('/courses','POST',{
+          title:title.value.trim(),description:description.value.trim(),level:level.value,
+          category_id:Number(category.value),duration_minutes:Number(duration.value),
+          lesson_title:lessonTitle.value.trim(),lesson_text:lessonText.value.trim(),
+          video_url:url.value.trim()||null,video_storage_key:storageKey
+        });
         form.reset();notify(feedback,'Curso publicado y disponible para todos.');await reload();
       } catch(error){
         notify(feedback,'No se pudo publicar: '+errorText(error));

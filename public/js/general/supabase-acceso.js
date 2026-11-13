@@ -1,7 +1,5 @@
-/* LinkNoDin: autenticación real de candidatos y empresas con Supabase.
-   El registro empresarial requiere la migración SQL de esta entrega.
-   La sesión de compatibilidad NO es fuente de permisos de base de datos. */
 import { supabase } from '/js/supabase-config.js';
+import { generalRequest } from '/js/general/api-general.js';
 
 const formLogin = document.getElementById('ld-login');
 const formRegister = document.getElementById('ld-register');
@@ -14,19 +12,12 @@ const message = (text, type = 'info') => {
 };
 
 function cacheForOldPages(perfil, email) {
-    // Retrocompatibilidad solo de la respuesta; no se mantiene una sesión paralela local.
     return {candidate:'candidato',company:'empresa',admin:'admin'}[perfil.rol] || 'candidato';
 }
 
 async function loadProfile(user) {
-    const {data, error} = await supabase.from('users')
-        .select('id, full_name, status, role_id')
-        .eq('auth_user_id', user.id)
-        .single();
-    if (error) throw new Error('No se pudo consultar tu perfil: ' + error.message);
+    const data = await generalRequest('/account');
     if (data.status !== 'active') throw new Error('Tu cuenta no está activa.');
-    // Los ID de roles 1/2/3 fueron verificados en esta base de datos.
-    // La autorización real debe validarse mediante RLS, no con este valor del navegador.
     const rol = ({1:'candidate',2:'company',3:'admin'}[data.role_id]);
     if (!rol) throw new Error('No se pudo identificar tu rol.');
     return {...data, rol};
@@ -117,7 +108,6 @@ if (formRegister) {
         button.disabled = true;
         message('Creando cuenta en Supabase...');
         try {
-            // No mezclar una cuenta nueva con otra sesión ya iniciada.
             const {data: current, error: currentError} = await supabase.auth.getUser();
             if (currentError && currentError.name !== 'AuthSessionMissingError') throw currentError;
             if (current?.user) {
@@ -126,8 +116,6 @@ if (formRegister) {
 
             const metadata = {full_name: name};
             if (isCompany) {
-                // El trigger validado en PostgreSQL determina el rol y crea companies.
-                // No se solicita ni concede el rol admin desde el navegador.
                 Object.assign(metadata, {
                     account_type: 'company',
                     company_name: company.commercial_name,

@@ -2,15 +2,17 @@
    Los permisos reales están en PostgreSQL RLS; nunca se confía en localStorage. */
 import { supabase } from '/js/supabase-config.js';
 import { adminRequest } from '/js/admin/admin-api.js';
+import { cursosForosRequest } from './api-cursos-foros.js';
+import { generalRequest } from '/js/general/api-general.js';
 const $=s=>document.querySelector(s);
 function el(tag,cls,text){const x=document.createElement(tag);if(cls)x.className=cls;if(text!==undefined)x.textContent=text;return x;}
 function btn(label,run,cls='btn'){const x=el('button',cls,label);x.type='button';x.onclick=run;return x;}
 function info(box,text){box.textContent=text;box.setAttribute('role','status');}
 async function db(query){const {data,error}=await query;if(error)throw error;return data;}
 async function identity(){
- const {data:{user},error}=await supabase.auth.getUser();
- if(error || !user)return null;
- const record=await db(supabase.from('users').select('id,full_name,role_id,status').eq('auth_user_id',user.id).single());
+ const {data}=await supabase.auth.getSession();
+ if(!data.session)return null;
+ const record=await generalRequest('/account');
  return record.status==='active'?record:null;
 }
 function message(err){return err?.message||String(err);}
@@ -40,19 +42,20 @@ function reportDialog(me, contentType, contentId, onSuccess) {
  form.addEventListener('submit',async e=>{
   e.preventDefault();send.disabled=true;info(feedback,'Enviando reporte...');
   try{
-   await db(supabase.from('content_reports').insert({reporter_id:me.id,content_type:contentType,content_id:contentId,reason:reason.value,description:detail.value.trim()||null}));
+   await cursosForosRequest('/forum/reports','POST',{content_type:contentType,content_id:contentId,reason:reason.value,description:detail.value.trim()||null});
    close();if(onSuccess)onSuccess('Reporte enviado. El administrador lo revisará.');
   }catch(err){info(feedback,err.code==='23505'?'Ya reportaste este contenido y tu reporte está registrado.':'No se pudo enviar: '+message(err));send.disabled=false;}
  });
 }
-async function categories(){return db(supabase.from('forum_categories').select('id,name,is_active').order('name'));}
-async function topics(){return db(supabase.from('forum_topics').select('id,title,body,author_id,category_id,status,created_at').order('created_at',{ascending:false}));}
-async function replies(topicId){return db(supabase.from('forum_replies').select('id,topic_id,author_id,body,status,created_at').eq('topic_id',topicId).order('created_at',{ascending:true}));}
+async function categories(){return cursosForosRequest('/forum/categories');}
+async function topics(){return cursosForosRequest('/forum/topics');}
+async function replies(topicId){return cursosForosRequest(`/forum/topics/${topicId}/replies`);}
 // Identificar por nombre o alias; nunca exponer correos de participantes.
 async function authorNames(topicId){
- const {data,error}=await supabase.rpc('ln26_forum_author_names',{p_topic_id:topicId});
- if(error){console.warn('Autores no disponibles (falta configurar la funcion o su acceso):',error.message);return new Map();}
- return new Map((data||[]).map(person=>[Number(person.user_id),person.display_name]));
+ try {
+  const data=await cursosForosRequest(`/forum/topics/${topicId}/authors`);
+  return new Map((data||[]).map(person=>[Number(person.user_id),person.display_name]));
+ } catch(error){console.warn('Autores no disponibles:',error.message);return new Map();}
 }
 async function renderList(){
  const main=$('main .container'); if(!main)return;
@@ -78,7 +81,7 @@ async function renderList(){
   if(!category.options.length){send.disabled=true;info(feedback,'El administrador debe activar al menos una categoría.');}
   form.addEventListener('submit',async event=>{
    event.preventDefault();if(!form.reportValidity())return;send.disabled=true;info(feedback,'Publicando...');
-   try{await db(supabase.from('forum_topics').insert({title:title.value.trim(),body:body.value.trim(),category_id:Number(category.value),author_id:me.id}));
+   try{await cursosForosRequest('/forum/topics','POST',{title:title.value.trim(),body:body.value.trim(),category_id:Number(category.value)});
     form.reset();info(feedback,'Tema publicado correctamente.');await draw();
    }catch(e){info(feedback,'No se pudo publicar: '+message(e));}finally{send.disabled=false;}
   });
@@ -103,7 +106,7 @@ async function renderTopic(){
  const submit=form.querySelector('[type=submit]'); const modal=$('#ld-forum-modal'); let selected=null,me=null,topic=null;
  const pending=el('p','muted','Cargando conversación...');list.append(pending);form.hidden=true;
  if(!Number.isInteger(id)||id<1){title.textContent='Selecciona un tema de la lista de Foros';list.replaceChildren();return;}
- try{me=await identity();topic=await db(supabase.from('forum_topics').select('id,title,body,status,author_id,category_id,created_at').eq('id',id).single());
+ try{me=await identity();topic=await cursosForosRequest(`/forum/topics/${id}`);
   title.textContent=topic.title;paragraphs[2].textContent=topic.body;paragraphs[3].textContent='Publicado '+new Date(topic.created_at).toLocaleDateString('es-SV');
   if(me && topic.status!=='hidden'){const report=btn('Reportar tema',()=>reportDialog(me,'forum_topic',id,value=>info(feedback,value)),'btn btn-sm ld-report-btn');title.parentElement.append(report);}
  }catch(e){title.textContent='Tema no disponible';list.replaceChildren(el('p','muted','Este tema no existe o no tienes permiso para verlo.'));return;}
@@ -126,7 +129,7 @@ async function renderTopic(){
   event.preventDefault();if(!allowed())return;
   const body=textarea.value.trim();if(!body||body.length>1000)return;
   submit.disabled=true;info(feedback,'Publicando...');
-  try{await db(supabase.from('forum_replies').insert({topic_id:id,author_id:me.id,body}));textarea.value='';$('#ld-forum-count').textContent='0';info(feedback,'Respuesta publicada.');await draw();}
+  try{await cursosForosRequest(`/forum/topics/${id}/replies`,'POST',{body});textarea.value='';$('#ld-forum-count').textContent='0';info(feedback,'Respuesta publicada.');await draw();}
   catch(e){info(feedback,'No se pudo responder: '+message(e));}
   finally{submit.disabled=false;}
  });
@@ -134,7 +137,7 @@ async function renderTopic(){
  $('#ld-forum-cancel').onclick=close;
  $('#ld-forum-confirm').onclick=async()=>{
   if(!selected||!me)return;const target=selected;close();
-  try{await db(supabase.from('forum_replies').update({status:'hidden'}).eq('id',target).eq('author_id',me.id));info(feedback,'Respuesta retirada.');await draw();}
+  try{await cursosForosRequest(`/forum/replies/${target}/hide`,'PATCH');info(feedback,'Respuesta retirada.');await draw();}
   catch(e){info(feedback,'No se pudo retirar la respuesta: '+message(e));}
  };
  modal.addEventListener('click',e=>{if(e.target===modal)close();});

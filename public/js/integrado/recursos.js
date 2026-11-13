@@ -1,5 +1,6 @@
 /* Recursos auténticos de PostgreSQL: filtros, lectura y marcadores por usuario. */
 import {supabase,$,dom,run,who,status,messageError} from './base.js';
+import { generalRequest } from '/js/general/api-general.js';
 async function init(){
  const old=$('rc-count');if(!old)return;
  document.querySelector('.rc-tools')?.setAttribute('hidden','');
@@ -10,18 +11,18 @@ async function init(){
  const q=dom('input');q.type='search';q.placeholder='Buscar recursos publicados';
  const info=dom('p','muted'),list=dom('div');root.append(q,info,list);
  const me=await who();
- const [resources,sections,activity]=await Promise.all([
-   run(supabase.from('resources').select('id,slug,title,category,summary,intro,reading_minutes').order('created_at',{ascending:false})),
-   run(supabase.from('resource_sections').select('resource_id,heading,body,sort_order').order('sort_order')),
-   me?run(supabase.from('user_resource_activity').select('resource_id,is_saved').eq('user_id',me.id)):Promise.resolve([])
+ const resources=await generalRequest('/resources');
+ const [groups,activity]=await Promise.all([
+   Promise.all(resources.map(r=>generalRequest('/resources/'+r.id+'/sections'))),
+   me?generalRequest('/resource-activity'):Promise.resolve([])
  ]);
+ const sections=groups.flat();
  const saved=new Map(activity.map(a=>[a.resource_id,a.is_saved]));
  async function flip(r,btn){
   if(!me){status(info,'Inicia sesión para guardar recursos.',true);return;}
   btn.disabled=true;
   try{const value=!saved.get(r.id);
-   if(saved.has(r.id))await run(supabase.from('user_resource_activity').update({is_saved:value,updated_at:new Date().toISOString()}).eq('user_id',me.id).eq('resource_id',r.id));
-   else await run(supabase.from('user_resource_activity').insert({user_id:me.id,resource_id:r.id,is_saved:value}));
+   await generalRequest('/resource-activity/'+r.id,'PUT',{is_saved:value});
    saved.set(r.id,value);render();
   }catch(e){status(info,messageError(e),true);btn.disabled=false;}
  }

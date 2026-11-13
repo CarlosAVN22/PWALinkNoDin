@@ -1,0 +1,10 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Restablecer contraseña | LinkNoDin</title><link rel="stylesheet" href="/css/estilos.css"><link rel="stylesheet" href="/css/integrado.css"></head>
+<body><main class="container" style="max-width:620px;margin:5rem auto"><section class="panel" style="padding:2rem">
+<h1>Restablecer contraseña</h1><p>Usa el enlace enviado por Supabase a tu correo para continuar.</p>
+<form id="ln-reset-form" hidden><div class="field"><label for="ln-password">Contraseña nueva</label><input id="ln-password" name="password" type="password" minlength="8" autocomplete="new-password" required></div>
+<div class="field"><label for="ln-confirm">Repetir contraseña</label><input id="ln-confirm" name="confirm" type="password" minlength="8" autocomplete="new-password" required></div><button class="btn btn-primary" type="submit">Guardar contraseña</button></form>
+<p id="ln-reset-status" role="status">Verifica el enlace de recuperación recibido por correo.</p>
+<a href="/doc/general/login.html">Volver al inicio de sesión</a></section></main>
+<script src="/js/app.js"></script><script type="module" src="/js/general/restablecer.js"></script>    <script type="module" src="/js/integrado/navegacion.js"></script>
+</body></html>

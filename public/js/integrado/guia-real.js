@@ -1,5 +1,6 @@
 /* Guías con actividades de Supabase y avance individual, sin sesión local. */
 import {supabase,run,who,dom,status,messageError} from './base.js';
+import { generalRequest } from '/js/general/api-general.js';
 const $=id=>document.getElementById(id);
 const destinations={
  'Crear cuenta y perfil':'/doc/general/registro.html','Completar mi perfil':'/doc/general/perfil.html',
@@ -16,9 +17,16 @@ const destinations={
 async function init(){
  const root=$('ld-guide-app');if(!root)return;
  const me=await who(),note=$('ld-guide-account-note'),content=$('ld-guide-content');
- const all=await run(supabase.from('guide_activities').select('id,audience,title,description,sort_order').order('sort_order'));
- const saved=me?await run(supabase.from('user_guide_progress').select('activity_id').eq('user_id',me.id)):[];
+ const all=await generalRequest('/guide');
+ const saved=me?await generalRequest('/guide/progress'):[];
  let done=new Set(saved.map(x=>x.activity_id));let audience=me?.role_id===2?'empresa':'candidato';
+ const tabs=root.querySelector('.ld-guide-tabs');
+ if(me?.role_id===1||me?.role_id===2){
+  const selected=me.role_id===2?'empresa':'candidato';
+  tabs.hidden=true;
+  audience=selected;
+  root.querySelector('.lead').textContent='Consulta las instrucciones de tu cuenta y registra tu progreso.';
+ }
  if(note)note.textContent=me?'Tu progreso se guarda y se sincroniza entre dispositivos.':'Inicia sesión para conservar tu progreso entre dispositivos.';
  function draw(){
   content.replaceChildren();const activities=all.filter(x=>x.audience===audience||x.audience===(audience==='candidato'?'candidate':'company'));
@@ -37,9 +45,9 @@ async function init(){
    const button=dom('button','btn ld-guide-complete',done.has(activity.id)?'Marcar pendiente':'Marcar como completada');button.type='button';button.disabled=!me;
    button.onclick=async()=>{
     button.disabled=true;
-    try{if(done.has(activity.id)){await run(supabase.from('user_guide_progress').delete().eq('user_id',me.id).eq('activity_id',activity.id));done.delete(activity.id);}
-    else{await run(supabase.from('user_guide_progress').insert({user_id:me.id,activity_id:activity.id,completed_at:new Date().toISOString()}));done.add(activity.id);}
-    draw();}catch(error){alert(messageError(error));button.disabled=false;}
+    try{if(done.has(activity.id)){await generalRequest('/guide/progress/'+activity.id,'PUT',{completed:false});done.delete(activity.id);}
+    else{await generalRequest('/guide/progress/'+activity.id,'PUT',{completed:true});done.add(activity.id);}
+    draw();}catch(error){status(note,messageError(error),true);button.disabled=false;}
    };details.append(button);toggle.onclick=()=>{details.hidden=!details.hidden;toggle.setAttribute('aria-expanded',String(!details.hidden));};section.append(toggle,details);content.append(section);
   }
  }

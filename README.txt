@@ -11,23 +11,22 @@ ESTADO ACTUAL
 -------------
 - Supabase sigue siendo la plataforma de Auth, PostgreSQL, RLS y Storage.
 - Node/Express agrega una API para centralizar operaciones del backend.
-- La API tiene un piloto de perfil propio: GET /api/v1/me.
+- La API tiene un piloto de perfil propio: GET /api/v1/me. 
 Remover luego, esto solo lo puse para probar si conseguia hacerlo furular.
 
 - El módulo admin consulta Supabase con el token del usuario y verifica en
   servidor la sesión y el rol admin de LND.
-- El frontend admin usa el API para empresas, reportes, categorías de
-  cursos/foros, cursos/temas, usuarios, seguridad, panel y estadísticas.
-- Los scripts actualizan los elementos HTML existentes; no ocultan ni
-  reconstruyen las tarjetas, tablas y modales del diseño original.
-- La cuenta de servidor SUPABASE_SECRET_KEY se usa solo en Node para Auth
-  Admin, consultas administrativas y auditoría; nunca se envía al navegador.
+- El frontend admin ya usa el API para empresas, reportes, categorias de
+  cursos/foros, estado de cursos/temas, panel principal y estadísticas.
+- La gestión de usuarios y la página de seguridad no forman parte aún del
+  API admin. Las funciones comunes del sitio pueden seguir usando Supabase
+  directamente bajo sus políticas RLS mientras no exista un endpoint Node.
 - No hay modo demo ni pruebas automatizadas locales.
 
-IMPORTANTE: GET /api/v1/me solo probó una lectura de perfil propio. El usuario
-ya confirmó que el dashboard admin carga con su cuenta administradora de LND.
-Las escrituras (invitaciones, edición/eliminación, moderación, preferencias y
-verificación) aún deben probarse individualmente contra Supabase.
+IMPORTANTE: la respuesta de GET /api/v1/me que se comprobo en Postman valida
+una lectura de perfil propio con usuario normal. No demuestra el CRUD admin.
+La integración admin está escrita, pero falta validarla con una cuenta admin
+de LND contra el proyecto Supabase del equipo.
 
 ARQUITECTURA Y RESPONSABILIDADES
 --------------------------------
@@ -111,7 +110,8 @@ Para desarrollo local, el frontend debe abrirse desde:
   http://localhost:3000
 La API escucha por defecto en:
   http://localhost:3001
-El CORS local permite http://localhost:3000. Si se usa otro origen, configurar
+El CORS local permite http://loc
+alhost:3000. Si se usa otro origen, configurar
 FRONTEND_ORIGIN en el entorno del backend. Si el API tiene otra URL, configurar
 el meta lnd-api-base-url en las paginas admin que consumen Node, con una URL
 terminada en /api/v1.
@@ -125,11 +125,8 @@ CONFIGURACION Y ARRANQUE LOCAL
      API_PORT=3001
      FRONTEND_ORIGIN=http://localhost:3000
      SUPABASE_URL=<URL del proyecto>
-     SUPABASE_PUBLISHABLE_KEY=<clave pública>
-     SUPABASE_SECRET_KEY=<clave secreta del servidor>
-     FRONTEND_BASE_URL=http://localhost:3000
-     La clave secreta va únicamente en el .env local/servidor. No pegarla en
-     JavaScript, HTML, README, Postman compartido o repositorio.
+     SUPABASE_PUBLISHABLE_KEY=<clave publica>
+   No copiar valores secretos a este archivo, al frontend ni al repositorio.
    No compartir el contenido de .env por chat.
 3. Abrir dos terminales desde la raíz del proyecto:
    Terminal 1:
@@ -139,28 +136,7 @@ CONFIGURACION Y ARRANQUE LOCAL
 4. Abrir:
      http://localhost:3000/doc/general/index.html
 5. Para probar rutas admin, iniciar sesión en el navegador con una cuenta que
-   tenga rol admin activo de LND. Una cuenta normal recibe 403; sin
-   SUPABASE_SECRET_KEY configurada, la API admin responde 503.
-
-FUNCIONES ADMIN Y LÍMITES
-------------------------
-- Usuarios: lista, invitación por correo de Supabase, edición de nombre/rol/
-  estado (suspender también bloquea Auth), envío de restablecimiento y
-  eliminación permanente. No permite
-  cambiar el correo desde Editar, suspender/eliminar la sesión propia ni
-  desactivar/eliminar al único administrador activo.
-- Seguridad: lee alertas existentes, guarda preferencias y marca alertas como
-  revisadas; registra acciones administrativas en admin_audit_log.
-- Las preferencias no generan alertas automáticamente. Los accesos y eventos
-  Auth de Supabase no son una bitácora disponible para este módulo LND.
-- Las invitaciones y restablecimientos requieren que el proveedor de correo de
-  Supabase esté configurado y que las URL de restablecer/login estén autorizadas.
-- La suspensión establece un bloqueo de Auth y el middleware de Node rechaza
-  el perfil suspendido. Las políticas RLS deben comprobar también el estado si
-  se requiere bloquear inmediatamente sesiones con tokens aún vigentes.
-- Eliminar una cuenta es permanente; las filas relacionadas dependen de las
-  claves foráneas/cascadas del esquema.
-- El detalle de endpoints, bodies y restricciones está en InfoApiAdmin.txt.
+   tenga rol admin de LND. Una cuenta normal solo puede usar rutas permitidas.
 
 DOCUMENTACION DE REFERENCIA
 ---------------------------
