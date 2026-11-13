@@ -47,6 +47,20 @@ export function createUserAuth({
                 return;
             }
 
+            const { data: profile, error: profileError } = await client
+                .from("users")
+                .select("status")
+                .eq("auth_user_id", data.user.id)
+                .maybeSingle();
+            if (profileError) {
+                next(profileError);
+                return;
+            }
+            if (profile?.status === "suspended") {
+                res.status(403).json({ error: "La cuenta está suspendida." });
+                return;
+            }
+
             req.userContext = { client, user: data.user };
             next();
         } catch (error) {

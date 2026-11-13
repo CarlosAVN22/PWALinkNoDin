@@ -15,6 +15,19 @@ import {
     listAdminCompanies,
     updateCompanyVerification,
 } from "../services/adminCompaniesService.js";
+import {
+    deleteAdminUser,
+    inviteAdminUser,
+    listAdminUsers,
+    sendAdminUserPasswordReset,
+    updateAdminUser,
+} from "../services/adminUsersService.js";
+import {
+    getAdminSecurityData,
+    reviewAdminSecurityAlert,
+    updateAdminSecurityPreferences,
+} from "../services/adminSecurityService.js";
+import { recordAdminAction } from "../services/adminAuditService.js";
 
 function sendResult(req, res, data, statusCode = 200) {
     res.status(statusCode).json({
@@ -48,6 +61,12 @@ export async function updateCompanyStatus(req, res, next) {
             req.validatedId,
             req.validatedStatus,
         );
+        await recordAdminAction(req.adminContext, {
+            eventType: "account",
+            action: "Verificación de empresa actualizada",
+            affectedRecord: data.commercial_name,
+            details: `Estado: ${req.validatedStatus}.`,
+        });
         sendResult(req, res, data);
     } catch (error) {
         next(error);
@@ -70,6 +89,12 @@ export async function createCategory(req, res, next) {
             req.params.type,
             req.validatedName,
         );
+        await recordAdminAction(req.adminContext, {
+            eventType: "content",
+            action: "Categoría creada",
+            affectedRecord: data.name,
+            details: `Tipo: ${req.params.type}.`,
+        });
         sendResult(req, res, data, 201);
     } catch (error) {
         next(error);
@@ -84,6 +109,12 @@ export async function updateCategory(req, res, next) {
             req.validatedId,
             req.validatedChanges,
         );
+        await recordAdminAction(req.adminContext, {
+            eventType: "content",
+            action: "Categoría actualizada",
+            affectedRecord: String(req.validatedId),
+            details: `Tipo: ${req.params.type}.`,
+        });
         sendResult(req, res, data);
     } catch (error) {
         next(error);
@@ -97,6 +128,12 @@ export async function deactivateCategory(req, res, next) {
             req.params.type,
             req.validatedId,
         );
+        await recordAdminAction(req.adminContext, {
+            eventType: "content",
+            action: "Categoría desactivada",
+            affectedRecord: String(req.validatedId),
+            details: `Tipo: ${req.params.type}.`,
+        });
         sendResult(req, res, data);
     } catch (error) {
         next(error);
@@ -119,6 +156,12 @@ export async function updateCourseStatus(req, res, next) {
             req.validatedId,
             req.validatedStatus,
         );
+        await recordAdminAction(req.adminContext, {
+            eventType: "content",
+            action: "Estado de curso actualizado",
+            affectedRecord: data.title,
+            details: `Estado: ${req.validatedStatus}.`,
+        });
         sendResult(req, res, data);
     } catch (error) {
         next(error);
@@ -141,6 +184,12 @@ export async function updateTopicStatus(req, res, next) {
             req.validatedId,
             req.validatedStatus,
         );
+        await recordAdminAction(req.adminContext, {
+            eventType: "content",
+            action: "Estado de tema actualizado",
+            affectedRecord: data.title,
+            details: `Estado: ${req.validatedStatus}.`,
+        });
         sendResult(req, res, data);
     } catch (error) {
         next(error);
@@ -163,7 +212,85 @@ export async function updateReportDecision(req, res, next) {
             req.validatedId,
             req.validatedDecision,
         );
+        await recordAdminAction(req.adminContext, {
+            eventType: "content",
+            action: "Decisión de reporte registrada",
+            affectedRecord: String(req.validatedId),
+            details: `Decisión: ${req.validatedDecision}.`,
+        });
         sendResult(req, res, data);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getUsers(req, res, next) {
+    try {
+        sendResult(req, res, await listAdminUsers(req.adminContext));
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function createUser(req, res, next) {
+    try {
+        sendResult(req, res, await inviteAdminUser(req.adminContext, req.validatedUser), 201);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updateUser(req, res, next) {
+    try {
+        sendResult(
+            req,
+            res,
+            await updateAdminUser(req.adminContext, req.validatedId, req.validatedChanges),
+        );
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function resetUserPassword(req, res, next) {
+    try {
+        sendResult(req, res, await sendAdminUserPasswordReset(req.adminContext, req.validatedId));
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function removeUser(req, res, next) {
+    try {
+        sendResult(req, res, await deleteAdminUser(req.adminContext, req.validatedId));
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getSecurity(req, res, next) {
+    try {
+        sendResult(req, res, await getAdminSecurityData(req.adminContext));
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updateSecurityPreferences(req, res, next) {
+    try {
+        sendResult(
+            req,
+            res,
+            await updateAdminSecurityPreferences(req.adminContext, req.validatedChanges),
+        );
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function reviewSecurityAlert(req, res, next) {
+    try {
+        sendResult(req, res, await reviewAdminSecurityAlert(req.adminContext, req.validatedId));
     } catch (error) {
         next(error);
     }

@@ -11,6 +11,7 @@ const serviceErrorStatuses = {
     BAD_REQUEST: 400,
     NOT_FOUND: 404,
     CONFLICT: 409,
+    CONFIGURATION: 503,
 };
 
 export function errorHandler(error, req, res, next) {

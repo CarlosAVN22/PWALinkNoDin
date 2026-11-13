@@ -120,3 +120,81 @@ export const validateReportDecision = validate(req => {
     }
     req.validatedDecision = decision;
 });
+
+export const validateAdminUserId = validate(req => {
+    req.validatedId = readId(req.params.userId, "El id de usuario");
+});
+
+export const validateAdminUserCreate = validate(req => {
+    const body = readObjectBody(req.body);
+    if (typeof body.fullName !== "string" || body.fullName.trim().length < 3 || body.fullName.trim().length > 160) {
+        throw new HttpError(400, "El nombre debe tener entre 3 y 160 caracteres.");
+    }
+    if (typeof body.email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email.trim())) {
+        throw new HttpError(400, "Indica un correo electrónico válido.");
+    }
+    if (!["candidate", "admin"].includes(body.roleCode)) {
+        throw new HttpError(400, "El rol de invitación debe ser candidate o admin.");
+    }
+    if (body.status !== "active") {
+        throw new HttpError(400, "Las cuentas nuevas deben invitarse con estado active.");
+    }
+
+    req.validatedUser = {
+        fullName: body.fullName.trim(),
+        email: body.email.trim().toLowerCase(),
+        roleCode: body.roleCode,
+        status: body.status,
+    };
+});
+
+export const validateAdminUserUpdate = validate(req => {
+    req.validatedId = readId(req.params.userId, "El id de usuario");
+    const body = readObjectBody(req.body);
+    const changes = {};
+
+    if (Object.hasOwn(body, "fullName")) {
+        if (typeof body.fullName !== "string" || body.fullName.trim().length < 3 || body.fullName.trim().length > 160) {
+            throw new HttpError(400, "El nombre debe tener entre 3 y 160 caracteres.");
+        }
+        changes.fullName = body.fullName.trim();
+    }
+    if (Object.hasOwn(body, "roleCode")) {
+        if (!["candidate", "company", "admin"].includes(body.roleCode)) {
+            throw new HttpError(400, "El rol indicado no es válido.");
+        }
+        changes.roleCode = body.roleCode;
+    }
+    if (Object.hasOwn(body, "status")) {
+        if (!["active", "suspended"].includes(body.status)) {
+            throw new HttpError(400, "El estado debe ser active o suspended.");
+        }
+        changes.status = body.status;
+    }
+    if (!Object.keys(changes).length) {
+        throw new HttpError(400, "Indica fullName, roleCode o status para actualizar.");
+    }
+
+    req.validatedChanges = changes;
+});
+
+export const validateSecurityPreferences = validate(req => {
+    const body = readObjectBody(req.body);
+    const changes = {};
+    for (const field of ["repeated_password_resets", "unverified_companies", "inactive_accounts"]) {
+        if (Object.hasOwn(body, field)) {
+            if (typeof body[field] !== "boolean") {
+                throw new HttpError(400, `${field} debe ser booleano.`);
+            }
+            changes[field] = body[field];
+        }
+    }
+    if (!Object.keys(changes).length) {
+        throw new HttpError(400, "Indica al menos una preferencia para actualizar.");
+    }
+    req.validatedChanges = changes;
+});
+
+export const validateSecurityAlertId = validate(req => {
+    req.validatedId = readId(req.params.alertId, "El id de alerta");
+});

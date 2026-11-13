@@ -7,12 +7,20 @@ import {
     getCourses,
     getDashboard,
     getReports,
+    getSecurity,
     getTopics,
+    getUsers,
+    createUser,
+    removeUser,
+    resetUserPassword,
+    reviewSecurityAlert,
     updateCategory,
     updateCompanyStatus,
     updateCourseStatus,
     updateReportDecision,
+    updateSecurityPreferences,
     updateTopicStatus,
+    updateUser,
 } from "../controllers/adminController.js";
 import { createAdminAuth } from "../middleware/adminAuth.js";
 import {
@@ -24,6 +32,11 @@ import {
     validateCourseStatus,
     validateReportDecision,
     validateReportFilter,
+    validateAdminUserCreate,
+    validateAdminUserId,
+    validateAdminUserUpdate,
+    validateSecurityAlertId,
+    validateSecurityPreferences,
     validateTopicStatus,
 } from "../middleware/validators.js";
 
@@ -46,6 +59,16 @@ export function createAdminRouter() {
     router.patch("/forum/topics/:topicId/status", validateTopicStatus, updateTopicStatus);
     router.get("/reports", validateReportFilter, getReports);
     router.patch("/reports/:reportId/decision", validateReportDecision, updateReportDecision);
+
+    router.get("/users", getUsers);
+    router.post("/users", validateAdminUserCreate, createUser);
+    router.patch("/users/:userId", validateAdminUserUpdate, updateUser);
+    router.post("/users/:userId/password-reset", validateAdminUserId, resetUserPassword);
+    router.delete("/users/:userId", validateAdminUserId, removeUser);
+
+    router.get("/security", getSecurity);
+    router.patch("/security/preferences", validateSecurityPreferences, updateSecurityPreferences);
+    router.patch("/security/alerts/:alertId/review", validateSecurityAlertId, reviewSecurityAlert);
 
     return router;
 }

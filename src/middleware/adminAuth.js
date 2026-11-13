@@ -45,17 +45,42 @@ export function createAdminAuth() {
                 return;
             }
 
-            const { data: role, error: roleError } = await client.rpc("linknodin_role");
-            if (roleError) {
-                next(roleError);
+            const { data: profile, error: profileError } = await client
+                .from("users")
+                .select("id,role_id,status")
+                .eq("auth_user_id", authData.user.id)
+                .maybeSingle();
+
+            if (profileError) {
+                next(profileError);
                 return;
             }
-            if (role !== "admin") {
+            if (!profile || profile.role_id !== 3 || profile.status !== "active") {
                 res.status(403).json({ error: "La cuenta no tiene rol administrativo." });
                 return;
             }
 
-            req.adminContext = { dataSource: "supabase", client };
+            const secretKey = process.env.SUPABASE_SECRET_KEY;
+            if (!secretKey) {
+                res.status(503).json({
+                    error: "Configura SUPABASE_SECRET_KEY en el entorno del servidor para la API administrativa.",
+                });
+                return;
+            }
+
+            const adminClient = createClient(supabaseUrl, secretKey, {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false,
+                },
+            });
+
+            req.adminContext = {
+                dataSource: "supabase",
+                client,
+                adminClient,
+                actorUserId: profile.id,
+            };
             next();
         } catch (error) {
             next(error);

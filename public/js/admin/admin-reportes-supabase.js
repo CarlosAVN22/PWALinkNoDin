@@ -38,12 +38,12 @@ async function start() {
     feedback.setAttribute('role', 'status');
     card.append(filters, listing, feedback);
     // Mantener las categorías en primer lugar y los reportes justo debajo.
-    const categoriesPanel = host.querySelector('#ln-forum-admin');
-    if (categoriesPanel) categoriesPanel.insertAdjacentElement('afterend', card);
+    const categoriesPanel=host.querySelector('#ln-forum-admin');
+    if(categoriesPanel) categoriesPanel.insertAdjacentElement('afterend',card);
     else host.prepend(card);
-    const shortcut = node('a', 'btn btn-soft btn-sm', 'Gestionar categorías');
-    shortcut.href = '#ln-forum-admin';
-    shortcut.title = 'Ir al formulario para crear y activar categorías';
+    const shortcut=node('a','btn btn-soft btn-sm','Gestionar categorías');
+    shortcut.href='#ln-forum-admin';
+    shortcut.title='Ir al formulario para crear y activar categorías';
     head.append(shortcut);
 
     let active = 'open';
@@ -73,7 +73,7 @@ async function start() {
             try { await run(); close(); await load(); }
             catch (error) { feedback.textContent = 'No se guardó la decisión: ' + errorText(error); close(); }
         }, 'btn btn-primary');
-        actions.append(confirm); dialog.append(actions); backdrop.append(dialog); document.body.append(backdrop);
+        actions.append(confirm);dialog.append(actions);backdrop.append(dialog);document.body.append(backdrop);
         backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
         document.addEventListener('keydown', escape);
         confirm.focus();

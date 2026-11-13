@@ -1307,6 +1307,7 @@ tr:last-child td {
 .security-action-account { color: #285ca5; background: #eaf2ff; }
 .security-action-content { color: #147b68; background: #e8f8f2; }
 .security-action-access { color: #7759a5; background: #f2ecff; }
+.security-action-security { color: #7759a5; background: #f2ecff; }
 .security-empty { padding: 20px; margin: 0; text-align: center; color: var(--muted); }
 
 .security-modal-backdrop {
