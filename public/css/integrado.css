@@ -1,0 +1,66 @@
+/* LinkNoDin: paneles de datos reales. Conserva el estilo original y respeta los dos temas. */
+.ln-integ-section{margin:24px auto;max-width:1120px;padding:24px}
+.ln-integ-card{background:#fff;border:1px solid #d6e1f0;border-radius:14px;padding:20px;margin:14px 0;color:#182a45;box-shadow:0 4px 18px rgba(15,31,60,.04)}
+.ln-integ-card h3,.ln-integ-card strong{color:#0e315f}
+.ln-integ-card p{line-height:1.6;margin:10px 0}
+.ln-integ-card .muted{color:#63768e}
+.ln-integ-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.ln-integ-form{display:grid;gap:14px}.ln-integ-form textarea{width:100%;min-height:100px}
+.ln-integ-section>input,.ln-integ-section>select,.ln-integ-section>textarea{display:block;margin:12px 0;width:100%;max-width:560px;padding:12px;border:1px solid #c9d6e7;border-radius:10px;background:#f7faff;color:#142f53}
+.ln-integ-section details{margin:12px 0;padding:12px;border-radius:10px;border:1px solid #d6e1f0}
+.ln-integ-section summary{cursor:pointer;font-weight:700}
+.ln-integ-section .ld-status[data-error="true"],.ld-status[data-error="true"]{color:#a32238}
+body.dark-mode .ln-integ-card{background:#1a2537;border-color:#3d4d65;color:#e8f0fc;box-shadow:none}
+body.dark-mode .ln-integ-card h3,body.dark-mode .ln-integ-card strong{color:#eef5ff}
+body.dark-mode .ln-integ-card .muted{color:#b6c7df}
+body.dark-mode .ln-integ-section>input,body.dark-mode .ln-integ-section>select,body.dark-mode .ln-integ-section>textarea{background:#172336;border-color:#40516c;color:#e8f1ff}
+body.dark-mode .ln-integ-section details{border-color:#3d4d65}
+body.dark-mode .ln-integ-section .ld-status[data-error="true"]{color:#ffb1b9}
+@media(max-width:700px){.ln-integ-section{padding:16px}.ln-integ-actions{flex-direction:column}.ln-integ-actions .btn{width:100%}}
+.ln-admin-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}.ln-admin-summary .ln-integ-card{text-align:center}
+.ln-admin-search{width:100%;max-width:480px;padding:11px;border:1px solid #aebed2;border-radius:9px;margin:12px 0}
+body.dark-mode .ln-admin-search{background:#172336;color:#eef5ff;border-color:#52647e}
+
+
+.ln-form-field {
+ display: flex;
+ flex-direction: column;
+ gap: 8px;
+ margin: 10px 0;
+ font-weight: 600;
+}
+.ln-form-field select,
+.ln-form-field input,
+.ln-form-field textarea,
+.ln-lesson-form select,
+.ln-lesson-form input,
+.ln-lesson-form textarea {
+ width: 100%;
+ min-height: 44px;
+ border: 1px solid #b9cce1;
+ border-radius: 10px;
+ padding: 11px 13px;
+ background: #f8fbff;
+ color: #173052;
+ font: inherit;
+}
+.ln-form-field textarea,
+.ln-lesson-form textarea {min-height: 110px;}
+.ln-lesson-form {max-width: 740px;}
+.ln-lesson-form button {justify-self: start;}
+.ln-job-detail-map {height: 290px; min-height: 290px; border-radius: 12px; margin: 14px 0; overflow: hidden;}
+body.dark-mode .ln-form-field select,
+body.dark-mode .ln-form-field input,
+body.dark-mode .ln-form-field textarea,
+body.dark-mode .ln-lesson-form select,
+body.dark-mode .ln-lesson-form input,
+body.dark-mode .ln-lesson-form textarea {
+ background: #172336;
+ color: #eaf2ff;
+ border-color: #536883;
+}
+.ln-form-field select:focus-visible,
+.ln-form-field textarea:focus-visible,
+.ln-lesson-form select:focus-visible,
+.ln-lesson-form input:focus-visible {outline: 2px solid #2266e5; outline-offset: 2px;}
+@media (max-width: 650px) { .ln-lesson-form {width: 100%;} }

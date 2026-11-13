@@ -1,0 +1,125 @@
+LinkNoDin - API del módulo administrativo
+Actualizado: 12/11/2026
+
+BASE LOCAL
+----------
+http://localhost:3001/api/v1/admin
+
+AUTENTICACIÓN Y CONFIGURACIÓN
+-----------------------------
+Todas las rutas requieren:
+  Authorization: Bearer <access_token de Supabase>
+
+El middleware valida el token, consulta el perfil LND y exige estado active y
+role_id = 3. También exige SUPABASE_SECRET_KEY en el entorno de Node. La clave
+secreta se usa solo en servidor para operaciones administrativas de Auth y BD;
+nunca se envía al navegador. El frontend usa public/js/admin/admin-api.js.
+
+Respuesta habitual:
+  {"data": <resultado>, "meta": {"dataSource": "supabase"}}
+
+Códigos:
+  400 entrada inválida
+  401 falta token o la sesión no es válida
+  403 perfil sin rol admin activo
+  404 registro inexistente
+  409 operación en conflicto (por ejemplo, único admin activo)
+  503 falta SUPABASE_SECRET_KEY
+  500 error inesperado; revisar terminal de Node sin compartir tokens
+
+PANEL Y EMPRESAS
+----------------
+GET   /dashboard
+  Conteos actuales de usuarios, empresas, vacantes, postulaciones, cursos,
+  temas, reportes y últimas acciones administrativas.
+
+GET   /companies
+PATCH /companies/:companyId/verification
+  Body: {"status":"pending"|"verified"|"rejected"}
+
+CATEGORÍAS
+----------
+GET    /categories/:type
+POST   /categories/:type                  {"name":"Nombre"}
+PATCH  /categories/:type/:categoryId      {"is_active":true|false}
+PATCH  /categories/forum/:categoryId      También admite {"name":"..."}
+DELETE /categories/:type/:categoryId      Desactiva; no borra el registro
+  type: forum | course
+
+CURSOS, TEMAS Y REPORTES
+------------------------
+GET   /courses
+PATCH /courses/:courseId/status           {"status":"published"|"hidden"}
+GET   /forum/topics
+PATCH /forum/topics/:topicId/status       {"status":"visible"|"blocked"|"hidden"}
+GET   /reports?status=open|closed|all
+PATCH /reports/:reportId/decision         {"decision":"keep"|"hide"}
+
+USUARIOS
+--------
+GET    /users
+POST   /users
+  {
+    "fullName":"Nombre completo",
+    "email":"persona@ejemplo.com",
+    "roleCode":"candidate"|"admin",
+    "status":"active"
+  }
+  Envía invitación de Supabase Auth. El trigger de Auth debe crear el perfil
+  LND. Las invitaciones comienzan activas; si no se encuentra el perfil, el
+  API intenta revertir la invitación.
+
+PATCH  /users/:userId
+  Acepta una o más propiedades:
+  {"fullName":"Nombre", "roleCode":"candidate"|"company"|"admin",
+   "status":"active"|"suspended"}
+  El correo no se cambia desde el formulario Editar.
+  Cambiar el estado a suspended bloquea Auth; active quita el bloqueo.
+
+POST   /users/:userId/password-reset
+  Pide a Supabase enviar el correo de restablecimiento.
+
+DELETE /users/:userId
+  Elimina la identidad Auth y el perfil si no se eliminó en cascada. No permite
+  eliminar la sesión propia ni el único administrador activo. Las relaciones
+  de la base pueden eliminar datos relacionados; confirmar antes de usarlo.
+
+SEGURIDAD Y ACTIVIDAD
+---------------------
+GET   /security
+  Devuelve preferencias propias, hasta 50 alertas, 40 acciones recientes y
+  conteos de alertas abiertas/actividad.
+
+PATCH /security/preferences
+  Acepta una o varias preferencias booleanas:
+  repeated_password_resets, unverified_companies, inactive_accounts
+
+PATCH /security/alerts/:alertId/review
+  Marca como revisada una alerta abierta y registra la acción.
+
+SERVICIOS Y FRONTEND
+--------------------
+- Rutas: src/routes/admin.js
+- Validación: src/middleware/validators.js
+- Auth/rol: src/middleware/adminAuth.js
+- Controllers: src/controllers/adminController.js
+- Services: src/services/admin*Service.js
+- Auditoría: src/services/adminAuditService.js
+- Cliente frontend: public/js/admin/admin-api.js
+- Las páginas actualizan sus componentes HTML actuales; no sustituyen el diseño
+  por un panel nuevo.
+
+LÍMITES Y VALIDACIÓN
+--------------------
+- Las invitaciones y restablecimientos necesitan el proveedor de email activo
+  y las redirect URLs autorizadas en Supabase Auth.
+- La API rechaza perfiles suspendidos. RLS debe comprobar también users.status
+  para bloquear de inmediato operaciones directas con tokens aún vigentes.
+- Las preferencias se guardan, pero no existe un proceso que genere alertas
+  automáticamente a partir de accesos o restablecimientos.
+- admin_audit_log registra acciones realizadas por estas rutas; no sustituye
+  los logs de Auth de Supabase ni registra inicios de sesión.
+- Auth, perfil y bitácora no forman una transacción SQL. Si hay un error tras
+  una operación, revisa el estado antes de reintentar.
+- La sintaxis y los rechazos sin sesión se verifican localmente; cada escritura
+  aún debe probarse con una cuenta admin LND contra Supabase.
