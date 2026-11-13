@@ -1,35 +1,18 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const formulario = document.getElementById('ld-recuperar-form');
-    const correo = document.getElementById('ld-recuperar-correo');
-    const mensaje = document.getElementById('ld-recuperar-estado');
-
-    if (!formulario || !correo || !mensaje) return;
-
-    function avisar(texto, error) {
-        mensaje.textContent = texto;
-        mensaje.hidden = false;
-        mensaje.classList.toggle('ld-recuperar-error', Boolean(error));
-    }
-
-    formulario.addEventListener('submit', function (evento) {
-        evento.preventDefault();
-        const email = correo.value.trim().toLowerCase();
-
-        if (!email || !correo.checkValidity()) {
-            avisar('Ingresa una dirección de correo electrónico válida.', true);
-            correo.focus();
-            return;
-        }
-
-        // La solicitud se almacena únicamente para demostrar el flujo, sin guardar contraseñas.
-        const clave = 'linknodin-v3-recuperacion-demo';
-        try {
-            localStorage.setItem(clave, JSON.stringify({fecha: new Date().toISOString(), realizada: true}));
-        } catch (error) {
-            // El mensaje de demostración no depende del almacenamiento local.
-        }
-
-        avisar('Solicitud de demostración registrada. Cuando se conecte el servicio de correo, recibirás instrucciones si existe una cuenta con esta dirección. No se ha enviado ningún correo.', false);
-        formulario.reset();
-    });
+/* Restablecimiento real mediante correo de Supabase Auth. */
+import {supabase} from '/js/supabase-config.js';
+const form=document.getElementById('ld-recuperar-form');
+const email=document.getElementById('ld-recuperar-correo');
+const info=document.getElementById('ld-recuperar-estado');
+function notify(message,error=false){if(!info)return;info.hidden=false;info.textContent=message;info.dataset.error=String(error);}
+form?.addEventListener('submit',async event=>{
+ event.preventDefault();if(!email.checkValidity())return notify('Introduce un correo válido.',true);
+ const button=form.querySelector('[type=submit]');button.disabled=true;
+ try{
+  const {error}=await supabase.auth.resetPasswordForEmail(email.value.trim().toLowerCase(),{
+   redirectTo:location.origin+'/doc/general/restablecer.html'
+  });
+  if(error)throw error;
+  notify('Si existe una cuenta asociada, recibirás un enlace para recuperar tu contraseña. Revisa también spam.');form.reset();
+ }catch(error){notify('No se pudo procesar la solicitud: '+error.message,true);}
+ finally{button.disabled=false;}
 });

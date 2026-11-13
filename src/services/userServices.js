@@ -1,5 +1,5 @@
 //Importamos el POOL de la base de datos para realizar consultas
-import { pool } from "../db.js";
+import { pool } from "./databaseService.js";
 
 //Obtenemos todos los usuarios de la base de datos
 export const getAllUsers = async (req, res) => {

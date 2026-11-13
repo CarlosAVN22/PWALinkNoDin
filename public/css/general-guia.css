@@ -1,5 +1,6 @@
 /* Complemento exclusivo de la guía: conserva las variables y paneles del diseño original. */
 .ld-guide-tabs{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0 18px}
+.ld-guide-tabs[hidden]{display:none}
 .ld-guide-tabs .btn{cursor:pointer}
 .ld-guide-progress{padding:22px 26px}
 .ld-guide-progress-line{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}

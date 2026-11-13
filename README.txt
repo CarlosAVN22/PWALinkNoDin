@@ -1,32 +1,145 @@
-WORKLINK - PROTOTIPO VISUAL
+LinkNoDin
+Actualizado: 12/11/2026
 
-1. Abre una terminal en esta carpeta.
-2. Ejecuta npm install.
-3. Ejecuta npm run dev.
-4. Visita http://localhost:3000
+OBJETIVO
+---------
+Este documento resume lo que ya se implementó en la integración Node/Express
+con Supabase y define el flujo recomendado para que cada integrante migre o
+agregue su módulo sin duplicar lógica ni debilitar los permisos.
 
-VISTAS PRINCIPALES
-Inicio: http://localhost:3000/
-Login: http://localhost:3000/doc/general/login.html
-Candidato: http://localhost:3000/doc/candidato/candidato.html
-Empresa: http://localhost:3000/doc/empresa/empresa-panel.html
-Administrador: http://localhost:3000/doc/admin/admin.html
+ESTADO ACTUAL
+-------------
+- Supabase sigue siendo la plataforma de Auth, PostgreSQL, RLS y Storage.
+- Node/Express agrega una API para centralizar operaciones del backend.
+- La API tiene un piloto de perfil propio: GET /api/v1/me. 
+Remover luego, esto solo lo puse para probar si conseguia hacerlo furular.
 
-PENDIENTES:
-Cambiar color de fondo a negro ----Completado
-Carousel con los logos de las empresas y al darle click que muestre la vista de dicha empresa ----Pendiente
-Colocar imagenes de la empresa y del logo de la empresa ---Completado
-Validar que reciba la fecha de nacimiento para que sea mayor de edad ---Despues Cuando este bd
-Colocar el DUI o ID para validar y si es menor de edad que no deje registrarse en la pagina ----- Despues Cuando este bd
-Carousel para las opiniones de los usuarios registrados y no registrados  -----Pendiente
-Mapa pero dinamico de las propuestas de trabajo ----Pendiente
-Plan gratuito o pago simulado ---- Completado
-Notificaiones sobre la empresa y un apartado donde podramos modificar bien el tipo de alertas a recibir -----Despues Cuando trabajemos codigo
-Crear un apartado de los cursos formativos ---Pendiente
-Guia de pasos para al momento de hacer actividades importantes ---Pendiente
-Cambiar el nombre de la pagina  ----Completado
-Crear el logo de la pagina ---Completado
-La valoracion se haga desde el mismo apartado donde sale la empresa con el nombre de ella asi podamos ver todas las valoraciones en general y no solo colocar la nuestra ------Pendiente
+- El módulo admin consulta Supabase con el token del usuario y verifica en
+  servidor la sesión y el rol admin de LND.
+- El frontend admin ya usa el API para empresas, reportes, categorias de
+  cursos/foros, estado de cursos/temas, panel principal y estadísticas.
+- La gestión de usuarios y la página de seguridad no forman parte aún del
+  API admin. Las funciones comunes del sitio pueden seguir usando Supabase
+  directamente bajo sus políticas RLS mientras no exista un endpoint Node.
+- No hay modo demo ni pruebas automatizadas locales.
+
+IMPORTANTE: la respuesta de GET /api/v1/me que se comprobo en Postman valida
+una lectura de perfil propio con usuario normal. No demuestra el CRUD admin.
+La integración admin está escrita, pero falta validarla con una cuenta admin
+de LND contra el proyecto Supabase del equipo.
+
+ARQUITECTURA Y RESPONSABILIDADES
+--------------------------------
+Flujo de una solicitud:
+  navegador -> ruta -> middleware -> controlador -> servicio -> Supabase
+
+Estructura del backend:
+  src/routes/       Define URL, método HTTP y middleware de la ruta.
+  src/middleware/   Autenticación, rol, validación y manejo de errores.
+  src/controllers/  Lee datos validados, llama al servicio y arma la respuesta.
+  src/services/     Consultas/operaciones Supabase y reglas del caso de uso.
 
 
-Admin: admin@linknodin.demo / Admin123!
+
+
+
+
+
+Reglas para mantener la separación:
+1. Las rutas no contienen consultas SQL/Supabase ni lógica de interfaz.
+2. Los controladores no consultan Supabase; delegan en servicios y responden.
+3. Los servicios no conocen Express ni envían respuestas HTTP. Propagan errores
+   de Supabase y lanzan ServiceError para errores de negocio esperados.
+4. errorHandler convierte errores a respuestas HTTP/JSON centralizadas.
+5. Valida en el backend parámetros, IDs, estados y cuerpo JSON. La validación
+   del navegador mejora la experiencia, pero no sustituye la del servidor.
+6. Usa el cliente Supabase creado por el middleware con el access token de la
+   solicitud. No uses service_role para saltarte RLS.
+7. La autorización real permanece en Auth, funciones/roles y políticas RLS.
+   Ocultar un boton o revisar un rol solo en JavaScript no es seguridad.
+
+IMPLEMENTACIÓN PARA UN NUEVO MÓDULO
+-----------------------------------
+Antes de programar, el responsable del modulo debe:
+
+1. Definir el alcance: pantallas, operaciones, tablas/RPC, datos de entrada,
+   respuestas esperadas y quién puede ejecutar cada operación.
+2. Confirmar con el equipo de Supabase que las tablas/funciones están expuestas
+   a la Data API y que las politicas RLS permiten exactamente esas operaciones.
+   No asumir permisos ni crear politicas amplias para que "funcione".
+3. Revisar si ya existe una ruta, servicio, función SQL o flujo de frontend
+   equivalente. Reutilizarlo y no duplicar consultas.
+4. Implementar en este orden:
+   a. Middleware/validador: autenticar, comprobar rol si corresponde y validar
+      path params, query params y body.
+   b. Servicio: realizar las consultas/CRUD de Supabase usando el contexto
+      autenticado; propagar errores y representar errores de negocio con
+      ServiceError.
+   c. Controlador: llamar al servicio y responder JSON con el formato común.
+   d. Ruta: conectar endpoint, validadores, middleware y controlador.
+   e. Frontend: consumir el endpoint, presentar estados de carga/vacio/error y
+      actualizar la pantalla tras guardar.
+   f. Documentación: registrar endpoints, permisos, configuración y límites.
+5. Mantener el patron existente. No agregar models/repositories, capas nuevas,
+   dependencias ni archivos compartidos si el modulo no los necesita.
+6. Entregar el cambio acotado al modulo y coordinar cambios de archivos comunes
+   como validators.js, app.js, navigation y políticas SQL antes de editarlos.
+
+
+Recomiendo que se cree un InfoApi{Modulo}.txt donde se pongan los endpoints e info algo asi como el que hice para Admin, aunque le falta
+
+
+CONEXIÓN DEL FRONTEND AL API
+----------------------------
+Para operaciones admin, importar:
+  public/js/admin/admin-api.js
+
+adminRequest obtiene la sesión activa de Supabase, manda:
+  Authorization: Bearer <access_token>
+y devuelve la propiedad data de la respuesta del API. Ejemplos:
+  adminRequest("/companies")
+  adminRequest("/courses/15/status", {
+    method: "PATCH",
+    body: { status: "hidden" }
+  })
+
+No enviar contraseñas, service_role ni secretos desde el navegador. El API
+vuelve a validar el token y el rol admin; no confía en el rol del frontend.
+
+Para desarrollo local, el frontend debe abrirse desde:
+  http://localhost:3000
+La API escucha por defecto en:
+  http://localhost:3001
+El CORS local permite http://loc
+alhost:3000. Si se usa otro origen, configurar
+FRONTEND_ORIGIN en el entorno del backend. Si el API tiene otra URL, configurar
+el meta lnd-api-base-url en las paginas admin que consumen Node, con una URL
+terminada en /api/v1.
+
+
+CONFIGURACION Y ARRANQUE LOCAL
+------------------------------
+1. Instalar dependencias una vez:
+     npm install
+2. Completar .env con las variables requeridas:
+     API_PORT=3001
+     FRONTEND_ORIGIN=http://localhost:3000
+     SUPABASE_URL=<URL del proyecto>
+     SUPABASE_PUBLISHABLE_KEY=<clave publica>
+   No copiar valores secretos a este archivo, al frontend ni al repositorio.
+   No compartir el contenido de .env por chat.
+3. Abrir dos terminales desde la raíz del proyecto:
+   Terminal 1:
+     npm run dev:api
+   Terminal 2:
+     npm run dev
+4. Abrir:
+     http://localhost:3000/doc/general/index.html
+5. Para probar rutas admin, iniciar sesión en el navegador con una cuenta que
+   tenga rol admin de LND. Una cuenta normal solo puede usar rutas permitidas.
+
+DOCUMENTACION DE REFERENCIA
+---------------------------
+- README.md: pasos del proyecto, API actual y límites conocidos.
+- CAMBIOS_Y_PRUEBAS.md: historial de cambios/verificaciones si esta disponible.
+- .env.example: nombres de variables requeridas; nunca contiene secretos reales.

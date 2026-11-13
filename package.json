@@ -1,20 +1,21 @@
 {
-  "name": "prac1prd3",
+  "name": "linknodin-integracion-equipo",
   "version": "1.0.0",
-  "description": "",
+  "description": "Portal LinkNoDin con Supabase y servidor local de archivos",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node serve.mjs",
+    "dev:api": "node src/index.js",
+    "start": "node serve.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
     "dotenv": "^18.0.8",
-    "express": "^5.3.0",
-    "pg": "^8.23.1"
+    "express": "^5.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

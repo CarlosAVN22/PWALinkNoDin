@@ -155,7 +155,7 @@
                         </button>
                         <p aria-live="polite" class="ld-status" id="ld-status" role="status"></p>
                         <section id="em-publicadas" class="ld-em-posts" aria-live="polite"><h3>Mis últimas vacantes</h3><div id="em-publicadas-lista"></div></section>
-                        <p class="ld-muted">Esta publicación de demostración se guarda solo en este navegador. Las vacantes activas aparecen en Empleos; el mapa usa el punto elegido o la ubicación aproximada del municipio.</p>
+                        <p class="ld-muted">La vacante se guarda en Supabase y aparece en Empleos cuando está activa. Puedes señalar la ubicación aproximada en el mapa.</p>
                     </form>
                 </div>
             </div>
@@ -166,13 +166,17 @@
     </footer>
     <script src="/js/app.js">
     </script>
-    <script src="/js/acceso-demo.js"></script>
-     <script src="/js/linknodin.js"></script>
-    <script src="/js/notificaciones.js"></script>
-    <script src="/js/worklink-pendientes.js"></script>
-    <script src="/js/empresa-prototipo.js"></script>
+    
+     
+    
+    
+    
     <div class="ld-em-overlay" id="em-preview-modal" hidden><section class="ld-em-dialog panel" role="dialog" aria-modal="true" aria-labelledby="em-preview-title"><h2 id="em-preview-title">Vista previa de la vacante</h2><div id="em-preview-data"></div><div class="ld-em-actions"><button type="button" class="btn" id="em-preview-close">Volver a editar</button><button type="button" class="btn btn-primary" id="em-preview-confirm">Confirmar publicación</button></div></section></div>
-    <script src="/js/empleo/publicar.js"></script>
+    
+    <link href="/css/integrado.css" rel="stylesheet" />
+    <script type="module" src="/js/integrado/empleos.js"></script>
+    <script type="module" src="/js/empleo/formulario-real.js"></script>
+    <script type="module" src="/js/integrado/navegacion.js"></script>
 </body>
 
 </html>

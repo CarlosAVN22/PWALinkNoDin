@@ -100,7 +100,7 @@
                                           <div class="field"><label for="perfil-habilidades">Habilidades</label><textarea id="perfil-habilidades" placeholder="Ej. Atención al cliente, Excel, inglés" rows="3" maxlength="500"></textarea></div>
                                           <div class="field"><label for="perfil-resumen">Presentación personal</label><textarea id="perfil-resumen" placeholder="Describe tu experiencia, fortalezas e intereses laborales" rows="4" maxlength="1000"></textarea></div>
                                           <h3>Currículum</h3>
-                                          <div class="field"><label for="perfil-cv">Seleccionar currículum (PDF, DOC o DOCX)</label><input id="perfil-cv" accept=".pdf,.doc,.docx" type="file"><p class="ld-perfil-note">En el prototipo solo guardamos el nombre del archivo. Su contenido no se sube ni se conserva.</p><div class="ld-perfil-cv" id="perfil-cv-info" hidden><span id="perfil-cv-nombre"></span><button type="button" class="btn btn-sm" id="perfil-cv-quitar">Quitar currículum</button></div></div>
+                                          <div class="field"><label for="perfil-cv">Seleccionar currículum (PDF, DOC o DOCX)</label><input id="perfil-cv" accept=".pdf,.doc,.docx" type="file"><p class="ld-perfil-note">Tu currículum se guardará de forma privada y solo estará disponible para accesos autorizados.</p><div class="ld-perfil-cv" id="perfil-cv-info" hidden><span id="perfil-cv-nombre"></span><button type="button" class="btn btn-sm" id="perfil-cv-quitar">Quitar currículum</button></div></div>
                                           <div class="ld-perfil-progreso"><div class="ld-perfil-progreso-top"><strong>Perfil completado</strong><span id="perfil-porcentaje">0%</span></div><div class="ld-perfil-barra"><div id="perfil-barra-valor"></div></div></div>
                                           <p id="perfil-mensaje" class="ld-perfil-mensaje" role="status" aria-live="polite"></p>
                                           <button class="btn btn-primary" type="submit">Guardar perfil</button>
@@ -108,11 +108,11 @@
                             </div>
                      </div>
                      <div class="ld-member-callout">
-                            <div><strong>Tu plan y formación</strong>
-                                   <p>Consulta tu plan o visita los cursos exclusivos Premium.</p>
+                            <div><strong>Tu formación</strong>
+                                   <p>Consulta los cursos gratuitos de formación profesional.</p>
                             </div>
-                            <div class="ld-action-row"><a class="btn btn-primary" href="/doc/general/planes.html">Mi plan</a><a
-                                          class="btn" href="/doc/cursos-foros/cursos.html">Cursos Premium</a></div>
+                            <div class="ld-action-row"><a class="btn btn-primary" href="/doc/cursos-foros/cursos.html">Ver cursos</a><a
+                                          class="btn" href="/doc/cursos-foros/cursos.html">Cursos formativos</a></div>
                      </div>
               </div>
        </main>
@@ -121,14 +121,17 @@
        </footer>
        <script src="/js/app.js">
        </script>
-       <script src="/js/acceso-demo.js"></script>
-     <script src="/js/linknodin.js"></script>
-       <script src="/js/notificaciones.js"></script>
-       <script src="/js/worklink-pendientes.js"></script>
-        <script src="/js/general/perfil.js"></script>
-        <script src="/js/candidato-core.js"></script>
-        <script src="/js/candidato-perfil.js"></script>
+       
+     
+       
+       
+        
+        
+        
 
+    <link href="/css/integrado.css" rel="stylesheet" />
+    <script type="module" src="/js/integrado/perfiles.js"></script>
+    <script type="module" src="/js/integrado/navegacion.js"></script>
 </body>
 
 </html>

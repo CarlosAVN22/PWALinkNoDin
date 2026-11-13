@@ -1,1 +1,11 @@
 .ld-pub-section,.ld-pub-panel{margin-top:24px}.ld-pub-form{display:grid;gap:12px;max-width:800px}.ld-pub-form .field{display:grid;gap:6px}.ld-pub-form input,.ld-pub-form textarea,.ld-pub-form select,.ld-pub-actions select,.ld-pub-actions input{width:100%;padding:11px;border:1px solid #465571;border-radius:8px;background:#162338;color:#edf3ff}.ld-pub-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.ld-pub-actions .btn{white-space:nowrap}.ld-pub-review{align-items:flex-start;gap:18px}.ld-pub-list .rowcard{margin:10px 0}.ld-pub-section .panel,.ld-pub-panel{background:#172438;color:#eaf0fa}.ld-pub-form textarea{resize:vertical;min-height:100px}@media(max-width:700px){.ld-pub-review{display:block}.ld-pub-actions{margin-top:12px}}
+
+/* Etapa 7: categorías accesibles sin buscar entre reportes */
+.ln-forum-admin{scroll-margin-top:100px;margin-bottom:22px!important;}
+.ln-forum-admin .ln-admin-section{background:var(--ln-surface-soft)!important;}
+.ln-forum-admin .ln-admin-section h3{color:var(--ln-text)!important;margin:0 0 10px;font-size:18px;}
+.ln-forum-admin .ln-category-controls{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap;}
+.ln-forum-admin .ln-category-controls input{flex:1 1 260px;min-width:0;width:auto;}
+.ln-forum-admin .ln-category-controls button{min-height:44px;}
+.ln-forum-admin .rowcard{display:flex;justify-content:space-between;gap:12px;align-items:center;}
+@media(max-width:700px){.ln-forum-admin .rowcard{flex-wrap:wrap;}}
