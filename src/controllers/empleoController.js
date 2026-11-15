@@ -28,9 +28,3 @@ export const removeSavedJob = (req, res, next) =>
         services.removeSavedJob(req.userContext, req.params.jobId));
 
 
-export const getCompanyJobs = (req, res, next) =>
-    respond(req, res, next, () => services.getCompanyJobs(req.userContext));
-
-
-export const publishJob = (req, res, next) =>
-    respond(req, res, next, () => services.publishJob(req.userContext, req.body));

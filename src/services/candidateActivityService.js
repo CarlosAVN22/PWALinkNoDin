@@ -176,6 +176,16 @@ export async function enviarPostulacion(context, body) {
   }
 
   const jobId = idValido(body.jobId);
+
+  const previa = await consultar(context.client.from("applications")
+    .select("id")
+    .eq("candidate_id", context.candidateId)
+    .eq("job_id", jobId)
+    .maybeSingle());
+  if (previa) {
+    throw new ServiceError("CONFLICT", "Ya enviaste tu postulación a esta vacante. Puedes consultar su estado desde Mis postulaciones.");
+  }
+
   const carta = body.coverLetter ?? "";
   const respuestas = body.answers ?? [];
 
@@ -228,23 +238,70 @@ export async function enviarPostulacion(context, body) {
     }
   }
 
-  const previa = await consultar(context.client.from("applications")
-    .select("id")
-    .eq("candidate_id", context.candidateId)
-    .eq("job_id", jobId)
-    .maybeSingle());
-
-  if (previa) {
-    throw new ServiceError(
-      "CONFLICT", "Ya te postulaste a esta vacante."
-    );
+  try {
+    await consultar(context.client.rpc("ln26_postular", {
+      p_job_id: jobId,
+      p_cover_letter: carta.trim() || null,
+      p_answers: answers
+    }));
+  } catch (error) {
+    if (error instanceof ServiceError && error.code === "CONFLICT") {
+      throw new ServiceError("CONFLICT", "Ya enviaste tu postulación a esta vacante. Puedes consultar su estado desde Mis postulaciones.");
+    }
+    throw error;
   }
 
-  await consultar(context.client.rpc("ln26_postular", {
-    p_job_id: jobId,
-    p_cover_letter: carta.trim() || null,
-    p_answers: answers
-  }));
-
   return { submitted: true };
+}
+
+async function ownedCandidateApplication({ client, candidateId }, rawId) {
+  const applicationId = idValido(rawId);
+  const application = await consultar(client.from("applications")
+    .select("id,job_id,candidate_id,status,applied_at")
+    .eq("id", applicationId).eq("candidate_id", candidateId).maybeSingle());
+  if (!application) throw new ServiceError("NOT_FOUND", "No se encontró esta postulación.");
+  const job = await consultar(client.from("jobs")
+    .select("id,title,company_id").eq("id", application.job_id).single());
+  const company = await consultar(client.from("companies")
+    .select("id,user_id,commercial_name").eq("id", job.company_id).single());
+  return { application, job, company };
+}
+
+export async function listarMensajesPostulacion(context, rawId) {
+  const { application } = await ownedCandidateApplication(context, rawId);
+  const messages = await consultar(context.client.from("application_messages")
+    .select("id,sender_user_id,body,created_at,read_at")
+    .eq("application_id", application.id).order("created_at", { ascending: true }));
+  const unread = messages.filter(message => message.sender_user_id !== context.candidateId && !message.read_at).map(message => message.id);
+  if (unread.length) await context.client.from("application_messages")
+    .update({ read_at: new Date().toISOString() }).in("id", unread).eq("application_id", application.id);
+  const { company } = await ownedCandidateApplication(context, rawId);
+  return messages.map(message => ({ ...message, name: message.sender_user_id === context.candidateId ? "Tú" : company.commercial_name || "Empresa", role: message.sender_user_id === context.candidateId ? "candidato" : "empresa", is_mine: message.sender_user_id === context.candidateId }));
+}
+
+export async function enviarMensajePostulacion(context, rawId, input) {
+  const { application, job, company } = await ownedCandidateApplication(context, rawId);
+  const body = typeof input?.body === "string" ? input.body.trim() : "";
+  if (!body || body.length > 4000) throw new ServiceError("BAD_REQUEST", "Escribe un mensaje de hasta 4,000 caracteres.");
+  const message = await consultar(context.client.from("application_messages").insert({
+    application_id: application.id,
+    sender_user_id: context.candidateId,
+    body,
+  }).select("id,application_id,sender_user_id,body,created_at,read_at").single());
+  const notice = await context.client.from("notifications").insert({
+    user_id: company.user_id,
+    notification_type: "application_message",
+    title: "Nuevo mensaje de candidato",
+    message: `Nuevo mensaje sobre ${job.title}.`,
+    target_url: "/doc/empresa/empresa-candidatos.html",
+  });
+  if (notice.error) console.warn("No se pudo crear la notificación del mensaje:", notice.error.message);
+  return message;
+}
+
+export async function historialPostulacionCandidato(context, rawId) {
+  const { application } = await ownedCandidateApplication(context, rawId);
+  return consultar(context.client.from("application_status_history")
+    .select("id,status,note,changed_at")
+    .eq("application_id", application.id).order("changed_at", { ascending: true }));
 }

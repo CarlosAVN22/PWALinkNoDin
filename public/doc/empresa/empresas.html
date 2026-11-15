@@ -53,26 +53,28 @@
     </header>
     <main>
         <div class="container">
-            <h1 class="page-title">
-                Empresas que están contratando
-            </h1>
-            <p class="lead">
-                Conoce las organizaciones y revisa las vacantes que ofrecen.
-            </p>
-            <section class="wl-section">
-                <div class="wl-heading">
+            <section class="company-directory" aria-labelledby="company-directory-title">
+                <div class="company-directory-heading">
                     <div>
-                        <h2>Empresas que están contratando</h2>
-                        <p>Explora sus perfiles y las valoraciones de la comunidad.</p>
-                    </div>
-                    <div><button class="wl-arrow" type="button" data-company-prev aria-label="Anterior">←</button>
-                        <button class="wl-arrow" type="button" data-company-next aria-label="Siguiente">→</button>
+                        <p class="company-eyebrow">OPORTUNIDADES Y ORGANIZACIONES</p>
+                        <h1 class="page-title" id="company-directory-title">Explora empresas</h1>
+                        <p class="lead">Conoce quién está detrás de las oportunidades y encuentra empresas que buscan talento.</p>
                     </div>
                 </div>
-                <div class="wl-company-carousel" data-company-carousel>
-                    <p class="muted">Cargando empresas verificadas...</p>
+                <div class="company-directory-filters" aria-label="Buscar y filtrar empresas">
+                    <label class="company-search-field"><span>Buscar empresa</span><input id="company-search" type="search" placeholder="Nombre, sector o ubicación" autocomplete="off"></label>
+                    <label><span>Sector</span><select id="company-sector-filter"><option value="">Todos los sectores</option></select></label>
+                    <label><span>Departamento</span><select id="company-location-filter"><option value="">Todos los departamentos</option></select></label>
+                    <label><span>Vacantes</span><select id="company-hiring-filter"><option value="all">Todas las empresas</option><option value="hiring">Contratando</option><option value="none">Sin vacantes activas</option></select></label>
+                    <label><span>Ordenar</span><select id="company-sort"><option value="jobs">Más vacantes</option><option value="name">Nombre A–Z</option></select></label>
                 </div>
-                <p class="wl-note">Explora los perfiles de empresas verificadas registradas en LinkNoDin.</p>
+                <div class="company-directory-summary"><p id="company-directory-count" aria-live="polite">Cargando empresas verificadas…</p><a href="/doc/empleo/empleos.html">Explorar todas las vacantes →</a></div>
+                <div class="company-directory-grid" id="company-directory-list" aria-live="polite" aria-busy="true">
+                    <article class="company-directory-skeleton" aria-hidden="true"><span class="ld-skeleton ld-skeleton-line short"></span><span class="ld-skeleton ld-skeleton-line medium"></span><span class="ld-skeleton ld-skeleton-line"></span></article>
+                    <article class="company-directory-skeleton" aria-hidden="true"><span class="ld-skeleton ld-skeleton-line short"></span><span class="ld-skeleton ld-skeleton-line medium"></span><span class="ld-skeleton ld-skeleton-line"></span></article>
+                    <article class="company-directory-skeleton" aria-hidden="true"><span class="ld-skeleton ld-skeleton-line short"></span><span class="ld-skeleton ld-skeleton-line medium"></span><span class="ld-skeleton ld-skeleton-line"></span></article>
+                </div>
+                <nav class="company-directory-pagination" id="company-directory-pages" aria-label="Paginación de empresas" hidden></nav>
             </section>
 
         </div>
@@ -88,7 +90,6 @@
     
     
     <script type="module" src="/js/integrado/portales.js"></script>
-    <script src="/js/general/empresa-carousel.js"></script>
     <script type="module" src="/js/integrado/navegacion.js"></script>
 </body>
 

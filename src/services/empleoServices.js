@@ -37,16 +37,6 @@ async function candidate(context) {
     return user;
 }
 
-async function company(context) {
-    const user = await account(context);
-    if (user.role_id !== 2) throw new HttpError(403, "Se requiere una cuenta empresarial.");
-    const companies = check(await context.client.from("companies")
-        .select("id,verification_status").eq("user_id", user.id));
-    const verified = companies.find(item => item.verification_status === "verified");
-    if (!verified) throw new HttpError(403, "La empresa debe estar verificada.");
-    return { userId: user.id, companyId: verified.id };
-}
-
 export async function getJobs(context) {
     const client = context?.client || publicClient();
     const [jobsResult, companiesResult] = await Promise.all([
@@ -94,31 +84,3 @@ export async function removeSavedJob(context, value) {
     return { job_id: jobId, saved: false };
 }
 
-export async function getCompanyJobs(context) {
-    const owned = await company(context);
-    return check(await context.client.from("jobs")
-        .select("id,title,city,status").eq("company_id", owned.companyId)
-        .order("created_at", { ascending: false }).limit(10));
-}
-
-export async function publishJob(context, values) {
-    const owned = await company(context);
-    const payload = { ...(values?.job || {}) };
-    const questions = values?.questions || [];
-    if (!Array.isArray(questions) || questions.length > 5 ||
-        !questions.every(question => typeof question === "string")) {
-        throw new HttpError(400, "Las preguntas no son válidas.");
-    }
-    if (typeof payload.title !== "string" || payload.title.trim().length < 3 ||
-        !payload.city || !payload.summary || !payload.requirements) {
-        throw new HttpError(400, "Completa los campos principales de la vacante.");
-    }
-    payload.company_id = owned.companyId;
-    payload.created_by = owned.userId;
-    payload.status = "active";
-    payload.published_at = new Date().toISOString();
-    return check(await context.client.rpc("ln26_publicar_vacante", {
-        p_job: payload,
-        p_questions: questions.map(question => question.trim()).filter(Boolean),
-    }));
-}

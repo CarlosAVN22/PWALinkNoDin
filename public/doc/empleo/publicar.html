@@ -131,12 +131,12 @@
                             <div class="grid2">
                                 <div class="field"><label for="job-department">Departamento</label><select id="job-department" name="departamento" required><option value="">Selecciona departamento</option><option>Ahuachapán</option><option>Cabañas</option><option>Chalatenango</option><option>Cuscatlán</option><option>La Libertad</option><option>La Paz</option><option>La Unión</option><option>Morazán</option><option>San Miguel</option><option>San Salvador</option><option>San Vicente</option><option>Santa Ana</option><option>Sonsonate</option><option>Usulután</option></select></div>
                                 <div class="field"><label for="job-city">Municipio o ciudad</label><input id="job-city" name="ciudad" maxlength="80" placeholder="Ej. Santa Tecla" required></div>
-                                <div class="field"><label for="job-address">Dirección o zona</label><input id="job-address" name="direccion" maxlength="180" placeholder="Colonia, calle, número de local o parque empresarial"></div>
+                                <div class="field"><label for="job-address">Dirección o zona</label><input id="job-address" name="direccion" maxlength="180" placeholder="Colonia, calle, número de local o parque empresarial"><button id="job-address-search" class="btn btn-soft btn-sm" type="button">Buscar ubicación</button></div>
                                 <div class="field"><label for="job-reference">Punto de referencia (opcional)</label><input id="job-reference" name="referencia" maxlength="160" placeholder="Ej. frente al parque central"></div>
                             </div>
                             <label class="job-check"><input id="job-map-private" name="ubicacionAproximada" type="checkbox" checked> Mostrar solo la ubicación aproximada en el mapa</label>
                             <div id="job-location-map" class="job-location-map" role="application" aria-label="Mapa para seleccionar la ubicación del trabajo"></div>
-                            <small class="ld-muted">El mapa y la sugerencia de direccion usan OpenStreetMap. Verifica los datos antes de publicar.</small>
+                            <small class="ld-muted">El mapa y la búsqueda de direcciones usan OpenStreetMap y se limitan a El Salvador. Escribe una dirección y pulsa “Buscar ubicación” o Enter.</small>
                             <p id="job-location-status" class="ld-muted" aria-live="polite">Selecciona un punto del mapa para indicar la ubicación exacta; puedes mover el marcador después.</p>
                             <input type="hidden" name="latitud"><input type="hidden" name="longitud">
                         </fieldset>

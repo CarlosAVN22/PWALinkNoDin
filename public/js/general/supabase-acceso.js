@@ -1,5 +1,6 @@
 import { supabase } from '/js/supabase-config.js';
 import { generalRequest } from '/js/general/api-general.js';
+import { companyRequest } from '/js/empresa/api-empresa.js';
 
 const formLogin = document.getElementById('ld-login');
 const formRegister = document.getElementById('ld-register');
@@ -51,6 +52,9 @@ if (formLogin) {
         try {
             const {data, error} = await supabase.auth.signInWithPassword({email,password});
             if (error) throw error;
+            if (data.user?.user_metadata?.account_type === 'company') {
+                await companyRequest('/onboard','POST',{authUserId:data.user.id});
+            }
             const perfil = await loadProfile(data.user);
             const role = cacheForOldPages(perfil, data.user.email.toLowerCase());
             message('Inicio de sesión correcto.', 'success');
@@ -107,6 +111,7 @@ if (formRegister) {
 
         button.disabled = true;
         message('Creando cuenta en Supabase...');
+        let authUserCreated = false;
         try {
             const {data: current, error: currentError} = await supabase.auth.getUser();
             if (currentError && currentError.name !== 'AuthSessionMissingError') throw currentError;
@@ -133,6 +138,10 @@ if (formRegister) {
             });
             if (error) throw error;
             if (!data.user) throw new Error('No se pudo confirmar la creación de la cuenta.');
+            authUserCreated = true;
+            if (isCompany) {
+                await companyRequest('/onboard','POST',{authUserId:data.user.id});
+            }
             if (!data.session) {
                 return message('Solicitud recibida. Si tu correo requiere confirmación, revísalo antes de iniciar sesión.', 'success');
             }
@@ -140,12 +149,15 @@ if (formRegister) {
             const perfil = await loadProfile(data.user);
             if (isCompany && perfil.rol !== 'company') {
                 await supabase.auth.signOut();
-                throw new Error('No se asignó el perfil empresarial. Comprueba que ejecutaste el SQL de registro de empresas antes de registrarte.');
+                throw new Error('No se pudo preparar tu cuenta empresarial. Inténtalo de nuevo.');
             }
             const role = cacheForOldPages(perfil, data.user.email.toLowerCase());
             location.assign(destination(role));
         } catch (error) {
             let detail = error.message || 'Error desconocido';
+            if (isCompany && authUserCreated) {
+                detail = 'Tu cuenta ya se creó. Inicia sesión cuando confirmes el correo para completar el registro de la empresa.';
+            }
             if (detail.includes('User already registered')) detail = 'Ese correo ya está registrado. Usa Iniciar sesión.';
             if (detail.includes('email rate limit exceeded')) detail = 'Se alcanzó el límite de correos de Supabase. Revisa la configuración del proveedor Email.';
             message('No se pudo registrar: ' + detail, 'error');

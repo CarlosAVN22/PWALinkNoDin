@@ -12,7 +12,10 @@ import {
   saveJob,
   deleteSaved,
   getApplications,
-  postApplication
+  postApplication,
+  getApplicationMessages,
+  postApplicationMessage,
+  getApplicationHistory
 } from "../controllers/candidateController.js";
 
 export function createCandidateRouter() {
@@ -32,6 +35,9 @@ export function createCandidateRouter() {
 
   router.get("/applications", getApplications);
   router.post("/applications", postApplication);
+  router.get("/applications/:applicationId/history", getApplicationHistory);
+  router.get("/applications/:applicationId/messages", getApplicationMessages);
+  router.post("/applications/:applicationId/messages", postApplicationMessage);
 
   return router;
 }

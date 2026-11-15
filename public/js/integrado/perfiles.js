@@ -1,4 +1,5 @@
 import {supabase,$,dom,run,who,status,messageError} from './base.js';
+import {companyRequest} from '/js/empresa/api-empresa.js';
 const mapping={
  'company-name':'commercial_name','company-legal-name':'legal_name','company-sector':'sector',
  'company-size':'employee_range','company-founded':'founded_year','company-department':'department',
@@ -124,11 +125,10 @@ async function personal(){
  },true);
 }
 async function enterprise(){
- const form=$('company-profile-form');if(!form)return;
+ const form=$('company-profile-form'),loading=$('company-profile-loading');if(!form)return;
  const me=await who(),notice=$('company-profile-status');
- if(!me||me.role_id!==2){status(notice,'Inicia sesión como empresa.',true);return;}
- const company=(await run(supabase.from('companies').select('*').eq('user_id',me.id)))[0];
- if(!company){status(notice,'No se encontró la empresa asociada.',true);return;}
+ if(!me||me.role_id!==2){if(loading){loading.setAttribute('aria-busy','false');loading.replaceChildren(dom('h2','','Acceso al perfil empresarial'),dom('p','muted','Inicia sesión con una cuenta de empresa para consultar este perfil.'));}return;}
+ const company=await companyRequest('/profile');
  for(const [id,col] of Object.entries(mapping))if($(id))$(id).value=company[col]??'';
  const preview=form.querySelector('[data-company-public-preview]');if(preview)preview.href='/doc/empresa/empresa-detalle.html?empresa='+company.id;
  const logo=$('company-logo-file'),remove=$('company-logo-remove'),container=$('company-profile-logo-preview');
@@ -144,16 +144,16 @@ async function enterprise(){
   logo.disabled=true;const old=logoPath;const path=`${me.uid}/${crypto.randomUUID()}.${file.name.split('.').pop().toLowerCase()}`;
   try{
    const uploaded=await supabase.storage.from('company-logos').upload(path,file,{contentType:file.type,upsert:false});if(uploaded.error)throw uploaded.error;
-   try{await run(supabase.from('companies').update({logo_storage_key:path}).eq('id',company.id));}
+   try{await companyRequest('/profile','PATCH',{logo_storage_key:path});}
    catch(e){await supabase.storage.from('company-logos').remove([path]);throw e;}
    logoPath=path;logoPreview();status(notice,'Logo actualizado correctamente.');
    if(old)await supabase.storage.from('company-logos').remove([old]);
-  }catch(e){status(notice,'No se pudo subir el logo. Revisa que exista el almacenamiento company-logos y vuelve a intentarlo. Detalle: '+messageError(e),true);}finally{logo.disabled=false;logo.value='';}
+  }catch(e){status(notice,'No se pudo actualizar el logo. Inténtalo de nuevo.',true);}finally{logo.disabled=false;logo.value='';}
  });
  if(remove)remove.onclick=async()=>{
   if(!logoPath)return;const old=logoPath;remove.disabled=true;
-  try{await run(supabase.from('companies').update({logo_storage_key:null}).eq('id',company.id));logoPath=null;logoPreview();await supabase.storage.from('company-logos').remove([old]);status(notice,'Logo eliminado.');}
-  catch(e){status(notice,messageError(e),true);}finally{remove.disabled=false;}
+  try{await companyRequest('/profile','PATCH',{logo_storage_key:null});logoPath=null;logoPreview();await supabase.storage.from('company-logos').remove([old]);status(notice,'Logo eliminado.');}
+  catch(e){status(notice,'No se pudo quitar el logo. Inténtalo de nuevo.',true);}finally{remove.disabled=false;}
  };
  function progress(){const elements=['company-name','company-sector','company-department','company-city','company-public-email','company-description'];const complete=elements.filter(k=>$(k)?.value.trim()).length;
  const label=$('company-profile-progress-label'),bar=$('company-profile-progress');if(label)label.textContent=Math.round(complete/elements.length*100)+'%';if(bar)bar.style.width=(complete/elements.length*100)+'%';
@@ -167,9 +167,11 @@ async function enterprise(){
    const el=$(id);if(!el)continue;const value=el.value.trim();values[col]=col==='founded_year'?(value?Number(value):null):value||null;
   }
   values.updated_at=new Date().toISOString();
-  try{await run(supabase.from('companies').update(values).eq('id',company.id));status(notice,'Perfil empresarial actualizado correctamente.');progress();}
-  catch(e){status(notice,messageError(e),true);}finally{btn.disabled=false;}
+  try{await companyRequest('/profile','PATCH',values);status(notice,'Perfil empresarial actualizado correctamente.');progress();}
+  catch(e){status(notice,'No se pudo guardar el perfil. Inténtalo de nuevo.',true);}finally{btn.disabled=false;}
  },true);
+ if(loading){loading.hidden=true;loading.removeAttribute('aria-busy');}
+ form.hidden=false;
 }
-async function start(){try{await personal();await enterprise();}catch(e){console.error('Error de perfil:',e);status($('perfil-mensaje')||$('company-profile-status'),messageError(e),true);}}
+async function start(){try{await personal();await enterprise();}catch(e){const loading=$('company-profile-loading');if(loading){loading.setAttribute('aria-busy','false');loading.replaceChildren(dom('h2','','No se pudo cargar el perfil'),dom('p','muted','Revisa tu conexión e inténtalo de nuevo.'));const retry=dom('button','btn btn-primary','Reintentar');retry.type='button';retry.addEventListener('click',()=>location.reload());loading.append(retry);}else status($('perfil-mensaje')||$('company-profile-status'),'No se pudo cargar el perfil. Inténtalo de nuevo.',true);}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();

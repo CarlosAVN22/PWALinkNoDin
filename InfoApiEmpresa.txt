@@ -1,0 +1,62 @@
+LinkNoDin - API de la cuenta empresarial
+Actualizado: 14/11/2026
+
+BASE LOCAL
+----------
+http://localhost:3001/api/v1/company
+
+REGISTRO EMPRESARIAL
+--------------------
+POST  /onboard   {"authUserId":"UUID devuelto por Supabase Auth"}
+  Valida la identidad y los metadatos de registro, y crea el perfil LND y la
+  empresa pendiente si aún no existen. Es idempotente para completar registros
+  existentes. Requiere SUPABASE_SECRET_KEY solo en el servidor.
+
+AUTENTICACIÓN Y AUTORIZACIÓN
+----------------------------
+Las rutas de perfil, vacantes y postulaciones requieren:
+  Authorization: Bearer <access_token de Supabase>
+
+`POST /onboard` valida la identidad de Auth con la clave del servidor y no
+requiere que la cuenta ya tenga una sesión activa.
+
+El middleware valida la sesión, exige un usuario LND activo con role_id = 2
+y resuelve la empresa asociada al usuario autenticado. Perfil admite empresas
+pendientes; vacantes y postulaciones requieren verification_status = verified.
+
+PERFIL
+------
+GET   /profile
+PATCH /profile
+  Solo acepta campos del perfil propio. No permite cambiar user_id ni el estado
+  de verificación. La clave del logo debe estar bajo el UID de la sesión.
+
+VACANTES
+--------
+GET   /vacancies
+POST  /vacancies
+  Body: {"job": {...}, "questions": ["Pregunta"]}
+  Publica mediante ln26_publicar_vacante; company_id y created_by se derivan
+  de la sesión del servidor.
+PATCH /vacancies/:vacancyId/status
+  Body: {"status":"active"|"closed"}
+  Solo afecta vacantes de la empresa autenticada.
+
+POSTULACIONES
+-------------
+GET   /applications
+GET   /applications/:applicationId
+GET   /applications/:applicationId/answers
+GET   /applications/:applicationId/cv
+  Devuelve URL firmada de cinco minutos solo si la postulación corresponde a
+  una vacante de la empresa.
+PATCH /applications/:applicationId/status
+  Body: {"status":"received"|"reviewing"|"interview"|"selected"|"rejected"}
+  Solo afecta postulaciones de vacantes propias.
+
+RESPUESTA
+---------
+Las respuestas siguen el formato {"data": ...}. Los errores usan el formato
+JSON común del errorHandler. Códigos habituales: 400 entrada inválida; 401
+sesión ausente/no válida; 403 rol, estado o verificación no permitidos; 404
+empresa, vacante o postulación inexistente; 500 error inesperado.

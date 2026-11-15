@@ -4,7 +4,8 @@ const companyFields        = "id, commercial_name, sector, public_email, city, v
 const verificationStatuses = new Set(["pending", "verified", "rejected"]);
 
 export async function listAdminCompanies(adminContext) {
-    const { data, error } = await adminContext.client
+    const client = adminContext.adminClient || adminContext.client;
+    const { data, error } = await client
         .from("companies")
         .select(companyFields)
         .order("created_at", { ascending: false });
@@ -34,7 +35,8 @@ export async function updateCompanyVerification(adminContext, companyId, status)
         throw new ServiceError("NOT_FOUND", "No se encontro la empresa o el cambio fue rechazado.");
     }
 
-    const { data: company, error: readError } = await adminContext.client
+    const client = adminContext.adminClient || adminContext.client;
+    const { data: company, error: readError } = await client
         .from("companies")
         .select(companyFields)
         .eq("id", companyId)

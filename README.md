@@ -14,13 +14,13 @@ Versión integrada del portal de empleos, empresas, postulaciones, CV privado, c
 1. Respalda la base de datos.
 2. En **SQL Editor**, ejecuta `database/03_catalogos_complementarios.sql` para poblar habilidades y guías.
 3. En **SQL Editor**, ejecuta `database/04_complementos_frontend.sql` para habilitar logos empresariales públicos con permiso de escritura del propietario y limpieza de metadatos CV. Esta migración **añade la columna** `companies.logo_storage_key` y el bucket `company-logos` público. No modifica la privacidad de `candidate-cvs` ni `course-videos`.
-4. Revisa Data API: deben estar expuestas las tablas de la aplicación y las funciones `ln26_admin_verificar_empresa`, `ln26_publicar_vacante`, `ln26_postular`, `ln26_respuestas_postulacion`, `ln26_forum_author_names` y `ln_applicant_directory` (el SQL define las funciones; Data API puede requerir configurar esquemas expuestos y permisos). Las políticas RLS se mantienen como fuente de autorización.
+4. Revisa Data API: deben estar disponibles las tablas de la aplicación y las funciones `ln26_admin_verificar_empresa`, `ln26_publicar_vacante`, `ln26_postular`, `ln26_respuestas_postulacion`, `ln26_forum_author_names` y `ln_applicant_directory`.
 5. En **Authentication → URL Configuration**, agrega `http://localhost:3000/doc/general/restablecer.html` y `http://localhost:3000/doc/general/login.html` a las URL de redirección autorizadas; agrega además tus URLs reales de hosting con HTTPS. Comprueba que Email auth y el proveedor de envíos estén funcionando.
 6. Verifica que `candidate-cvs` (máximo 5 MB) y `course-videos` (máximo 30 MB) sigan siendo **privados**. `company-logos` es público a propósito. Nunca pongas la `service_role` key en JavaScript, HTML o Git.
 
 ## Iniciar la aplicación
 
-Completa `.env` con `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`. Para desarrollo local, el backend permite por defecto el origen `http://localhost:3000`; si publicas el frontend en otro origen, configura `FRONTEND_ORIGIN` con su URL exacta.
+Completa `.env` con `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` y `SUPABASE_SECRET_KEY`. La clave secreta se usa solo en el servidor para crear el perfil y la ficha de una empresa nueva. Para desarrollo local, el backend permite por defecto el origen `http://localhost:3000`; si publicas el frontend en otro origen, configura `FRONTEND_ORIGIN` con su URL exacta.
 
 Si aún no instalaste las dependencias, ejecuta `npm install`. Después, inicia cada proceso en una terminal distinta:
 
@@ -38,13 +38,13 @@ Si el API se despliega en otra URL, configura el `meta` `lnd-api-base-url` en la
 
 ## Modulo MVC de perfil propio
 
-`GET /api/v1/me` es un piloto de solo lectura para probar Node con Supabase usando una cuenta normal de LND, sin requerir rol admin. El flujo es ruta → middleware (valida el token Supabase) → controlador → servicio (consulta `public.users`). La politica `user_self_read` debe estar aplicada; RLS limita la lectura al perfil del usuario autenticado. No se modifican datos.
+`GET /api/v1/me` es un piloto de solo lectura para consultar el perfil de la cuenta activa. El flujo es ruta → middleware → controlador → servicio (consulta `public.users`). No modifica datos.
 
 Configura `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` en `.env` usando los valores publicos ya presentes en `public/js/supabase-config.js`.
 
 Para probarlo con Postman, inicia la API con `npm run dev:api` y envía `GET http://localhost:3001/api/v1/me` con el access token de una cuenta normal de LND en `Authorization: Bearer <access_token>`. Se espera HTTP 200 y un objeto `data` con el perfil propio. No se requiere rol admin y la ruta no modifica datos.
 
-La consulta depende de la politica RLS `user_self_read`, los permisos de lectura y la función `linknodin_user_id()`.
+La ruta requiere una sesión activa y un perfil existente.
 
 ## Modulo MVC de administracion
 
@@ -74,18 +74,35 @@ Las rutas requieren `Authorization: Bearer <access_token>` de una cuenta con rol
 
 Las respuestas incluyen `meta.dataSource: "supabase"`. Las páginas de empresas, moderación de reportes, categorías y cursos, temas de foro, panel principal y estadísticas usan estas rutas. La gestión de usuarios y las páginas de seguridad siguen fuera de este módulo API. Las estadísticas no incluyen conteos de usuarios, vacantes ni postulaciones.
 
-El middleware valida el usuario y el rol con `public.linknodin_role`. Los servicios consultan las tablas permitidas y usan el RPC existente `ln26_admin_verificar_empresa` para verificar empresas. La autorización final depende de RLS y de las funciones expuestas a la Data API. La integración está implementada, pero aún falta validarla con una cuenta admin contra el proyecto remoto.
+El middleware valida el usuario y el rol con `public.linknodin_role`. Los servicios consultan las tablas necesarias y usan el RPC `ln26_admin_verificar_empresa` para verificar empresas. La integración aún debe validarse con una cuenta admin del proyecto.
 
 Ya se comprobó con una cuenta normal que Node puede validar una sesión y leer el perfil propio. Eso no prueba el rol admin ni las operaciones de escritura. Para validar la integración administrativa, inicia sesión en el frontend con una cuenta admin de LND y revisa las páginas conectadas. Ya no se incluyen pruebas automatizadas locales ni modo demo.
+
+## Módulo MVC de cuenta empresarial
+
+La cuenta empresarial usa `/api/v1/company`. La lectura y edición de perfil admite empresas pendientes; vacantes, postulaciones y CV requieren que la empresa esté verificada.
+
+- `GET|PATCH /profile`: consultar o actualizar el perfil propio.
+- `POST /onboard`: completar de forma idempotente la ficha empresarial después de registrarse o iniciar sesión.
+- `GET|POST /vacancies`: listar vacantes propias o publicar usando `ln26_publicar_vacante`.
+- `PATCH /vacancies/:vacancyId/status`: activar o cerrar una vacante propia.
+- `GET /applications`: listar postulaciones de vacantes propias.
+- `GET /applications/:applicationId`: detalle de una postulación propia.
+- `GET /applications/:applicationId/answers`: respuestas a preguntas adicionales.
+- `GET /applications/:applicationId/cv`: URL firmada de corta duración para el CV autorizado.
+- `PATCH /applications/:applicationId/status`: actualizar el estado de la postulación.
+
+El flujo está organizado en `src/routes/company.js`, `src/controllers/companyController.js`, `src/services/companyService.js` y `src/middleware/companyAuth.js`. El archivo `public/js/empresa/api-empresa.js` centraliza las solicitudes desde el frontend. La carga del logo y su asociación al perfil están integradas con el almacenamiento y el API.
 
 ## Rutas y módulos principales
 
 - `public/js/general/supabase-acceso.js`: inicio de sesión y registro por Supabase Auth.
-- `public/js/integrado/navegacion.js`: navegación y controles visuales por sesión real; las solicitudes directas del frontend a Supabase siguen protegidas por RLS.
+- `public/js/integrado/navegacion.js`: navegación y controles visuales por sesión real.
 - `public/js/admin/admin-empresas-supabase.js`: aprobación empresarial mediante `ln26_admin_verificar_empresa`.
 - `public/js/admin/admin-reportes-supabase.js`: administración de reportes y moderación.
 - `public/js/integrado/empleos.js`: catálogo, filtros, mapas, publicación `ln26_publicar_vacante`, postulación `ln26_postular`, respuestas `ln26_respuestas_postulacion`, guardados y estados.
 - `public/js/integrado/perfiles.js`: perfil candidato/empresa, habilidades, CV privado y logo público (requiere ambos SQL complementarios).
+- `public/js/empresa/api-empresa.js`: cliente frontend de la API de cuenta empresarial.
 - `public/js/integrado/portales.js`: paneles de candidatos/empresas, directorio y detalle de empresas, mapa.
 - `public/js/cursos-foros/*`: foros, cursos, categorías y lecciones adicionales.
 - `public/js/integrado/{recursos,recurso-detalle,guia-real,opiniones,notificaciones,seguridad}.js`: contenidos reales y administración.
@@ -109,6 +126,6 @@ Ya se comprobó con una cuenta normal que Node puede validar una sesión y leer 
 - Los **planes y pagos** no procesan cobros reales. Es una sección informativa, no una pasarela.
 - No se han migrado registros antiguos de `localStorage` a PostgreSQL; los datos reales deben ingresarse en Supabase.
 - No se ejecutaron pruebas de extremo a extremo de las operaciones administrativas contra el Supabase privado del equipo.
-- **Revisar RLS y todos los casos de `FUNCIONALIDADESPENDIENTES.txt` antes de declararlo listo para entrega**. No subir directamente a `main` sin revisión y respaldo.
+- **Revisar todos los casos de `FUNCIONALIDADESPENDIENTES.txt` antes de declararlo listo para entrega**. No subir directamente a `main` sin revisión y respaldo.
 
 Consulta `CAMBIOS_Y_PRUEBAS.md` para conocer archivos, verificaciones y límites del paquete.

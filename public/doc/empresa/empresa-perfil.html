@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="es">
 
@@ -77,7 +77,16 @@
                     </a>
                 </aside>
                 <div class="content">
-                    <form class="panel demo-form company-profile-form" id="company-profile-form">
+                    <section class="panel company-profile-loading" id="company-profile-loading" aria-label="Cargando el perfil empresarial" aria-busy="true">
+                        <div class="company-profile-form-head"><div><span class="ld-skeleton company-profile-skeleton-title"></span><span class="ld-skeleton company-profile-skeleton-line medium"></span></div><span class="ld-skeleton company-profile-skeleton-button"></span></div>
+                        <section class="company-profile-section"><span class="ld-skeleton company-profile-skeleton-heading"></span><span class="ld-skeleton company-profile-skeleton-line medium"></span><div class="company-profile-loading-logo"><span class="ld-skeleton"></span><span class="ld-skeleton company-profile-skeleton-line"></span></div><div class="company-profile-loading-grid"><span class="ld-skeleton company-profile-skeleton-field"></span><span class="ld-skeleton company-profile-skeleton-field"></span><span class="ld-skeleton company-profile-skeleton-field"></span><span class="ld-skeleton company-profile-skeleton-field"></span></div></section>
+                        <section class="company-profile-section"><span class="ld-skeleton company-profile-skeleton-heading"></span><span class="ld-skeleton company-profile-skeleton-line medium"></span><div class="company-profile-loading-grid"><span class="ld-skeleton company-profile-skeleton-field"></span><span class="ld-skeleton company-profile-skeleton-field"></span><span class="ld-skeleton company-profile-skeleton-field"></span><span class="ld-skeleton company-profile-skeleton-field"></span><span class="ld-skeleton company-profile-skeleton-field"></span></div></section>
+                        <section class="company-profile-section"><span class="ld-skeleton company-profile-skeleton-heading"></span><div class="company-profile-loading-grid"><span class="ld-skeleton company-profile-skeleton-field"></span><span class="ld-skeleton company-profile-skeleton-field"></span></div></section>
+                        <section class="company-profile-section"><span class="ld-skeleton company-profile-skeleton-heading"></span><div class="company-profile-loading-grid"><span class="ld-skeleton company-profile-skeleton-area"></span><span class="ld-skeleton company-profile-skeleton-area short"></span></div></section>
+                        <span class="ld-skeleton company-profile-skeleton-progress"></span>
+                        <span class="ld-skeleton company-profile-skeleton-button"></span>
+                    </section>
+                    <form class="panel demo-form company-profile-form" id="company-profile-form" hidden>
                         <div class="company-profile-form-head">
                             <div><p class="company-eyebrow">PRESENCIA DE TU EMPRESA</p><h2>Completa el perfil de tu empresa</h2><p>Esta informacion ayuda a las personas candidatas a conocer quien publica las vacantes.</p></div>
                             <a class="btn btn-soft" href="/doc/empresa/empresa-detalle.html" data-company-public-preview>Ver perfil publico</a>

@@ -10,7 +10,10 @@ import {
   agregarGuardado,
   eliminarGuardado,
   listarPostulaciones,
-  enviarPostulacion
+  enviarPostulacion,
+  listarMensajesPostulacion,
+  enviarMensajePostulacion,
+  historialPostulacionCandidato
 } from "../services/candidateActivityService.js";
 
 function responder(operacion, codigo = 200) {
@@ -60,4 +63,17 @@ export const getApplications = responder(
 export const postApplication = responder(
   (contexto, params, body) => enviarPostulacion(contexto, body),
   201
+);
+
+export const getApplicationMessages = responder(
+  (contexto, params) => listarMensajesPostulacion(contexto, params.applicationId)
+);
+
+export const postApplicationMessage = responder(
+  (contexto, params, body) => enviarMensajePostulacion(contexto, params.applicationId, body),
+  201
+);
+
+export const getApplicationHistory = responder(
+  (contexto, params) => historialPostulacionCandidato(contexto, params.applicationId)
 );

@@ -11,9 +11,9 @@ Todas las rutas requieren:
   Authorization: Bearer <access_token de Supabase>
 
 El middleware valida el token, consulta el perfil LND y exige estado active y
-role_id = 3. También exige SUPABASE_SECRET_KEY en el entorno de Node. La clave
-secreta se usa solo en servidor para operaciones administrativas de Auth y BD;
-nunca se envía al navegador. El frontend usa public/js/admin/admin-api.js.
+role_id = 3. Las operaciones que requieren acceso privilegiado de servidor
+necesitan SUPABASE_SECRET_KEY en el entorno de Node. La clave secreta nunca se
+envía al navegador. El frontend usa public/js/admin/admin-api.js.
 
 Respuesta habitual:
   {"data": <resultado>, "meta": {"dataSource": "supabase"}}

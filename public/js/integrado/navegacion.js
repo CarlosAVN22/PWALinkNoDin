@@ -1,4 +1,4 @@
-/* Navegación y control visual de acceso. Las políticas RLS son la autoridad final. */
+/* Navegación y controles de sesión. */
 import {supabase} from '/js/supabase-config.js';
 const path=location.pathname;
 const guarded={
@@ -32,7 +32,11 @@ async function init(){
   if(!actions.querySelector('[data-ln-panel]')){const a=document.createElement('a');a.className='btn btn-sm';a.dataset.lnPanel='';a.href=destinations[role];a.textContent='Mi panel';actions.append(a);}
   if(!actions.querySelector('[data-ln-logout]')){const b=document.createElement('button');b.className='btn btn-soft btn-sm';b.type='button';b.textContent='Cerrar sesión';b.dataset.lnLogout='';b.addEventListener('click',async()=>{
     b.disabled=true;const {error}=await supabase.auth.signOut();
-    if(error){alert('No se pudo cerrar sesión: '+error.message);b.disabled=false;return;}
+    if(error){
+      let feedback=actions.querySelector('[data-ln-logout-feedback]');
+      if(!feedback){feedback=document.createElement('small');feedback.dataset.lnLogoutFeedback='';feedback.setAttribute('role','status');actions.append(feedback);}
+      feedback.textContent='No se pudo cerrar sesión. Inténtalo de nuevo.';b.disabled=false;return;
+    }
     Object.keys(localStorage).filter(k=>k.startsWith('linknodin-v3-')).forEach(k=>localStorage.removeItem(k));
     location.assign('/doc/general/index.html');
   });actions.append(b);}

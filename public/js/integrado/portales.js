@@ -1,4 +1,6 @@
 import {supabase,dom,run,who,money,date,status,messageError} from './base.js';
+import {companyRequest} from '/js/empresa/api-empresa.js';
+import {empleoRequest} from '/js/empleo/api-empleo.js';
 const $=id=>document.getElementById(id);
 const url='/doc/empresa/empresa-detalle.html?empresa=';
 function link(label,href,cls='btn'){const x=dom('a',cls,label);x.href=href;return x;}
@@ -35,30 +37,70 @@ async function companyPanel(){
  const me=await who();if(!me||me.role_id!==2)return;
  const parent=document.querySelector('main .content');if(!parent)return;
  hideSections('main .content .stats,main .content .panel');
- const root=rootIn('main .content','Panel empresarial');if(!root)return;
- const companies=await run(supabase.from('companies').select('id,commercial_name,verification_status').eq('user_id',me.id));
- if(!companies.length){root.append(dom('p','muted','No se encontró un registro empresarial vinculado a tu cuenta.'));return;}
- const company=companies[0],jobs=await run(supabase.from('jobs').select('id,title,status,created_at').eq('company_id',company.id));
- const ids=jobs.map(j=>j.id);
- const apps=ids.length?await run(supabase.from('applications').select('id,job_id,status,applied_at').in('job_id',ids).order('applied_at',{ascending:false})):[];
+ const root=rootIn('main .content','Panel empresarial');if(!root)return;root.setAttribute('aria-busy','true');
+ const loading=dom('div','ln-admin-summary');for(let i=0;i<3;i++){const card=dom('div','ln-integ-card ld-skeleton-card');card.setAttribute('aria-hidden','true');card.append(dom('span','ld-skeleton ld-skeleton-stat'),dom('span','ld-skeleton ld-skeleton-line medium'));loading.append(card);}root.append(loading,dom('span','ld-skeleton ld-skeleton-line medium'));
+ const company=await companyRequest('/profile');
+ const [jobs,apps]=company.verification_status==='verified'
+  ? await Promise.all([companyRequest('/vacancies'),companyRequest('/applications')])
+  : [[],[]];
+ root.replaceChildren(dom('h2','','Panel empresarial'));root.removeAttribute('aria-busy');
  root.append(dom('p','muted',`${company.commercial_name} · Estado de verificación: ${company.verification_status}`));
  if(company.verification_status!=='verified')root.append(dom('p','muted','Solo las empresas verificadas pueden publicar vacantes y cursos.'));
  const stats=dom('div','ln-admin-summary');for(const [name,value] of [['Vacantes activas',jobs.filter(j=>j.status==='active').length],['Postulaciones',apps.length],['En revisión',apps.filter(a=>a.status==='reviewing').length]]){
   const card=dom('div','ln-integ-card');card.append(dom('h3','',String(value)),dom('p','',name));stats.append(card);
  }root.append(stats,dom('h3','','Postulaciones recientes'));
  for(const a of apps.slice(0,6)){
-  const card=dom('article','ln-integ-card');card.append(dom('strong','',jobs.find(j=>j.id===a.job_id)?.title||'Vacante'),dom('p','muted',`Estado: ${a.status} · ${date(a.applied_at)}`),link('Ver postulantes','/doc/empresa/empresa-candidatos.html'));root.append(card);
+  const card=dom('article','ln-integ-card');card.append(dom('strong','',a.job_title||'Vacante'),dom('p','muted',`Estado: ${a.status} · ${date(a.applied_at)}`),link('Ver postulantes','/doc/empresa/empresa-candidatos.html'));root.append(card);
  }if(!apps.length)root.append(dom('p','muted','Aún no has recibido postulaciones.'));
  root.append(link('Administrar mis vacantes','/doc/empresa/empresa-vacantes.html','btn btn-primary'));
 }
 async function companyDirectory(){
- const main=document.querySelector('main .container');if(!main)return;
- hideSections('main .wl-section,main .cards');
- const root=rootIn('main .container','Empresas verificadas');
- const data=await run(supabase.from('companies').select('id,commercial_name,sector,city,description').eq('verification_status','verified').order('commercial_name'));
- if(!data.length)root.append(dom('p','muted','Todavía no hay empresas verificadas.'));
- const cards=dom('div','cards');
- for(const c of data){const card=dom('article','card');card.append(dom('h3','',c.commercial_name),dom('p','muted',[c.sector,c.city].filter(Boolean).join(' · ')),dom('p','',c.description||'Consulta la información publicada por esta empresa.'),link('Ver perfil',url+encodeURIComponent(c.id),'btn btn-primary'));cards.append(card);}root.append(cards);
+ const root=$('company-directory-list'),count=$('company-directory-count');if(!root)return;
+ const [companies,jobs]=await Promise.all([
+  run(supabase.from('companies').select('id,commercial_name,sector,city,department,description,employee_range,founded_year,logo_storage_key').eq('verification_status','verified').order('commercial_name')),
+  empleoRequest('/jobs'),
+ ]);
+ const activeCounts=new Map();for(const job of jobs)activeCounts.set(job.company_id,(activeCounts.get(job.company_id)||0)+1);
+ const rows=companies.map(company=>({...company,activeJobs:activeCounts.get(company.id)||0}));
+ const sector=$('company-sector-filter'),department=$('company-location-filter');
+ const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es');
+ let currentPage=1;const pageSize=9,pagination=$('company-directory-pages');
+ function options(select,values,label){for(const value of [...new Set(values.filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'))){const option=document.createElement('option');option.value=value;option.textContent=value;select.append(option);}select.setAttribute('aria-label',label);}
+ options(sector,rows.map(row=>row.sector),'Filtrar empresas por sector');options(department,rows.map(row=>row.department),'Filtrar empresas por departamento');
+ const search=$('company-search'),hiring=$('company-hiring-filter'),sort=$('company-sort');
+ function render(){
+  const query=normalize(search.value.trim()),selectedSector=sector.value,selectedDepartment=department.value;
+  let visible=rows.filter(company=>{
+   const text=normalize([company.commercial_name,company.sector,company.city,company.department,company.description].join(' '));
+   return (!query||text.includes(query))&&(!selectedSector||company.sector===selectedSector)&&(!selectedDepartment||company.department===selectedDepartment)&&(hiring.value==='all'||(hiring.value==='hiring'?company.activeJobs>0:company.activeJobs===0));
+  });
+  visible.sort(sort.value==='name'?(a,b)=>a.commercial_name.localeCompare(b.commercial_name,'es'):(a,b)=>b.activeJobs-a.activeJobs||a.commercial_name.localeCompare(b.commercial_name,'es'));
+  root.replaceChildren();root.setAttribute('aria-busy','false');
+  const contratando=rows.filter(company=>company.activeJobs>0).length;
+  count.textContent=`${visible.length} ${visible.length===1?'empresa encontrada':'empresas encontradas'} · ${contratando} ${contratando===1?'empresa con vacantes':'empresas con vacantes'}`;
+  if(!visible.length){pagination.hidden=true;const empty=dom('div','company-directory-empty');empty.append(dom('span','company-directory-empty-icon','⌕'),dom('h2','','No encontramos empresas'),dom('p','muted','Prueba con otro nombre o cambia los filtros.'));const clear=dom('button','btn btn-soft','Limpiar filtros');clear.type='button';clear.addEventListener('click',()=>{search.value='';sector.value='';department.value='';hiring.value='all';sort.value='jobs';render();});empty.append(clear);root.append(empty);return;}
+  const pageCount=Math.ceil(visible.length/pageSize);currentPage=Math.min(currentPage,pageCount);
+  for(const company of visible.slice((currentPage-1)*pageSize,currentPage*pageSize)){
+   const card=dom('article','company-directory-card');
+   const top=dom('div','company-directory-card-top'),brand=dom('div','company-directory-brand');
+   if(company.logo_storage_key){const image=document.createElement('img');image.src=supabase.storage.from('company-logos').getPublicUrl(company.logo_storage_key).data.publicUrl;image.alt='';image.loading='lazy';image.addEventListener('error',()=>{image.replaceWith(dom('span','company-directory-initials',company.commercial_name.slice(0,1).toLocaleUpperCase('es')));},{once:true});brand.append(image);}
+   else brand.append(dom('span','company-directory-initials',company.commercial_name.slice(0,1).toLocaleUpperCase('es')));
+   top.append(brand);card.append(top);
+   card.append(dom('h2','company-directory-name',company.commercial_name));
+   const meta=dom('p','company-directory-meta',[company.sector,company.city||company.department].filter(Boolean).join(' · ')||'Empresa registrada en El Salvador');card.append(meta);
+   card.append(dom('p','company-directory-description',company.description||'Conoce el perfil y las oportunidades de esta empresa.'));
+   const facts=dom('div','company-directory-facts');const vacancyFact=dom('div','company-directory-vacancy-count');vacancyFact.append(dom('strong','',String(company.activeJobs)),dom('span','',company.activeJobs===1?'vacante activa':'vacantes activas'));facts.append(vacancyFact);
+   if(company.employee_range)facts.append(dom('span','company-directory-size',company.employee_range));
+   if(company.founded_year)facts.append(dom('span','company-directory-founded',`Desde ${company.founded_year}`));
+   const actions=dom('div','company-directory-actions'),profile=link('Ver perfil',url+encodeURIComponent(company.id),'btn btn-soft');actions.append(profile);
+   const offers=link(company.activeJobs?'Ver vacantes':'Conocer empresa',url+encodeURIComponent(company.id)+'#wl-company-jobs',company.activeJobs?'btn btn-primary':'btn btn-soft');actions.append(offers);
+   card.append(facts,actions);root.append(card);
+  }
+  pagination.replaceChildren();pagination.hidden=pageCount<2;
+  if(pageCount>1){const previous=dom('button','btn btn-soft','← Anterior');previous.type='button';previous.disabled=currentPage===1;previous.addEventListener('click',()=>{currentPage--;render();});const label=dom('span','',`Página ${currentPage} de ${pageCount}`);const next=dom('button','btn btn-soft','Siguiente →');next.type='button';next.disabled=currentPage===pageCount;next.addEventListener('click',()=>{currentPage++;render();});pagination.append(previous,label,next);}
+ }
+ for(const control of [search,sector,department,hiring,sort])control.addEventListener(control===search?'input':'change',()=>{currentPage=1;render();});
+ render();
 }
 async function companyDetail(){
  const params=new URLSearchParams(location.search),id=Number(params.get('empresa')||params.get('id'));
@@ -130,6 +172,7 @@ async function init(){
   if(p.endsWith('/empresa/empresas.html'))await companyDirectory();
   if(p.endsWith('/empresa/empresa-detalle.html'))await companyDetail();
   if(p.endsWith('/empleo/mapa-empleos.html'))await mapJobs();
- }catch(error){console.error('Portales LinkNoDin:',error);const main=document.querySelector('main');main?.prepend(dom('p','ld-status','No se pudieron cargar los datos: '+messageError(error)));}
+ }catch(error){const directory=$('company-directory-list');if(directory){directory.replaceChildren();directory.removeAttribute('aria-busy');const empty=dom('div','company-directory-empty');empty.append(dom('span','company-directory-empty-icon','!'),dom('h2','','No se pudo cargar el directorio'),dom('p','muted','Revisa tu conexión e inténtalo de nuevo.'));const retry=dom('button','btn btn-primary','Reintentar');retry.type='button';retry.addEventListener('click',()=>location.reload());empty.append(retry);directory.append(empty);const count=$('company-directory-count');if(count)count.textContent='';}
+  else{const root=$('ln-live-portal');if(root){root.removeAttribute('aria-busy');root.replaceChildren(dom('h2','','Panel empresarial'),dom('p','ld-status','No se pudo cargar la información de tu empresa. Recarga la página para intentarlo de nuevo.'));}else{const main=document.querySelector('main');main?.prepend(dom('p','ld-status','No se pudo cargar esta sección. Inténtalo de nuevo.'));}}}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();

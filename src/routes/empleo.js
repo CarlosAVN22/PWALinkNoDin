@@ -15,8 +15,5 @@ export function createEmpleoRouter() {
     router.get("/saved", requireUser, controller.getSavedJobs);
     router.post("/saved/:jobId", requireUser, controller.saveJob);
     router.delete("/saved/:jobId", requireUser, controller.removeSavedJob);
-    router.get("/company/jobs", requireUser, controller.getCompanyJobs);
-    router.post("/company/jobs", requireUser, controller.publishJob);
-
     return router;
 }

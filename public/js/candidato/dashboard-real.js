@@ -10,9 +10,18 @@ mensaje.className = "muted";
 mensaje.setAttribute("role", "status");
 contenido.prepend(mensaje);
 
-// Evitar mostrar estadísticas del prototipo.
-estadisticas.hidden = true;
-panel.hidden = true;
+// Mantener el diseño visible y sustituir los datos de muestra por esqueletos.
+estadisticas.setAttribute("aria-busy", "true");
+panel.setAttribute("aria-busy", "true");
+panel.querySelectorAll(".job").forEach(fila => {
+  fila.replaceChildren();
+  fila.classList.add("ld-skeleton-card");
+  const line = document.createElement("span");
+  line.className = "ld-skeleton ld-skeleton-line medium";
+  const subline = document.createElement("span");
+  subline.className = "ld-skeleton ld-skeleton-line short";
+  fila.append(line, subline);
+});
 
 function actualizarEstadistica(indice, nombre, cantidad) {
   const elemento = estadisticas.querySelectorAll(".stat")[indice];
@@ -125,12 +134,13 @@ async function cargarDashboard() {
 
     estadisticas.hidden = false;
     panel.hidden = false;
+    estadisticas.removeAttribute("aria-busy");
+    panel.removeAttribute("aria-busy");
     mensaje.textContent = "";
 
   } catch (error) {
     console.error("Dashboard candidato:", error);
-    mensaje.textContent =
-      "No se pudo cargar el dashboard: " + error.message;
+    mensaje.textContent = "No se pudieron cargar los datos. Recarga la página para intentarlo de nuevo.";
   }
 }
 

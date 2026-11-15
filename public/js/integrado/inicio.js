@@ -6,7 +6,7 @@ async function init(){
  if(!location.pathname.endsWith('/general/index.html'))return;
  const featured=$('ld-featured'),carousel=document.querySelector('[data-company-carousel]');
  const {companies,jobs,reviews:homeReviews}=await generalRequest('/home');
- const names=new Map(companies.map(c=>[c.id,c.commercial_name]));
+ const companiesById=new Map(companies.map(c=>[c.id,c]));
  if(carousel){carousel.replaceChildren();
   for(const c of companies){const a=dom('a','wl-company-tile');a.href='/doc/empresa/empresa-detalle.html?empresa='+c.id;
    if(c.logo_storage_key){const image=dom('img');image.alt='Logo de '+c.commercial_name;image.src=supabase.storage.from('company-logos').getPublicUrl(c.logo_storage_key).data.publicUrl;a.append(image);}
@@ -17,8 +17,16 @@ async function init(){
   for(const [selector,direction] of [['[data-company-prev]',-1],['[data-company-next]',1]])document.querySelector(selector)?.addEventListener('click',()=>carousel.scrollBy({left:direction*280,behavior:'smooth'}));
  }
  if(featured){featured.replaceChildren();
-  const today=new Date().toISOString().slice(0,10);const active=jobs.filter(job=>names.has(job.company_id)&&(!job.application_deadline||job.application_deadline>=today)).slice(0,6);
-  for(const job of active){const row=dom('article','ln-integ-card');row.append(dom('h3','',job.title),dom('p','muted',`${names.get(job.company_id)} · ${job.city||'El Salvador'} · ${job.modality||''}`),link('Ver empleo','/doc/empleo/detalle-empleo.html?id='+job.id,'btn btn-primary'));featured.append(row);}
+  const today=new Date().toISOString().slice(0,10);const active=jobs.filter(job=>companiesById.has(job.company_id)&&(!job.application_deadline||job.application_deadline>=today)).slice(0,6);
+  for(const job of active){
+   const company=companiesById.get(job.company_id),row=dom('article','ln-integ-card ld-home-featured-job'),brand=dom('div','ld-home-featured-brand'),logo=dom('span','ld-home-featured-logo');
+   const initials=(company.commercial_name||'E').trim().charAt(0).toLocaleUpperCase('es');
+   if(company.logo_storage_key){const image=dom('img');image.src=supabase.storage.from('company-logos').getPublicUrl(company.logo_storage_key).data.publicUrl;image.alt='Logo de '+company.commercial_name;image.loading='lazy';image.addEventListener('error',()=>logo.replaceChildren(dom('span','ld-home-featured-initial',initials)),{once:true});logo.append(image);}
+   else logo.append(dom('span','ld-home-featured-initial',initials));
+   brand.append(logo,dom('span','ld-home-featured-company',company.commercial_name));
+   row.append(brand,dom('h3','',job.title),dom('p','muted',[job.city||'El Salvador',job.modality].filter(Boolean).join(' · ')),link('Ver empleo','/doc/empleo/detalle-empleo.html?id='+job.id,'btn btn-primary'));
+   featured.append(row);
+  }
   if(!active.length)featured.append(dom('p','muted','Pronto habrá nuevas oportunidades de empleo publicadas.'));
  }
 

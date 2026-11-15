@@ -61,19 +61,14 @@ export function createAdminAuth() {
             }
 
             const secretKey = process.env.SUPABASE_SECRET_KEY;
-            if (!secretKey) {
-                res.status(503).json({
-                    error: "Configura SUPABASE_SECRET_KEY en el entorno del servidor para la API administrativa.",
-                });
-                return;
-            }
-
-            const adminClient = createClient(supabaseUrl, secretKey, {
-                auth: {
-                    autoRefreshToken: false,
-                    persistSession: false,
-                },
-            });
+            const adminClient = secretKey
+                ? createClient(supabaseUrl, secretKey, {
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false,
+                    },
+                })
+                : null;
 
             req.adminContext = {
                 dataSource: "supabase",
