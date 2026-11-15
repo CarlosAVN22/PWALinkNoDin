@@ -50,6 +50,9 @@ function renderAlerts(openAlerts) {
     host.replaceChildren();
 
     $('[data-security-count="alerts"]').textContent = String(openAlerts);
+    const alertNote = $("[data-security-alerts-note]");
+    alertNote.classList.toggle("security-stat-warning", openAlerts > 0);
+    alertNote.textContent = openAlerts > 0 ? "Requieren revisión" : "Sin alertas pendientes";
     if (!alerts.length) {
         const empty = document.createElement("p");
         empty.className = "muted";
@@ -90,6 +93,9 @@ function renderActivity(totalActivity) {
     const body = $("[data-security-activity]");
     body.replaceChildren();
     $('[data-security-count="activity"]').textContent = String(totalActivity);
+    $("[data-security-latest]").textContent = activity.length
+        ? date(activity[0].occurred_at)
+        : "Sin registros";
 
     if (!activity.length) {
         const row = document.createElement("tr");
@@ -155,6 +161,7 @@ function applyActivityFilters() {
     for (const row of rows) {
         const event = activity.find(item => String(item.id) === row.dataset.securityRowId);
         const matchesText = !term || [
+            event.event_type,
             event.action,
             event.affected_record,
             event.actor_name,
@@ -165,12 +172,12 @@ function applyActivityFilters() {
         if (!row.hidden) visible += 1;
     }
 
-    $("[data-security-empty]").hidden = visible > 0;
+    $("[data-security-empty]").hidden = activity.length === 0 || visible > 0;
 }
 
 function showAlertDetails(alert) {
     selectedAlertId = alert.id;
-    $("[data-security-detail-title]").textContent = "Detalle de alerta";
+    $("#security-detail-title").textContent = "Detalle de alerta";
     $("[data-detail-action]").textContent = alert.title;
     $("[data-detail-record]").textContent = alert.related_user_id
         ? `Usuario #${alert.related_user_id}`
@@ -186,7 +193,7 @@ function showAlertDetails(alert) {
 
 function showActivityDetails(event) {
     selectedAlertId = null;
-    $("[data-security-detail-title]").textContent = "Detalle de actividad";
+    $("#security-detail-title").textContent = "Detalle de actividad";
     $("[data-detail-action]").textContent = event.action;
     $("[data-detail-record]").textContent = event.affected_record || "—";
     $("[data-detail-date]").textContent = date(event.occurred_at);
@@ -199,8 +206,8 @@ function showActivityDetails(event) {
 async function loadSecurityData() {
     try {
         const data = await adminRequest("/security");
-        alerts = data.alerts;
-        activity = data.activity;
+        alerts = Array.isArray(data.alerts) ? data.alerts : [];
+        activity = Array.isArray(data.activity) ? data.activity : [];
         renderAlerts(data.openAlerts);
         renderActivity(data.totalActivity);
 
@@ -208,11 +215,19 @@ async function loadSecurityData() {
             const checkbox = $(`[data-security-preference="${field}"]`);
             checkbox.checked = data.preferences[field];
         }
-        showStatus("Preferencias, alertas y bitácora actualizadas.");
+        showStatus(
+            `${alerts.length} alerta(s) cargadas. Mostrando ${activity.length} de ${data.totalActivity} acciones registradas.`,
+        );
     } catch (error) {
+        alerts = [];
+        activity = [];
         showStatus(`No se pudo cargar Seguridad y actividad: ${error.message}`, true);
         $("[data-security-alerts]").replaceChildren();
         $("[data-security-activity]").replaceChildren();
+        $('[data-security-count="alerts"]').textContent = "—";
+        $('[data-security-count="activity"]').textContent = "—";
+        $("[data-security-latest]").textContent = "—";
+        $("[data-security-alerts-note]").textContent = "No se pudieron cargar las alertas";
     }
 }
 
@@ -253,28 +268,41 @@ async function reviewSelectedAlert() {
 }
 
 function exportActivity() {
-    const rows = [...document.querySelectorAll("[data-security-row]:not([hidden])")];
-    const csvRows = [["Fecha", "Tipo", "Acción", "Registro", "Responsable", "Detalle"]];
-    for (const row of rows) {
-        const event = activity.find(item => String(item.id) === row.dataset.securityRowId);
-        if (event) {
-            csvRows.push([
-                date(event.occurred_at),
-                event.event_type,
-                event.action,
-                event.affected_record || "",
-                event.actor_name || "",
-                event.details || "",
-            ]);
-        }
+    const rows = [...document.querySelectorAll("[data-security-activity] [data-security-row]:not([hidden])")];
+    const visibleEvents = rows
+        .map(row => activity.find(event => String(event.id) === row.dataset.securityRowId))
+        .filter(Boolean);
+
+    if (!visibleEvents.length) {
+        showStatus("No hay acciones visibles para exportar.");
+        return;
     }
-    const csv = csvRows.map(row => row.map(value =>
-        `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\r\n");
+
+    const csvRows = [["Fecha", "Tipo", "Acción", "Registro", "Responsable", "Detalle"]];
+    for (const event of visibleEvents) {
+        csvRows.push([
+            date(event.occurred_at),
+            event.event_type,
+            event.action,
+            event.affected_record || "",
+            event.actor_name || "",
+            event.details || "",
+        ]);
+    }
+    const csv = "\uFEFF" + csvRows.map(row => row.map(value => {
+        const text = String(value ?? "");
+        const safeText = /^[\t\r ]*[=+\-@]/.test(text) ? `'${text}` : text;
+        return `"${safeText.replaceAll('"', '""')}"`;
+    }).join(",")).join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     const link = document.createElement("a");
-    link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-    link.download = "linknodin-actividad-admin.csv";
+    link.href = url;
+    link.download = `linknodin-actividad-admin-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.append(link);
     link.click();
-    URL.revokeObjectURL(link.href);
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showStatus(`${visibleEvents.length} acción(es) exportadas.`);
 }
 
 async function init() {

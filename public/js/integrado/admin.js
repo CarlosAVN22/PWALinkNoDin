@@ -14,6 +14,10 @@ function number(value) {
     return new Intl.NumberFormat("es-SV").format(value ?? 0);
 }
 
+function percentage(part, total) {
+    return total > 0 ? Math.round((part / total) * 100) : null;
+}
+
 function setText(selector, value) {
     const node = $(selector);
     if (node) node.textContent = value;
@@ -70,32 +74,72 @@ async function loadDashboard(path) {
             }
         } else {
             const metrics = {
-                registeredUsers: ["Usuarios registrados", data.registeredUsers],
-                verifiedCompanies: ["Empresas verificadas", data.verifiedCompanies],
-                activeJobs: ["Vacantes activas", data.activeJobs],
-                openReports: ["Reportes pendientes", data.openReports],
+                registeredUsers: {
+                    label: "Usuarios registrados",
+                    value: number(data.registeredUsers),
+                },
+                verifiedCompanies: {
+                    label: "Empresas verificadas",
+                    value: number(data.verifiedCompanies),
+                },
+                activeJobs: {
+                    label: "Vacantes activas",
+                    value: number(data.activeJobs),
+                },
+                openReports: {
+                    label: "Reportes pendientes",
+                    value: number(data.openReports),
+                },
+                candidateProfiles: {
+                    label: "Perfiles de candidato",
+                    value: number(data.candidateProfiles),
+                },
+                pendingCompanies: {
+                    label: "Empresas pendientes de verificación",
+                    value: number(data.pendingCompanies),
+                },
+                jobs: {
+                    label: "Vacantes registradas",
+                    value: number(data.jobs),
+                },
+                forumTopics: {
+                    label: "Temas de foro",
+                    value: number(data.forumTopics),
+                },
+                publishedCourses: {
+                    label: "Cursos publicados",
+                    value: `${number(data.publishedCourses)} de ${number(data.courses)}`,
+                },
+                resolvedReports: {
+                    label: "Reportes resueltos",
+                    value: `${number(data.resolvedReports)} de ${number(data.totalReports)}`,
+                },
             };
             $(".content .stats")?.querySelectorAll(".stat").forEach((node, index) => {
-                const item = Object.values(metrics)[index];
+                const item = Object.values(metrics).slice(0, 4)[index];
                 if (!item) return;
                 const label = node.querySelector("small");
                 const value = node.querySelector("strong");
-                if (label) label.textContent = item[0];
-                if (value) value.textContent = number(item[1]);
+                if (label) label.textContent = item.label;
+                if (value) value.textContent = item.value;
             });
-            for (const [key, [label, value]] of Object.entries(metrics)) {
-                setText(`[data-admin-stat="${key}"]`, number(value));
-                setText(`[data-admin-stat-label="${key}"]`, label);
+            for (const [key, metric] of Object.entries(metrics)) {
+                setText(`[data-admin-stat="${key}"]`, metric.value);
+                setText(`[data-admin-stat-label="${key}"]`, metric.label);
             }
-            setText('[data-admin-stat="candidateProfiles"]', number(data.candidateProfiles));
-            setText(
-                '[data-admin-stat="resolvedReports"]',
-                `${number(data.resolvedReports)} de ${number(data.totalReports)}`,
-            );
             setText(
                 "[data-admin-insight]",
                 `${number(data.pendingCompanies)} empresa(s) pendiente(s) de verificación.`,
             );
+            for (const [key, rate] of Object.entries({
+                verifiedCompanyRate: percentage(data.verifiedCompanies, data.companies),
+                activeJobRate: percentage(data.activeJobs, data.jobs),
+                resolvedReportRate: percentage(data.resolvedReports, data.totalReports),
+            })) {
+                setText(`[data-admin-stat="${key}"]`, rate === null ? "—" : `${rate}%`);
+                const bar = $(`[data-admin-stat-bar="${key}"]`);
+                if (bar) bar.style.width = `${rate ?? 0}%`;
+            }
         }
         showStatus(status, "Información actualizada desde Supabase.");
     } catch (error) {
@@ -207,6 +251,13 @@ function openUserModal(user, save) {
     name.value = user?.fullName || "";
     email.value = user?.email || "";
     email.readOnly = Boolean(user);
+    state.replaceChildren();
+    for (const [value, label] of [["active", "Activo"], ["suspended", "Suspendido"]]) {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        state.append(option);
+    }
     state.value = user?.status || "active";
     state.disabled = !user;
     role.replaceChildren();
