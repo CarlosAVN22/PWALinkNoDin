@@ -189,14 +189,26 @@ candidato, empresa pendiente, empresa verificada y administrador:
 
 ---
 
-## Contribuidores
+<div align="center">
+  <h2>Nuestro equipo</h2>
+  <p><em>Contribuidores de LinkNoDin</em></p>
+</div>
 
-| Integrante                        | Carnét        |
-| --------------------------------- | ------------- |
-| Kevin Alexander Salazar Estrada   | `2024-SE-651` |
-| Javier Alexander Martinez Vasquez | `2025-MV-652` |
-| Carlos Alfredo Vejar Noguera      | `2024-VN-601` |
-| Marlin Yolanda Afane Vasquez      | `2024-AV-601` |
+<table align="center" border="1" cellpadding="10" cellspacing="0">
+  <caption><strong>Equipo de desarrollo</strong></caption>
+  <thead>
+    <tr>
+      <th align="center">Integrante</th>
+      <th align="center">Carnét</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td align="center"> Kevin Alexander Salazar Estrada</td><td align="center"><code>2024-SE-651</code></td></tr>
+    <tr><td align="center"> Javier Alexander Martinez Vasquez</td><td align="center"><code>2025-MV-652</code></td></tr>
+    <tr><td align="center"> Carlos Alfredo Vejar Noguera</td><td align="center"><code>2024-VN-601</code></td></tr>
+    <tr><td align="center"> Marlin Yolanda Afane Vasquez</td><td align="center"><code>2024-AV-601</code></td></tr>
+  </tbody>
+</table>
 
 <p align="center">
   <img src="public/img/logo.png" alt="Logo de LinkNoDin" width="150">
